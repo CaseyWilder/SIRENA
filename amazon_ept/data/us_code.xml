@@ -1,0 +1,1144 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<odoo noupdate="1">
+    <record id="SLC1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SLC1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SLC3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SLC3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SLC4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SLC4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="HSL1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">HSL1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CAE1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CAE1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="GSP1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">GSP1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="OKC1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">OKC1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CLT3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CLT3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CLT4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CLT4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="RDU1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">RDU1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MSP1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MSP1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MEM2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MEM2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="STL8" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">STL8</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BOS1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BOS1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PHX3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PHX3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PHX5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PHX5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PHX6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PHX6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PHX7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PHX7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PHX8" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PHX8</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PHX9" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PHX9</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SAZ1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SAZ1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="TFC1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">TFC1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="TUS1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">TUS1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="TUS2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">TUS2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BFL1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BFL1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="FAT1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">FAT1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LAX9" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LAX9</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LGB1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LGB1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LGB3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LGB3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LGB4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LGB4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LGB6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LGB6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LGB7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LGB7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LGB9" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LGB9</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="OAK3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">OAK3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="OAK4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">OAK4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="OAK6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">OAK6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ONT2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ONT2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ONT3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ONT3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ONT4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ONT4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ONT7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ONT7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ONT6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ONT6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="HLA3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">HLA3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ONT9" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ONT9</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PCA1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PCA1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PCA2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PCA2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PSP1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PSP1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SCK1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SCK1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SCK3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SCK3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SJC7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SJC7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SMF1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SMF1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SMF3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SMF3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SNA4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SNA4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SNA6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SNA6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SNA9" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SNA9</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="DCA2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">DCA2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SNA7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SNA7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SNA8" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SNA8</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LGB5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LGB5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="KRB1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">KRB1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="XUSD" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">XUSD</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="DDV5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">DDV5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="DEN2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">DEN2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="DEN3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">DEN3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BDL2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BDL2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BDL3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BDL3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PHL1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PHL1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PHL3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PHL3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PHL7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PHL7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PHL9" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PHL9</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PHL8" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PHL8</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="TPA2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">TPA2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LAL1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LAL1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="TPA1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">TPA1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="JAX2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">JAX2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="JAX3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">JAX3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MCO1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MCO1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MIA1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MIA1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="UFL4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">UFL4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SFL1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SFL1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ATL2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ATL2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ATL7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ATL7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ATL8" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ATL8</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MGE1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MGE1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MGE7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MGE7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MGE3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MGE3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PGA1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PGA1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SAV3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SAV3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="HMW1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">HMW1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MDW4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MDW4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MDW6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MDW6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MDW7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MDW7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MDW8" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MDW8</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MDW9" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MDW9</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PIL1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PIL1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="STL4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">STL4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="STL6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">STL6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="STL7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">STL7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="HLU1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">HLU1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="IND1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">IND1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="IND2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">IND2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="IND3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">IND3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="IND4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">IND4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="IND8" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">IND8</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="IND5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">IND5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="IND7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">IND7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PIN1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PIN1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SDF8" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SDF8</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="XUSE" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">XUSE</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MKC4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MKC4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MKC6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MKC6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CVG1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CVG1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CVG2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CVG2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CVG3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CVG3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CVG8" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CVG8</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="IVSA" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">IVSA</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="IVSB" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">IVSB</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="HCN1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">HCN1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LEX1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LEX1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LEX3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LEX3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LEX2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LEX2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SDF1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SDF1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SDF2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SDF2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SDF4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SDF4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SDF6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SDF6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SDF7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SDF7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SDF9" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SDF9</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BWI2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BWI2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="HBA1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">HBA1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="HSE1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">HSE1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MDT2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MDT2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="DCA1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">DCA1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BOS7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BOS7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="DET1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">DET1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="DET2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">DET2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="DTW1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">DTW1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="GRR1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">GRR1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="RNO3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">RNO3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="RNO4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">RNO4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LAS1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LAS1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LAS2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LAS2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LAS6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LAS6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LAS7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LAS7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="EWR1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">EWR1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="EWR4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">EWR4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="EWR6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">EWR6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="EWR7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">EWR7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="EWR8" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">EWR8</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="EWR9" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">EWR9</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LGA6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LGA6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LGA7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LGA7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LGA9" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LGA9</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="TEB3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">TEB3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="TEB6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">TEB6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ACY1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ACY1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ACY2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ACY2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CMH1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CMH1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CMH2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CMH2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CMH3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CMH3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CMH4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CMH4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CMH6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CMH6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="HCM1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">HCM1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CLE2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CLE2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CLE3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CLE3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="POH1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">POH1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PDX6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PDX6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="HPD1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">HPD1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PDX7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PDX7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PDX9" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PDX9</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="AVP1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">AVP1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="AVP2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">AVP2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="AVP3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">AVP3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="AVP6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">AVP6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="AVP8" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">AVP8</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ABE1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ABE1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ABE2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ABE2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ABE3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ABE3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ABE4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ABE4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ABE5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ABE5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MDT1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MDT1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PHL4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PHL4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PHL5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PHL5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PHL6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PHL6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PPA1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PPA1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="XUSC" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">XUSC</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BNA1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BNA1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BNA2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BNA2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BNA3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BNA3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CHA1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CHA1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CHA2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CHA2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="DAL3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">DAL3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="DFW1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">DFW1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="DFW8" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">DFW8</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="DFW6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">DFW6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="DFW7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">DFW7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="FTW2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">FTW2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="HDA1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">HDA1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="FTW3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">FTW3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="FTW4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">FTW4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="FTW6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">FTW6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="FTW7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">FTW7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="FTW9" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">FTW9</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="FTW8" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">FTW8</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PTX1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PTX1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SAT1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SAT1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SAT2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SAT2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="XUSB" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">XUSB</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="HOU2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">HOU2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="HOU3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">HOU3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BWI4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BWI4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="RIC1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">RIC1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="RIC2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">RIC2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="RIC3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">RIC3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="HRC1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">HRC1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BFI1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BFI1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BFI3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BFI3</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BFI4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BFI4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="GEG1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">GEG1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PWA1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PWA1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SEA6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SEA6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SEA8" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SEA8</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MKE1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MKE1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MKE2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MKE2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ONT5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ONT5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="OAK5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">OAK5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ONT8" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ONT8</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LGB8" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LGB8</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="DEN5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">DEN5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="DEN6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">DEN6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BDL1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BDL1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BDL5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BDL5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MIA5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MIA5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MCO5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MCO5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="JAX5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">JAX5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ATL6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ATL6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MDW2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MDW2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MDW5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MDW5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="IND6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">IND6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MCI1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MCI1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MCI5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MCI5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="TUL1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">TUL1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CVG7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CVG7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CVG5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CVG5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BWI5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BWI5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BOS5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BOS5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="DTW5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">DTW5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MSP5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MSP5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="RNO1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">RNO1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="RNO2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">RNO2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ACY5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ACY5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="EWR5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">EWR5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="LGA8" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">LGA8</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="ABE8" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">ABE8</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BUF5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BUF5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CLT5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CLT5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CLT1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CLT1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="RDU5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">RDU5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CLT2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CLT2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CLE5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CLE5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PDX5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PDX5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PIT5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PIT5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PIT1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PIT1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BNA5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BNA5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="SAT5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">SAT5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="HOU1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">HOU1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BWI1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BWI1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="RIC5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">RIC5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BFI5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BFI5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BFI7" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BFI7</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BFI6" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BFI6</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MKE5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MKE5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BNA4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BNA4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="VUBA" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">VUBA</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="VUGA" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">VUGA</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="MEM4" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MEM4</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="AGS2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">AGS2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="JFK8" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">JFK8</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="GYR1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">GYR1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="CSG1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">CSG1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="DAL2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">DAL2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BOI2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BOI2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="PCW1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">PCW1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="BHM1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">BHM1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="TUL2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">TUL2</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="DSM5" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">DSM5</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+    <record id="AKC1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">AKC1</field>
+        <field name="country_id" ref="base.us"/>
+    </record>
+</odoo>
