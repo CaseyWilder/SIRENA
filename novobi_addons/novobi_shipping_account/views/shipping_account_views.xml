@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_shipping_account_kanban" model="ir.ui.view">
+            <field name="name">shipping.account.kanban</field>
+            <field name="model">shipping.account</field>
+            <field name="arch" type="xml">
+                <kanban quick_create="true" create="true" import="false" class="o_kanban_shipping_account">
+                    <field name="id"/>
+                    <field name="name"/>
+                    <field name="provider"/>
+                    <field name="active"/>
+                    <field name="active_status"/>
+                    <field name="delivery_carrier_ids"/>
+                    <field name="provider_logo_url"/>
+                    <field name="number_of_services"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_card">
+                                <div class="oe_kanban_content">
+                                    <img type="open"
+                                         t-attf-src="#{record.provider_logo_url.raw_value}"
+                                         t-attf-style="float:right;#{record.provider.raw_value == 'ups' and 'width:55px;'
+                                          or record.provider.raw_value == 'usps' and 'width:130px;'
+                                          or record.provider.raw_value == 'shipstation' and 'width:130px;'
+                                          or 'width:80px'}"
+                                         class="oe_kanban_image"
+                                         alt="Logo"/>
+                                    <div class="o_kanban_record_top" style="padding-bottom:30px">
+                                        <div class="oe_kanban_top_left">
+                                            <div class="o_kanban_record_top">
+                                                <h3 class="mt4">
+                                                    <t t-esc="record.name.value"/>
+                                                    <field name="active_status" widget="label_selection"
+                                                       options="{'classes': {'inactive': 'danger', 'active': 'success'}}"/>
+                                                </h3>
+                                            </div>
+                                            <div class="o_kanban_record_bottom">
+                                                <button type="object"
+                                                        style="padding-left:0"
+                                                        name="action_open_service_list"
+                                                        class="btn btn-secondary">
+                                                    <t t-esc="record.number_of_services.raw_value"/> Services</button>
+                                            </div>
+                                        </div>
+                                        <div class="oe_kanban_top_right">
+
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_bottom">
+                                        <div class="oe_kanban_bottom_left">
+                                            <div class="o_kanban_record_top">
+                                                <field name="environment"
+                                                       widget="label_selection"
+                                                       options="{'classes': {'test': 'warning', 'production': 'success'}}"/>
+                                            </div>
+                                        </div>
+                                        <div class="oe_kanban_bottom_right">
+                                            <div class="o_kanban_record_top">
+                                                <button name="action_open_settings_form" type="object" class="btn btn-primary">Settings</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record id="view_shipping_account_form_settings" model="ir.ui.view">
+            <field name="name">shipping.account.form.settings</field>
+            <field name="model">shipping.account</field>
+            <field name="arch" type="xml">
+                <form create="0">
+                    <sheet>
+                        <field name="id" invisible="1"/>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_open_service_list" type="object"
+                                    class="oe_stat_button"
+                                    attrs="{'invisible':[('id','=',False)]}"
+                                    icon="fa-list">
+                                <field name="number_of_services"/>Services
+                            </button>
+                            <button name="toggle_debug_logging" type="object"
+                                    class="oe_stat_button"
+                                    icon="fa-pencil-square-o"
+                                    groups="base.group_no_one">
+                                <field name="debug_logging" widget="boolean_button" options="{'terminology': {
+                                    'string_true': 'Logging Enabled',
+                                    'hover_true': 'Disable Logging',
+                                    'string_false': 'Logging Disabled',
+                                    'hover_false': 'Enable Logging'
+                                }}"/>
+                            </button>
+                            <button name="toggle_prod_environment" type="object"
+                                    class="oe_stat_button"
+                                    icon="fa-check-square">
+                                <field name="prod_environment" widget="boolean_button" options='{"terminology": {
+                                    "string_true": "Production Environment",
+                                    "hover_true": "Switch to Test Environment",
+                                    "string_false": "Test Environment",
+                                    "hover_false": "Switch to Production Environment"
+                                }}'/>
+                            </button>
+                            <button class="oe_stat_button" type="object" name="toggle_active" icon="fa-archive">
+                                <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <label class="oe_edit_only" for="name" string="Name" modifiers="{}"/>
+                            <h1>
+                                <field name="name" placeholder="e.g UPS" required="True"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group class="mt-3">
+                                <field name="provider"
+                                       string="Provider"
+                                       widget="field_radio_selected_value"
+                                       options="{'invisible_values': ['none']}"/>
+                                <field name="label_file_type" attrs="{'invisible':[('provider', '=', 'none')]}"/>
+                            </group>
+                        </group>
+                        <group name="test_connection_btn">
+                            <button name="check_connection" type="object"
+                                    class="btn-secondary"
+                                    string="Test Connection"
+                                    icon="fa-television">
+                            </button>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_shipping_account_form_services" model="ir.ui.view">
+            <field name="name">shipping.account.form.services</field>
+            <field name="model">shipping.account</field>
+            <field name="arch" type="xml">
+                <form create="0">
+                    <sheet>
+                        <div>
+                            <p>Please select services you want to use</p>
+                        </div>
+                        <field name="id" invisible="1"/>
+                        <field name="delivery_carrier_ids"
+                               domain="[('shipping_account_id.id','=',id)]"
+                               nolabel="1" widget="custom_many2many_checkboxes"/>
+                    </sheet>
+                    <footer>
+                        <button string="Update" name="update_selected_services" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_shipping_account_settings" model="ir.actions.act_window">
+            <field name="name">Settings</field>
+            <field name="res_model">shipping.account</field>
+            <field name="view_mode">form</field>
+            <field name="target">current</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('novobi_shipping_account.view_shipping_account_form_settings')})]"/>
+        </record>
+
+        <record id="action_service_lists" model="ir.actions.act_window">
+            <field name="name">Update Services</field>
+            <field name="res_model">shipping.account</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="context">{'form_view_initial_mode': 'edit'}</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('novobi_shipping_account.view_shipping_account_form_services')})]"/>
+        </record>
+
+         <record id="action_shipping_account_kanban" model="ir.actions.act_window">
+            <field name="name">Shipping Accounts</field>
+            <field name="res_model">shipping.account</field>
+            <field name="context">{'active_test': False}</field>
+            <field name="view_mode">kanban,form</field>
+            <field name="view_ids" eval="[(5, 0, 0)]"/>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Create a new shipping account
+              </p>
+            </field>
+        </record>
+
+        <record id="action_custom_packaging_view_list" model="ir.actions.act_window">
+            <field name="name">Custom Packages</field>
+            <field name="res_model">product.packaging</field>
+            <field name="context">{'active_test': False, 'default_is_custom': True}</field>
+            <field name="domain">[('is_custom', '=', True)]</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="novobi_shipping_account.omni_product_packaging_tree"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new custom package type for your choices
+                </p>
+            </field>
+        </record>
+
+        <record id="shipping_account_action_view_kanban" model="ir.actions.act_window.view">
+            <field name="sequence">10</field>
+            <field name="view_mode">kanban</field>
+            <field name="act_window_id" ref="action_shipping_account_kanban"/>
+            <field name="view_id" ref="view_shipping_account_kanban"/>
+        </record>
+
+        <record id="shipping_account_action_view_form" model="ir.actions.act_window.view">
+            <field name="sequence">20</field>
+            <field name="view_mode">form</field>
+            <field name="act_window_id" ref="action_shipping_account_kanban"/>
+            <field name="view_id" ref="view_shipping_account_form_settings"/>
+        </record>
+
+        <!-- Menu in Inventory -->
+        <menuitem action="action_shipping_account_kanban" name="Shipping Accounts"
+                  groups="base.group_system"
+                  id="menu_shipping_account_inventory" parent="delivery.menu_delivery" sequence="1"/>
+
+        <menuitem action="action_custom_packaging_view_list" name="Custom Packages"
+                  groups="base.group_system"
+                  id="menu_custom_package_inventory" parent="delivery.menu_delivery" sequence="2"/>
+
+        <!-- Menu in Sales -->
+        <menuitem action="action_shipping_account_kanban" name="Shipping Accounts"
+                  groups="base.group_system"
+                  id="menu_shipping_account_sale" parent="sale.menu_sales_config" sequence="1"/>
+
+        <menuitem action="action_custom_packaging_view_list" name="Custom Packages"
+                  groups="base.group_system"
+                  id="menu_custom_package_sale" parent="sale.menu_sales_config" sequence="2"/>
+    </data>
+</odoo>

@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_shipping_method_channel_user,shipping.method.channel.user,model_shipping_method_channel,base.group_user,1,0,0,0
+access_shipping_method_channel_stock_user,shipping.method.channel.stock.user,model_shipping_method_channel,stock.group_stock_user,1,0,0,0
+access_shipping_method_channel_admin,shipping.method.channel.admin,model_shipping_method_channel,base.group_system,1,1,1,1
+
+access_shipping_account_user,shipping.account.user,model_shipping_account,base.group_user,1,0,0,0
+access_shipping_account_stock_user,shipping.account.stock.user,model_shipping_account,stock.group_stock_user,1,0,0,0
+access_shipping_account_admin,shipping.account.admin,model_shipping_account,base.group_system,1,1,1,1
+
+access_stock_picking_package_user,stock.picking.package.user,model_stock_picking_package,base.group_user,1,1,1,1
+access_confirm_create_shipping_label_user,confirm.create.shipping.label.user,model_confirm_create_shipping_label,base.group_user,1,1,1,1
+access_update_done_quantities_user,update.done.quantities.user,model_update_done_quantities,base.group_user,1,1,1,1
+

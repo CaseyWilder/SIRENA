@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data noupdate="1">
+        <!--        UPS Shipping Services-->
+        <record id="ups_ground" model="delivery.carrier">
+            <field name="name">UPS Ground</field>
+            <field name="delivery_type">ups</field>
+            <field name="ups_default_service_type">03</field>
+        </record>
+
+        <record id="ups_standard" model="delivery.carrier">
+            <field name="name">UPS Standard</field>
+            <field name="delivery_type">ups</field>
+            <field name="ups_default_service_type">11</field>
+        </record>
+
+        <record id="ups_next_day" model="delivery.carrier">
+            <field name="name">UPS Next Day®</field>
+            <field name="delivery_type">ups</field>
+            <field name="ups_default_service_type">01</field>
+        </record>
+
+        <record id="ups_next_day_am" model="delivery.carrier">
+            <field name="name">UPS Next Day A.M®</field>
+            <field name="delivery_type">ups</field>
+            <field name="ups_default_service_type">14</field>
+        </record>
+
+        <record id="ups_next_day_air_saver" model="delivery.carrier">
+            <field name="name">UPS Next Day Air Saver®</field>
+            <field name="delivery_type">ups</field>
+            <field name="ups_default_service_type">13</field>
+        </record>
+
+        <record id="ups_2nd_day" model="delivery.carrier">
+            <field name="name">UPS 2nd Day®</field>
+            <field name="delivery_type">ups</field>
+            <field name="ups_default_service_type">02</field>
+        </record>
+
+        <record id="ups_2nd_day_am" model="delivery.carrier">
+            <field name="name">UPS 2nd Day A.M®</field>
+            <field name="delivery_type">ups</field>
+            <field name="ups_default_service_type">59</field>
+        </record>
+
+        <record id="ups_3_day_select" model="delivery.carrier">
+            <field name="name">UPS 3 Day Select®</field>
+            <field name="delivery_type">ups</field>
+            <field name="ups_default_service_type">12</field>
+        </record>
+
+        <record id="ups_saver" model="delivery.carrier">
+            <field name="name">UPS Saver®</field>
+            <field name="delivery_type">ups</field>
+            <field name="ups_default_service_type">65</field>
+        </record>
+
+        <record id="ups_worldwide_express" model="delivery.carrier">
+            <field name="name">UPS Worldwide Express®</field>
+            <field name="delivery_type">ups</field>
+            <field name="ups_default_service_type">07</field>
+        </record>
+
+        <record id="ups_worldwide_expedited" model="delivery.carrier">
+            <field name="name">UPS Worldwide Expedited®</field>
+            <field name="delivery_type">ups</field>
+            <field name="ups_default_service_type">08</field>
+        </record>
+
+        <record id="ups_worldwide_express_plus" model="delivery.carrier">
+            <field name="name">UPS Worldwide Express Plus®</field>
+            <field name="delivery_type">ups</field>
+            <field name="ups_default_service_type">54</field>
+        </record>
+
+        <record id="ups_worldwide_express_freight" model="delivery.carrier">
+            <field name="name">UPS Worldwide Express Freight®</field>
+            <field name="delivery_type">ups</field>
+            <field name="ups_default_service_type">96</field>
+        </record>
+        <!--        /UPS Shipping Services-->
+    </data>
+</odoo>
