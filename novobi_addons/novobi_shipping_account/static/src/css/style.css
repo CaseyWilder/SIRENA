@@ -1,0 +1,55 @@
+.loader {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #008784;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 2s linear infinite;
+    display: inline-block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.estimated_shipping_rate_value{
+    color: #008784;
+    font-weight: bolder;
+    font-size: 2rem;
+    /*margin-top: -5px;*/
+}
+
+.estimated_shipping_rate_value{
+    color: #008784;
+    font-weight: bolder;
+    font-size: 2rem;
+    /*margin-top: -5px;*/
+}
+
+.btn-link {
+    cursor: pointer;
+    padding-bottom: 0.8rem !important;
+}
+
+.error-shipping-value {
+    color: #ff6900 !important;
+}
+
+div[name='estimated_shipping_rate'] {
+    margin-top: -0.8rem;
+}
+
+.field_currency_green span[name='shipping_cost'] {
+    color: #008784;
+    font-weight: bolder;
+    font-size: 2rem;
+    margin-top: -3%;
+}
+
+span[name='insurance_cost'] {
+    color: #008784;
+    font-weight: bolder;
+    font-size: 2rem;
+    margin-top: -3%;
+}

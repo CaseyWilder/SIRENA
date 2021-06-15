@@ -1,0 +1,41 @@
+.o_form_view {
+  .o_form_sheet {
+    span[name="merchant_shipping_cost"] {
+      color: #008784;
+      font-weight: bolder;
+      font-size: 2rem;
+      margin-top: -15px;
+    }
+    .other_shipping_information_section {
+      .o_horizontal_separator {
+        font-size: 1.5rem;
+      }
+      .inner_input_section {
+        & > div {
+          &:not(.inner_input_section_header) {
+            width: 94%;
+            margin-left: 5%;
+            & > label {
+              width: 30%;
+            }
+            & > div:last-child, & > input:last-child, & > select:last-child {
+              width: 62%;
+            }
+          }
+          &.inner_input_section_header {
+            & > div:last-child {
+              display: inline-block;
+              width: 94%;
+              & > label {
+                width: 30%;
+              }
+              & > div:last-child, & > input:last-child, & > select:last-child {
+                width: 62%;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

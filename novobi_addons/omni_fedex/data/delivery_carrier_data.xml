@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <!--        FeDex Shipping Services -->
+        <record id="fedex_international_economy" model="delivery.carrier">
+            <field name="name">INTERNATIONAL ECONOMY</field>
+            <field name="delivery_type">fedex</field>
+            <field name="fedex_service_type">INTERNATIONAL_ECONOMY</field>
+        </record>
+
+        <record id="fedex_international_priority" model="delivery.carrier">
+            <field name="name">INTERNATIONAL PRIORITY</field>
+            <field name="delivery_type">fedex</field>
+            <field name="fedex_service_type">INTERNATIONAL_PRIORITY</field>
+        </record>
+
+        <record id="fedex_fedex_ground" model="delivery.carrier">
+            <field name="name">FEDEX GROUND</field>
+            <field name="delivery_type">fedex</field>
+            <field name="fedex_service_type">FEDEX_GROUND</field>
+        </record>
+
+        <record id="fedex_fedex_2_day" model="delivery.carrier">
+            <field name="name">FEDEX 2 DAY</field>
+            <field name="delivery_type">fedex</field>
+            <field name="fedex_service_type">FEDEX_2_DAY</field>
+        </record>
+
+        <record id="fedex_fedex_2_day_am" model="delivery.carrier">
+            <field name="name">FEDEX 2 DAY AM</field>
+            <field name="delivery_type">fedex</field>
+            <field name="fedex_service_type">FEDEX_2_DAY_AM</field>
+        </record>
+
+        <record id="fedex_fedex_3_day_freight" model="delivery.carrier">
+            <field name="name">FEDEX 3 DAY FREIGHT</field>
+            <field name="delivery_type">fedex</field>
+            <field name="fedex_service_type">FEDEX_3_DAY_FREIGHT</field>
+        </record>
+
+        <record id="fedex_first_overnight" model="delivery.carrier">
+            <field name="name">FIRST OVERNIGHT</field>
+            <field name="delivery_type">fedex</field>
+            <field name="fedex_service_type">FIRST_OVERNIGHT</field>
+        </record>
+
+        <record id="fedex_priority_overnight" model="delivery.carrier">
+            <field name="name">PRIORITY OVERNIGHT</field>
+            <field name="delivery_type">fedex</field>
+            <field name="fedex_service_type">PRIORITY_OVERNIGHT</field>
+        </record>
+
+        <record id="fedex_standard_overnight" model="delivery.carrier">
+            <field name="name">STANDARD OVERNIGHT</field>
+            <field name="delivery_type">fedex</field>
+            <field name="fedex_service_type">STANDARD_OVERNIGHT</field>
+        </record>
+
+        <record id="fedex_fedex_next_day_early_morning" model="delivery.carrier">
+            <field name="name">FEDEX NEXT DAY EARLY MORNING</field>
+            <field name="delivery_type">fedex</field>
+            <field name="fedex_service_type">FEDEX_NEXT_DAY_EARLY_MORNING</field>
+        </record>
+
+        <record id="fedex_fedex_next_day_mid_morning" model="delivery.carrier">
+            <field name="name">FEDEX NEXT DAY MID MORNING</field>
+            <field name="delivery_type">fedex</field>
+            <field name="fedex_service_type">FEDEX_NEXT_DAY_MID_MORNING</field>
+        </record>
+
+        <record id="fedex_fedex_next_day_afternoon" model="delivery.carrier">
+            <field name="name">FEDEX NEXT DAY AFTERNOON</field>
+            <field name="delivery_type">fedex</field>
+            <field name="fedex_service_type">FEDEX_NEXT_DAY_AFTERNOON</field>
+        </record>
+
+        <record id="fedex_fedex_next_day_end_of_day" model="delivery.carrier">
+            <field name="name">FEDEX NEXT DAY END OF DAY</field>
+            <field name="delivery_type">fedex</field>
+            <field name="fedex_service_type">FEDEX_NEXT_DAY_END_OF_DAY</field>
+        </record>
+    </data>
+</odoo>

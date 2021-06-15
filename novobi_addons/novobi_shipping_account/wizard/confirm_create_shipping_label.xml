@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="confirm_create_shipping_label_form" model="ir.ui.view">
+        <field name="name">Create Shipping Label Confirmation</field>
+        <field name="model">confirm.create.shipping.label</field>
+        <field name="arch" type="xml">
+            <form string="Confirmation">
+                <group>
+                    <p>
+                        Do you want to create shipping label?
+                    </p>
+                </group>
+                <footer>
+                    <button name="confirm_yes" string="Yes" type="object" class="btn-primary"/>
+                    <button name="confirm_no" string="No" type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

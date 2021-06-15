@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Make Menuitem invisible   -->
+    <record model="ir.ui.menu" id="delivery.sale_menu_action_delivery_carrier_form">
+        <field name="active" eval="False"/>
+    </record>
+
+    <record model="ir.ui.menu" id="delivery.menu_action_delivery_carrier_form">
+        <field name="active" eval="False"/>
+    </record>
+</odoo>

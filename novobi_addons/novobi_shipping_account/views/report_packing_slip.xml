@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="packing_slip_external_layout_standard" inherit_id="web.external_layout_standard" primary="True">
+        <xpath expr="//div[@name='company_address']" position="after">
+            <div class="offset-1 col-5">
+                <h1>Packing Slip</h1>
+            </div>
+        </xpath>
+    </template>
+    <template id="packing_slip_external_layout" inherit_id="web.external_layout" primary="True">
+        <xpath expr="./t[@t-else='else']" position="replace" />
+        <xpath expr="./t[@t-if='company.external_report_layout_id']" position="replace">
+            <t t-call="novobi_shipping_account.packing_slip_external_layout_standard">
+                <t t-raw="0"/>
+            </t>
+        </xpath>
+    </template>
+    <template id="report_packing_slip_document">
+        <t t-call="web.html_container">
+            <t t-call="novobi_shipping_account.packing_slip_external_layout">
+                <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)" />
+                <t t-set="partner" t-value="o.partner_id or (o.move_lines and o.move_lines[0].partner_id) or False"/>
+                <t t-if="partner" name="partner_header">
+                    <t t-set="address">
+                        <div class="row">
+                            <div style="padding-right: 30px"><label><b>Ship To:</b></label></div>
+                            <div t-esc="partner"
+                                 t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True}'/>
+                        </div>
+                   </t>
+                    <t t-set="information_block">
+                        <t t-set="barcode" t-value="o.get_origin()" />
+                        <div t-if="barcode" class="col-6">
+                            <img t-attf-src="/report/barcode/?type=Code128&amp;value={{barcode}}&amp;width=600&amp;height=100"
+                                 style="width:300px;height:50px" alt="Barcode"/>
+                        </div>
+                    </t>
+                </t>
+
+                <div class="page">
+                    <table class="table table-sm mt16">
+                        <thead>
+                            <tr>
+                                <th><strong>Order</strong></th>
+                                <th><strong>Ship Date</strong></th>
+                                <th><strong>Shipping Service</strong></th>
+                                <th><strong>Shipping Weight</strong></th>
+                                <th><strong>Tracking Number</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-if="o.is_mul_packages">
+                                <t t-foreach="o.picking_package_ids" t-as="package">
+                                    <tr>
+                                        <t t-if="package_first">
+                                            <td><span t-esc="o.get_origin()"/></td>
+                                            <td><span t-if="o.shipping_date" t-esc="'{:%m/%d/%Y}'.format(o.shipping_date)"/></td>
+                                            <td><span t-field="o.delivery_carrier_id.name"/></td>
+                                        </t>
+                                        <t t-else="">
+                                            <td/>
+                                            <td/>
+                                            <td/>
+                                        </t>
+                                        <td><span t-field="package.weight"/> lb(s)</td>
+                                        <td><span t-field="package.carrier_tracking_ref"/></td>
+                                    </tr>
+                                </t>
+                            </t>
+                            <t t-else="">
+                                <tr>
+                                    <td><span t-esc="o.get_origin()"/></td>
+                                    <td><span t-if="o.shipping_date" t-esc="'{:%m/%d/%Y}'.format(o.shipping_date)"/></td>
+                                    <td><span t-field="o.delivery_carrier_id.name"/></td>
+                                    <td><span t-field="o.package_shipping_weight"/> lb(s)</td>
+                                    <td><span t-field="o.carrier_tracking_ref"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    <table class="table table-sm mt48">
+                        <thead>
+                            <tr>
+                                <th><strong>SKU</strong></th>
+                                <th><strong>Description</strong></th>
+                                <th><strong>Qty Shipped</strong></th>
+                                <th><strong>Backorder</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="lines" t-value="o.move_lines.filtered(lambda x: x.product_uom_qty)"/>
+                            <tr t-foreach="lines" t-as="move">
+                                <td>
+                                    <span t-field="move.product_id.default_code"/>
+                                </td>
+                                <td>
+                                    <span t-field="move.product_id.name"/>
+                                </td>
+                                <td>
+                                    <span t-field="move.quantity_done"/>
+                                </td>
+                                <td>
+                                    <span t-if="move.state == 'done'" t-field="move.remaining_backorder_qty"/>
+                                    <span t-else="">N/A</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+         </t>
+    </template>
+    <template id="report_packing_slip">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="novobi_shipping_account.report_packing_slip_document" t-lang="o.partner_id.lang"/>
+        </t>
+    </template>
+    <template id="report_shipping_label" />
+    <template id="report_shipping_label_packing_slip" />
+</odoo>

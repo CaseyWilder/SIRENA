@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'delivery_fedex'), ('model', '=', 'product.packaging')]" />
+            </function>
+            <value eval="{'noupdate': False}" />
+        </function>
+
+        <record id="delivery_fedex.fedex_packaging_FEDEX_BOX" model="product.packaging">
+            <field name="name">FedEx Box</field>
+        </record>
+        <record id="delivery_fedex.fedex_packaging_FEDEX_10KG_BOX" model="product.packaging">
+            <field name="name">FedEx 10kg Box</field>
+        </record>
+        <record id="delivery_fedex.fedex_packaging_FEDEX_25KG_BOX" model="product.packaging">
+            <field name="name">FedEx 25kg Box</field>
+        </record>
+        <record id="delivery_fedex.fedex_packaging_FEDEX_ENVELOPE" model="product.packaging">
+            <field name="name">FedEx Envelope</field>
+        </record>
+        <record id="delivery_fedex.fedex_packaging_FEDEX_PAK" model="product.packaging">
+            <field name="name">FedEx Pak</field>
+            <field name="max_weight">2.5</field>
+        </record>
+        <record id="delivery_fedex.fedex_packaging_FEDEX_TUBE" model="product.packaging">
+            <field name="name">FedEx Tube</field>
+        </record>
+        <record id="delivery_fedex.fedex_packaging_YOUR_PACKAGING" model="product.packaging">
+            <field name="name">FedEx Your Packaging</field>
+            <field name="is_require_dimensions" eval="True" />
+        </record>
+
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'delivery_fedex'), ('model', '=', 'product.packaging')]" />
+            </function>
+            <value eval="{'noupdate': True}" />
+        </function>
+
+        <record id="fedex_packaging_FEDEX_ONE_RATE_ENVELOPE" model="product.packaging">
+            <field name="name">FedEx One Rate Envelope</field>
+            <field name="shipper_package_code">FEDEX_ONE_RATE_ENVELOPE</field>
+            <field name="package_carrier_type">fedex</field>
+            <field name="max_weight">10</field>
+        </record>
+        <record id="fedex_packaging_FEDEX_ONE_RATE_EXTRA_LARGE_BOX" model="product.packaging">
+            <field name="name">FedEx One Rate Extra Large Box</field>
+            <field name="shipper_package_code">FEDEX_ONE_RATE_EXTRA_LARGE_BOX</field>
+            <field name="package_carrier_type">fedex</field>
+            <field name="max_weight">50</field>
+        </record>
+        <record id="fedex_packaging_FEDEX_ONE_RATE_LARGE_BOX" model="product.packaging">
+            <field name="name">FedEx One Rate Large Box</field>
+            <field name="shipper_package_code">FEDEX_ONE_RATE_LARGE_BOX</field>
+            <field name="package_carrier_type">fedex</field>
+            <field name="max_weight">50</field>
+        </record>
+        <record id="fedex_packaging_FEDEX_ONE_RATE_MEDIUM_BOX" model="product.packaging">
+            <field name="name">FedEx One Rate Medium Box</field>
+            <field name="shipper_package_code">FEDEX_ONE_RATE_MEDIUM_BOX</field>
+            <field name="package_carrier_type">fedex</field>
+            <field name="max_weight">50</field>
+        </record>
+        <record id="fedex_packaging_FEDEX_ONE_RATE_PAK" model="product.packaging">
+            <field name="name">FedEx One Rate Pak</field>
+            <field name="shipper_package_code">FEDEX_ONE_RATE_PAK</field>
+            <field name="package_carrier_type">fedex</field>
+            <field name="max_weight">50</field>
+        </record>
+        <record id="fedex_packaging_FEDEX_ONE_RATE_SMALL_BOX" model="product.packaging">
+            <field name="name">FedEx One Rate Small Box</field>
+            <field name="shipper_package_code">FEDEX_ONE_RATE_SMALL_BOX</field>
+            <field name="package_carrier_type">fedex</field>
+            <field name="max_weight">50</field>
+        </record>
+        <record id="fedex_packaging_FEDEX_ONE_RATE_TUBE" model="product.packaging">
+            <field name="name">FedEx One Rate Tube</field>
+            <field name="shipper_package_code">FEDEX_ONE_RATE_TUBE</field>
+            <field name="package_carrier_type">fedex</field>
+            <field name="max_weight">50</field>
+        </record>
+    </data>
+</odoo>

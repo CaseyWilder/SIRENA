@@ -1,0 +1,13 @@
+.o_kanban_view.o_kanban_shipping_account {
+  &.o_kanban_ungrouped {
+    .o_kanban_record {
+      width: 450px;
+    }
+  }
+}
+
+.custom-groupby-many2many{
+  .group-elements{
+    margin-left: 30px;
+  }
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="0">
+        <record model="res.partner" id="shipper_test_connection">
+            <field name="name">Shipper Test Connection</field>
+            <field name="city">Tulsa</field>
+            <field name="phone">202-555-0158</field>
+            <field eval="1" name="active"/>
+            <field model="res.country" name="country_id" search="[('code','ilike','us')]"/>
+            <field model="res.country.state" name="state_id" search="[('code','ilike','ok')]"/>
+            <field name="street">6528 East 91st Street</field>
+            <field name="zip">74133</field>
+            <field name="email">shipper@test.com</field>
+            <field name="active" eval="False"/>
+        </record>
+
+        <record model="res.partner" id="ship_from_test_connection">
+            <field name="name">Ship From Test Connection</field>
+            <field name="city">Marietta</field>
+            <field name="phone">202-555-0155</field>
+            <field eval="1" name="active"/>
+            <field model="res.country" name="country_id" search="[('code','ilike','us')]"/>
+            <field model="res.country.state" name="state_id" search="[('code','ilike','ga')]"/>
+            <field name="street">366 Robin LN SE</field>
+            <field name="zip">30067</field>
+            <field name="email">ship_from@test.com</field>
+            <field name="active" eval="False"/>
+        </record>
+
+        <record model="res.partner" id="ship_to_test_connection">
+            <field name="name">Ship To Test Connection</field>
+            <field name="city">Austin</field>
+            <field name="phone">202-555-0173</field>
+            <field eval="1" name="active"/>
+            <field model="res.country" name="country_id" search="[('code','ilike','us')]"/>
+            <field model="res.country.state" name="state_id" search="[('code','ilike','tx')]"/>
+            <field name="street">8920 Business Park Dr #250</field>
+            <field name="zip">78759</field>
+            <field name="email">ship_to@test.com</field>
+            <field name="active" eval="False"/>
+        </record>
+    </data>
+</odoo>

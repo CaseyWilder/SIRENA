@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_picking_package_form" model="ir.ui.view">
+        <field name="name">stock.picking.package.form</field>
+        <field name="model">stock.picking.package</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="picking_id" invisible="1"/>
+                        <field name="provider" invisible="1"/>
+                        <field name="packaging_id" string="Package Type"/>
+                        <field name="weight" string="Weight (lb)"/>
+                        <field name="length" string="Length (in)"/>
+                        <field name="width" string="Width (in)"/>
+                        <field name="height" string="Height (in)"/>
+                        <field name="carrier_tracking_ref" string="Tracking Number"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_picking_package_tree" model="ir.ui.view">
+        <field name="name">stock.picking.package.tree</field>
+        <field name="model">stock.picking.package</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="weight" string="Weight (lb)"/>
+                <field name="length" string="Length (in)"/>
+                <field name="width" string="Width (in)"/>
+                <field name="height" string="Height (in)"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

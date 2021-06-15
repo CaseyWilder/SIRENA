@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="assets_backend" name="Fulfillment Assets Backend" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/novobi_shipping_account/static/src/js/boolean_button_widget.js"/>
+            <script type="text/javascript" src="/novobi_shipping_account/static/src/js/get_rate_button.js"/>
+            <script type="text/javascript" src="/novobi_shipping_account/static/src/js/custom_radio_selected_value.js"/>
+            <script type="text/javascript" src="/novobi_shipping_account/static/src/js/custom_many2many_checkboxes.js"/>
+            <script type="text/javascript" src="/novobi_shipping_account/static/src/js/custom_groupby_many2many_checkboxes.js"/>
+            <script type="text/javascript" src="/novobi_shipping_account/static/src/js/cancel_create_label_button.js"/>
+            <link rel="stylesheet" href="/novobi_shipping_account/static/src/css/style.css"/>
+        </xpath>
+        <xpath expr="link[last()]" position="inside">
+            <link rel="stylesheet" type="text/scss" href="/novobi_shipping_account/static/src/scss/stock_picking.scss"/>
+            <link rel="stylesheet" type="text/scss" href="/novobi_shipping_account/static/src/scss/shipping_account.scss"/>
+        </xpath>
+    </template>
+</odoo>
