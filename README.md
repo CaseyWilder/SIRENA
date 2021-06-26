@@ -1,1 +1,1 @@
-# SIRENA
+Sirena project's SRN-31 ticket.
