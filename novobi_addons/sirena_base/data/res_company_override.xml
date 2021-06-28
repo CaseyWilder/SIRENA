@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="base.main_company" model="res.company">
+            <field name="name">Inviro Tek Inc DBA Sirena Inc</field>
+            <!--<field name="partner_id" ref="res.partner.Inviro Tek Inc DBA Sirena Inc"/>-->
+            <field name="street">11334 Boggy Creek Rd</field>
+            <field name="street2">Ste 107</field>
+            <field name="city">Orlando</field>
+            <field name="zip">32824</field>
+            <field name="country_id" ref="base.us"/>
+            <field name="website">https://www.sirenainc.com</field>
+            <field name="currency_id" ref="base.USD"/>
+        </record>
+    </data>
+
+    <data noupdate="1">
+        <record id="sirena_inc_ottawa" model="res.company">
+            <field name="name">Sirena Inc (Ottawa)</field>
+            <!--<field name="partner_id" ref="res_partner.Sirena Inc (Ottawa)"/>-->
+            <field name="street">5459 Canotek Rd</field>
+            <field name="street2">suite 1</field>
+            <field name="city">Ottawa</field>
+            <field name="state_id" ref="base.state_ca_on"/>
+            <field name="zip">K1J 9M3</field>
+            <field name="country_id" ref="base.ca"/>
+            <field name="phone">613.695.6444</field>
+            <field name="website">http://sirenavacuum.ca</field>
+            <field name="currency_id" ref="base.CAD"/>
+        </record>
+    </data>
+
+    <data noupdate="1">
+        <record id="paradise" model="res.company">
+            <field name="name">Paradise</field>
+            <!--<field name="partner_id" ref="res_partner.Paradise"/>-->
+            <field name="street">11334 BOGGY CREEK RD</field>
+            <field name="street2">STE 107</field>
+            <field name="city">ORLANDO</field>
+            <field name="zip">32824</field>
+            <field name="country_id" ref="base.us"/>
+            <field name="vat">84-4303401</field>
+            <field name="currency_id" ref="base.USD"/>
+        </record>
+    </data>
+</odoo>
