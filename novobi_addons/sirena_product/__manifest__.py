@@ -1,12 +1,33 @@
+# Copyright © 2021 Novobi, LLC
+# See LICENSE file for full copyright and licensing details.
+
 {
- 'name': "Sirena Product Template",
- 'summary': "Modifies/Adds new fields to the Product Template model",
- 'description': "Adds some customized fields for the product.template model",
- 'author': "Novobi LLC",
- 'category': 'Product',
- 'version': '14.1.0.0',
- 'depends': ['base','product'],
- 'data': [
-  'views/product_template_form_inherited.xml',
- ],
+    'name': 'Sirena Product Template',
+    'summary': 'Modifies/Adds new fields to the Product Template model',
+    'description': 'Adds some customized fields for the product.template model',
+    'version': '14.1.0.0',
+    'category': 'Other',
+    'author': 'Novobi LLC',
+    "license": "OPL-1",
+    'website': 'https://www.novobi.com',
+    'depends': ['product'],
+    'data': [
+        # ============================== DATA =================================
+
+        # ============================== SECURITY =============================
+
+        # ============================== VIEWS ================================
+        'views/product_template_views.xml',
+
+        # ============================== REPORT ===============================
+
+        # ============================== WIZARD ===============================
+
+        # ============================== MENU =================================
+
+    ],
+    'qweb': ['static/src/xml/*.xml'],
+    'installable': True,
+    'auto_install': False,
+    'application': False,
 }
