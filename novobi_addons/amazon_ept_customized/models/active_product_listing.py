@@ -77,7 +77,8 @@ class ActiveProductListingReportEpt(models.Model):
             seller_sku = row.get('seller-sku', '').strip()
             # changed part: add company_id condition
             odoo_product_id = product_obj.search(
-                [('company_id', '=', self.instance_id.company_id.id), '|', ('default_code', '=ilike', seller_sku), ('barcode', '=ilike', seller_sku)])
+                [('company_id', '=', self.instance_id.company_id.id), '|', ('default_code', '=ilike', seller_sku),
+                 ('barcode', '=ilike', seller_sku)], limit=1)
             # end of changed part
 
             amazon_product_id = amazon_product_ept_obj.search_amazon_product( \
@@ -85,9 +86,8 @@ class ActiveProductListingReportEpt(models.Model):
 
             if not amazon_product_id and not odoo_product_id:
                 # changed part: add instance_id condition
-                amazon_product = amazon_product_ept_obj.search(
-                    [('instance_id', '=', self.instance_id.id), '|', ('active', '=', False), ('active', '=', True), ('seller_sku', '=', seller_sku)],
-                    limit=1)
+                amazon_product = amazon_product_ept_obj.with_context(active_test=False).search(
+                    [('instance_id', '=', self.instance_id.id), ('seller_sku', '=', seller_sku)], limit=1)
                 # end of changed part
                 odoo_product_id = amazon_product.product_id
 
@@ -119,10 +119,9 @@ class ActiveProductListingReportEpt(models.Model):
 
         price_list_id = self.instance_id.pricelist_id
         if odoo_product_id:
-            # changed part: odoo_product_id -> odoo_product_id[0]
-            self.create_or_update_amazon_product_ept(False, odoo_product_id[0], fulfillment_type, row)
+            self.create_or_update_amazon_product_ept(False, odoo_product_id, fulfillment_type, row)
             if self.update_price_in_pricelist:
-                price_list_id.set_product_price_ept(odoo_product_id[0].id, float(row.get('price')))
+                price_list_id.set_product_price_ept(odoo_product_id.id, float(row.get('price')))
         else:
             if self.auto_create_product:
                 if not row.get('item-name'):
