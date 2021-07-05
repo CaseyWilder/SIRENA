@@ -1,0 +1,252 @@
+<odoo>
+    <record id="view_payslip_deduction_form" model="ir.ui.view">
+        <field name="name">payslip.deduction.form</field>
+        <field name="model">payslip.deduction</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0" delete="0">
+                <header>
+                    <field name="state" widget="statusbar" readonly="1"/>
+                </header>
+                <sheet>
+                    <group name="top">
+                        <field name="is_regular" invisible="1"/>
+                        <field name="is_history" invisible="1"/>
+                        <field name="vertex_id" invisible="1"/>
+                        <field name="payslip_id" invisible="1" required="0"/>
+                        <field name="employee_id" invisible="1" required="0" force_save="1"
+                               context="{'form_view_ref': 'l10n_us_hr_payroll.hr_employee_view_form'}"/>
+                        <field name="deduction_policy_id" required="0" readonly="1" force_save="1"
+                               attrs="{'invisible': ['|', ('is_regular', '=', False), ('vertex_id', '=', False)]}"
+                               options="{'no_create': True}"/>
+                        <field name="deduction_id"
+                               attrs="{'readonly': ['|', ('deduction_policy_id', '!=', False), ('is_regular', '=', True)],
+                               'required': [('deduction_policy_id', '==', False)]}" force_save="1"/>
+                        <field name="label" required="1"/>
+                        <field name="has_company_contribution" readonly="1" force_save="1"
+                               attrs="{'invisible': [('has_company_contribution', '=', False)]}"/>
+                        <field name="currency_id" invisible="1" force_save="1"/>
+                        <field name="amount" invisible="1"/>
+                        <field name="er_dollar_amt" invisible="1"/>
+                    </group>
+
+                    <group name="middle_history" attrs="{'invisible': [('is_history', '=', False)]}">
+                        <group name="employee_deduction_history" string="Employee Deduction">
+                            <label for="ee_amount" string="Amount"/>
+                            <div>
+                                <span class="oe_inline">$</span>
+                                <field name="ee_amount" class="oe_inline"/>
+                            </div>
+                        </group>
+
+                        <group name="employer_deduction_history" string="Company Contribution">
+                            <label for="er_amount" string="Amount"/>
+                            <div>
+                                <span class="oe_inline">$</span>
+                                <field name="er_amount" class="oe_inline" />
+
+                            </div>
+                        </group>
+                    </group>
+
+                    <group name="middle" attrs="{'invisible': [('is_history', '=', True)]}">
+                        <group name="employee_deduction" string="Employee Deduction">
+                            <field name="ee_amount_type" string="Amount Type"
+                                   attrs="{'required': [('vertex_id', '!=', False), ('is_history', '=', False)], 'invisible': [('vertex_id', '=', False)]}"/>
+                            <field name="ee_post_amount_type" string="Amount Type"
+                                   attrs="{'required': [('vertex_id', '=', False), ('is_history', '=', False)], 'invisible': [('vertex_id', '!=', False)]}"/>
+                            <label for="ee_amount" string="Amount"/>
+                            <div>
+                                <span attrs="{'invisible': ['|', '&amp;', ('vertex_id', '!=', False), ('ee_amount_type', '!=', 'fixed'),
+                                '&amp;', ('vertex_id', '=', False), ('ee_post_amount_type', '!=', 'fixed')]}"
+                                      class="oe_inline">$</span>
+                                <field name="ee_amount" class="oe_inline"/>
+                                <span attrs="{'invisible': ['|', '&amp;', ('vertex_id', '!=', False), ('ee_amount_type', '=', 'fixed'),
+                                '&amp;', ('vertex_id', '=', False), ('ee_post_amount_type', '=', 'fixed')]}"
+                                      class="oe_inline">%</span>
+                            </div>
+
+                            <field name="allowable_deduction_ids" widget="many2many_tags" force_save="1"
+                                   options="{'no_create': True, 'no_edit': True}"
+                                   attrs="{'invisible': [('ee_post_amount_type', '!=', 'disposable')],
+                                   'readonly': [('is_regular', '=', True)]}"/>
+                            <div attrs="{'invisible': [('ee_post_amount_type', '!=', 'disposable')]}" colspan="2">
+                                <p class="text-muted oe_edit_only">
+                                    Disposable income = Gross Pay - Employee Tax - Total Allowable Deductions.<br/>
+                                    Please check your garnishment order or state regulation for more info on Allowance Deductions
+                                </p>
+                            </div>
+
+                            <field name="ee_max_amount_type" string="Maximum Type" readonly="1" force_save="1"
+                                   attrs="{'invisible': [('is_regular', '=', False)]}"/>
+                            <label for="ee_max_amount" string="Maximum Amount" readonly="1" force_save="1"
+                                   attrs="{'invisible': [('is_regular', '=', False)]}"/>
+                            <div attrs="{'invisible': [('is_regular', '=', False)]}">
+                                <span attrs="{'invisible': [('ee_max_amount_type', '=', 'percentage')]}"
+                                      class="oe_inline">$</span>
+                                <field name="ee_max_amount" class="oe_inline" readonly="1" force_save="1"/>
+                                <span attrs="{'invisible': [('ee_max_amount_type', '!=', 'percentage')]}"
+                                      class="oe_inline">%</span>
+                                <field name="ee_maximum_period" class="oe_inline" readonly="1" force_save="1"
+                                       attrs="{'invisible': [('ee_max_amount_type', '!=', 'fixed')]}"/>
+                            </div>
+                            <div colspan="2" attrs="{'invisible': [('is_regular', '=', False)]}">
+                               <p class="text-muted oe_edit_only">
+                                You can set the maximum amount to withhold from employee's paycheck by: <br/>
+                                - Fixed amount: per paycheck or per year. <br/>
+                                - Percent of Net Pay per paycheck: usually use for Child Support. <br/>
+                                - Total Amount Owed: we'll stop withholding when the total amount is reached. This is usually used for Tax Lien/Garnishment.
+                                </p>
+                            </div>
+                        </group>
+
+                        <!--Company Contribution is Readonly, except for Maximum amount-->
+                        <group name="employer_deduction" string="Company Contribution"
+                               attrs="{'invisible': [('has_company_contribution', '==', False)]}">
+                            <field name="er_amount_type" string="Amount Type"
+                                   attrs="{'required': [('has_company_contribution', '!=', False), ('is_history', '=', False)],
+                                   'readonly': [('deduction_policy_id', '!=', False)]}"/>
+                            <label for="er_amount" string="Amount"/>
+                            <div>
+                                <span attrs="{'invisible': [('er_amount_type', '!=', 'fixed')]}"
+                                      class="oe_inline">$</span>
+                                <field name="er_amount" class="oe_inline"
+                                       attrs="{'readonly': [('deduction_policy_id', '!=', False)]}"/>
+                                <span attrs="{'invisible': [('er_amount_type', '==', 'fixed')]}"
+                                      class="oe_inline">%</span>
+                            </div>
+
+                            <label for="maximum_amount" string="Maximum Amount"/>
+                            <div>
+                                <field name="maximum_amount" class="oe_inline" readonly="1" force_save="1"/>
+                                <field name="maximum_period" class="oe_inline" readonly="1" force_save="1"/>
+                            </div>
+                        </group>
+                    </group>
+
+                    <group name="bottom" attrs="{'invisible': ['|', ('ee_max_amount_type', '!=', 'owed'), ('state', '!=', 'done')]}">
+                        <group name="left">
+                            <field name="amount"/>
+                            <field name="owed_payslip_remaining_amount"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_payslip_deduction_tree" model="ir.ui.view">
+        <field name="name">payslip.deduction.tree</field>
+        <field name="model">payslip.deduction</field>
+        <field name="arch" type="xml">
+            <tree decoration-muted="not vertex_id">
+                <field name="vertex_id" invisible="1"/>
+                <field name="employee_id" invisible="1" />
+                <field name="currency_id" invisible="1"/>
+                <field name="deduction_id" required="1"/>
+                <field name="deduction_policy_id"/>
+                <field name="label" required="1"/>
+                <field name="ee_amount_type_label" string="Employee Deduction Type" attrs="{'column_invisible': [('parent.state', '!=', 'draft')]}"/>
+                <field name="ee_amount" attrs="{'column_invisible': [('parent.state', '!=', 'draft')]}"/>
+                <field name="amount" string="Employee Deduction" attrs="{'column_invisible': [('parent.state', '=', 'draft')]}"/>
+                <field name="er_dollar_amt" string="Company Contribution" attrs="{'column_invisible': [('parent.state', '=', 'draft')]}"/>
+                <field name="mtd_amount" readonly="1" attrs="{'column_invisible': [('parent.state', '=', 'draft')]}"/>
+                <field name="qtd_amount" readonly="1" attrs="{'column_invisible': [('parent.state', '=', 'draft')]}"/>
+                <field name="ytd_amount" readonly="1" attrs="{'column_invisible': [('parent.state', '=', 'draft')]}"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_payslip_deduction_tree_report" model="ir.ui.view">
+        <field name="name">payslip.deduction.tree.report</field>
+        <field name="model">payslip.deduction</field>
+        <field name="arch" type="xml">
+            <tree default_order="pay_date" create="0" delete="0" edit="0">
+                <field name="currency_id" invisible="1"/>
+                <field name="employee_id" />
+                <field name="pay_date"/>
+                <field name="deduction_id"/>
+                <field name="deduction_policy_id"/>
+                <field name="label" />
+                <field name="amount" string="Employee Deduction" sum="Total Employee Deduction" />
+                <field name="mtd_amount" />
+                <field name="qtd_amount" />
+                <field name="ytd_amount" />
+
+                <field name="er_dollar_amt" string="Company Contribution" sum="Total Company Contribution"/>
+                <field name="er_mtd_amount" string="Company MTD"/>
+                <field name="er_qtd_amount" string="Company QTD"/>
+                <field name="er_ytd_amount" string="Company YTD"/>
+                <field name="state" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_payslip_deduction_filter" model="ir.ui.view">
+        <field name="name">payslip.deduction.search</field>
+        <field name="model">payslip.deduction</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id" />
+                <field name="pay_date" />
+                <field name="deduction_id" />
+                <field name="deduction_policy_id" />
+                <field name="label" />
+                <field name="employee_id"/>
+                <separator/>
+                <filter name="pay_date_filter" string="Pay date" date="pay_date"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_employee" string="Employee" context="{'group_by':'employee_id'}"/>
+                    <filter name="group_by_deduction" string="Deduction" context="{'group_by':'deduction_id'}"/>
+                    <separator/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_payslip_deduction" model="ir.actions.act_window">
+        <field name="name">Deduction</field>
+        <field name="res_model">payslip.deduction</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_payslip_deduction_tree_report"/>
+        <field name="context">{'search_default_group_by_deduction': 1}</field>
+        <field name="domain">[('state', '=', 'done')]</field>
+    </record>
+
+    <menuitem action="action_payslip_deduction"
+              id="menu_payslip_deduction"
+              parent="menu_us_payroll_report"
+              sequence="20"/>
+
+    <!-- Ad hoc Deduction -->
+    <record id="view_adhoc_payslip_deduction_tree" model="ir.ui.view">
+        <field name="name">payslip.deduction.tree.adhoc</field>
+        <field name="model">payslip.deduction</field>
+        <field name="priority" eval="30"/>
+        <field name="arch" type="xml">
+            <tree default_order="pay_date" editable="bottom">
+                <field name="currency_id" invisible="1"/>
+                <field name="pay_date" invisible="1"/>
+                <field name="payslip_id" domain="[('state', '=', 'draft')]" options="{'no_create': True}"/>
+                <field name="employee_id" readonly="1" force_save="1" context="{'form_view_ref': 'l10n_us_hr_payroll.hr_employee_view_form'}"/>
+                <field name="deduction_id" options="{'no_create': True}"/>
+
+                <field name="label" required="1"/>
+                <field name="ee_amount_type" attrs="{'required': [('ee_amount', '!=', 0)]}"/>
+                <field name="ee_amount"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_adhoc_payslip_deduction" model="ir.actions.act_window">
+        <field name="name">Deduction</field>
+        <field name="res_model">payslip.deduction</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_adhoc_payslip_deduction_tree"/>
+        <field name="domain">[('is_regular', '=', False), ('payslip_id.state', '=', 'draft')]</field>
+    </record>
+
+    <menuitem action="action_adhoc_payslip_deduction"
+              id="menu_adhoc_payslip_deduction"
+              parent="menu_us_payroll_adhoc"
+              sequence="20"/>
+</odoo>

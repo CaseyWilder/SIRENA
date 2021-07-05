@@ -1,0 +1,31 @@
+$color-db-lightgray: #eeeeee;
+$color-db-black: #242424;
+
+.o_reward_payroll {
+  position: initial !important;
+
+  .o_reward {
+    margin: auto;
+    padding: 0 50px;
+    height: 300px;
+    position: initial !important;
+  }
+
+  .o_reward_stars {
+    top: 8%;
+  }
+
+  .o_reward_face {
+    top: 30%;
+    height: 70% !important;
+  }
+
+  .o_reward_msg {
+    border: 1px solid $color-db-lightgray !important;
+
+    .o_reward_msg_content {
+      color: $color-db-black !important;
+      font-family: inherit !important;
+    }
+  }
+}

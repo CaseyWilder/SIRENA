@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_pay_period_form_inherit_direct_deposit_report" model="ir.ui.view">
+        <field name="name">pay.period.form.direct.deposit</field>
+        <field name="model">pay.period</field>
+        <field name="inherit_id" ref="l10n_us_hr_payroll.view_pay_period_form_bonus"/>
+        <field name="arch" type="xml">
+            <button name="button_done" position="after">
+                <button name="button_print_deposit" type="object" string="Print Direct Deposit" states="done"
+                        context="{'default_pay_period_id': active_id}"/>
+            </button>
+        </field>
+    </record>
+</odoo>

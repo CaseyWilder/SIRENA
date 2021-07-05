@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_payroll_dashboard_kanban" model="ir.ui.view">
+        <field name="name">payroll.dashboard.kanban</field>
+        <field name="model">payroll.dashboard</field>
+        <field name="arch" type="xml">
+            <kanban create="false" class="o_kanban_dashboard o_account_kanban o_payroll_dashboard"
+                    banner_route="/us_payroll/payroll_dashboard_onboarding">
+                <field name="type"/>
+                <field name="name"/>
+                <field name="color"/>
+                <!-- Things To Do -->
+                <field name="current_period_id"/>
+                <field name="period_calendar"/>
+                <field name="period_rainbow_man"/>
+                <field name="number_pending_leaves"/>
+                <field name="number_pending_paid"/>
+                <field name="number_term_payroll"/>
+                <field name="number_deduction_enrollment"/>
+                <!-- Employees -->
+                <field name="number_total_emp"/>
+                <field name="number_fulltime_emp"/>
+                <field name="number_parttime_emp"/>
+                <field name="number_absent_emp"/>
+                <field name="holidays"/>
+                <field name="birthday"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div>
+                            <div class="o_kanban_card_header">
+                                <t t-value="record.type.raw_value" t-set="type"/>
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary text-primary">
+                                        <t t-esc="record.name.raw_value"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container o_kanban_card_content content-payroll-dashboard">
+                                <t t-if="type == 'todo'"><t t-call="Todo"/></t>
+                                <t t-elif="type == 'employees'"><t t-call="Employees"/></t>
+                                <t t-else="">
+                                    <t t-if="type == 'tbd'"><t t-call="TBD"/></t>
+                                    <field name="kanban_dashboard_graph" widget="payroll_dashboard"/>
+                                </t>
+                            </div>
+                        </div>
+                    </t>
+
+                    <!-- THINGS TO DO -->
+                    <t t-name="Todo">
+                        <!-- Current Period / Rainbow Man -->
+                        <div name="current_period" class="mt-2">
+                            <t t-if="record.current_period_id.raw_value != false">
+                                <div class="container text-center">
+                                    <field name="period_calendar" widget="payroll_calendar"/>
+                                </div>
+                                <div class="float-right">
+                                    <button name="button_see_current_period" type="object" class="btn btn-primary">
+                                        Review this payroll
+                                    </button>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <field name="period_rainbow_man" widget="payroll_rainbow_man"/>
+                            </t>
+                        </div>
+
+                        <!-- Pending Termination Payroll -->
+                        <t t-set="item" t-value="{
+                            'img': '/l10n_us_hr_payroll_dashboard/static/src/img/termination.svg',
+                            'text': 'Pending Termination Payroll',
+                            'list': [[
+                                record.number_pending_paid.raw_value,
+                                'pending paid', 'employee.', 'employees.', '',
+                                'button_see_pending_paid_employees', 'View Employees', 'No pending paid employee.'
+                            ], [
+                                record.number_term_payroll.raw_value,
+                                'termination', 'payroll', 'payrolls', 'needed to be processed.',
+                                'button_see_termination_payroll', 'Go to Termination Payroll', 'No termination payroll in progress.'
+                            ]],
+                        }"/>
+                        <t t-call="ToDoContainer"/>
+
+                        <!-- Pending Leave Requests -->
+                        <t t-set="item" t-value="{
+                            'img': '/l10n_us_hr_payroll_dashboard/static/src/img/leave.svg',
+                            'text': 'Pending Leave Requests',
+                            'list': [[
+                                record.number_pending_leaves.raw_value,
+                                'pending leave', 'request', 'requests', 'to review.',
+                                'button_see_leave_requests', 'Go to Leaves', 'No pending leave request.'
+                            ]],
+                        }"/>
+                        <t t-call="ToDoContainer"/>
+
+                        <!-- Pending Deduction Enrollment -->
+                        <t t-set="item" t-value="{
+                            'img': '/l10n_us_hr_payroll_dashboard/static/src/img/deduction_enrollment.svg',
+                            'text': 'Pending Deduction Enrollment',
+                            'list': [[
+                                record.number_deduction_enrollment.raw_value,
+                                'pending deduction', 'policy', 'policies', 'to review and approve.',
+                                'button_see_deduction_enrollment', 'Go to Deduction', 'No pending enrollment.'
+                            ]],
+                        }"/>
+                        <t t-call="ToDoContainer"/>
+                    </t>
+                    <!-- Template -->
+                    <t t-name="ToDoContainer">
+                        <div class="payroll-box-container p-0">
+                            <div class="payroll-box d-flex align-items-start">
+                                <img t-att-src="item['img']" alt="Payroll Image" class="img-dashboard ml-2 mr-2"/>
+                                <div class="ml-3 w-100">
+                                    <h4 class="bold-text"><t t-esc="item['text']"/></h4>
+                                    <t t-foreach="item['list']" t-as="item">
+                                        <t t-call="ToDoItem"/>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                    <t t-name="ToDoItem">
+                        <t t-set="number" t-value="item[0]"/>
+                        <t t-if="number > 0">
+                            <div class="row">
+                                <div class="col-md-7 col-12">
+                                    You have
+                                    <span class="text-danger font-weight-bold"><t t-esc="number"/></span>
+                                    <t t-esc="item[1]"/>
+                                    <t t-if="number == 1"><t t-esc="item[2]"/></t>
+                                    <t t-else=""><t t-value="item[3]"/></t>
+                                    <t t-esc="item[4]"/>
+                                </div>
+                                <div class="col-md-5 col-12">
+                                    <a t-att-data-name="item[5]" type="object" role="button" class="btn btn-link btn-dashboard">
+                                        <i class="fa fa-arrow-right" t-att-title="item[6]"/>
+                                        <span><t t-esc="item[6]"/></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div><t t-esc="item[7]"/></div>
+                        </t>
+                    </t>
+
+                    <!-- EMPLOYEES -->
+                    <t t-name="Employees">
+                        <div name="employee">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <!-- Total Head Count -->
+                                    <t t-set="item" t-value="{
+                                        'color': 'orange', 'number': record.number_total_emp.raw_value,
+                                        'text': 'Total Head Count', 'button': 'button_see_all_employees'
+                                    }"/>
+                                    <t t-call="EmployeeItem"/>
+
+                                    <!-- Absent Today -->
+                                    <t t-set="item" t-value="{
+                                        'color': 'primary-purple', 'number': record.number_absent_emp.raw_value,
+                                        'text': 'Absent Today', 'button': 'button_see_absent_employees'
+                                    }"/>
+                                    <t t-call="EmployeeItem"/>
+                                </div>
+                                <div class="row">
+                                    <!-- Full-time Employees -->
+                                    <t t-set="item" t-value="{
+                                        'color': 'blue', 'number': record.number_fulltime_emp.raw_value,
+                                        'text': 'Full-time Employees', 'button': 'button_see_fulltime_employees'
+                                    }"/>
+                                    <t t-call="EmployeeItem"/>
+
+                                    <!-- Part-time Employees -->
+                                    <t t-set="item" t-value="{
+                                        'color': 'primary-green', 'number': record.number_parttime_emp.raw_value,
+                                        'text': 'Part-time Employees', 'button': 'button_see_parttime_employees'
+                                    }"/>
+                                    <t t-call="EmployeeItem"/>
+                                </div>
+                            </div>
+                            <div class="float-right">
+                                <button name="button_add_new_employee" type="object" class="btn btn-primary">
+                                    <i class="fa fa-plus"/>
+                                    Add Employee
+                                </button>
+                            </div>
+                        </div>
+                        <div class="container-fluid mt-3">
+                            <div class="row">
+                                <!-- Upcoming Holidays -->
+                                <t t-set="item" t-value="{
+                                    'img': '/l10n_us_hr_payroll_dashboard/static/src/img/holiday.svg',
+                                    'text': 'Upcoming Holidays', 'field': record.holidays.raw_value
+                                }"/>
+                                <t t-call="UpcomingDayItem"/>
+
+                                <!-- Upcoming Birthday -->
+                                <t t-set="item" t-value="{
+                                    'img': '/l10n_us_hr_payroll_dashboard/static/src/img/birthday.svg',
+                                    'text': 'Upcoming Birthdays', 'field': record.birthday.raw_value
+                                }"/>
+                                <t t-call="UpcomingDayItem"/>
+                            </div>
+                        </div>
+                    </t>
+                    <!-- Template -->
+                    <t t-name="EmployeeItem">
+                        <div class="col-6 payroll-box-container">
+                            <div t-attf-class="payroll-box white-content pl-3 pr-3 {{ item['color'] }}">
+                                <div class="row h-100">
+                                    <div class="col-8">
+                                        <div class="number"><t t-esc="item['number']"/></div>
+                                        <div class="text"><t t-esc="item['text']"/></div>
+                                    </div>
+                                    <div class="col-4 align-self-center">
+                                        <a t-att-data-name="item['button']" type="object" role="button" class="btn btn-outline white float-right">
+                                            View
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                    <t t-name="UpcomingDayItem">
+                        <div class="col-6 payroll-box-container">
+                            <div class="payroll-box h-100">
+                                <div class="d-flex align-items-center">
+                                    <img t-att-src="item['img']" alt="Payroll Image" class="img-dashboard mr-4"/>
+                                    <h4 class="bold-text"><t t-esc="item['text']"/></h4>
+                                </div>
+                                <t t-raw="item['field']"/>
+                            </div>
+                        </div>
+                    </t>
+
+                    <!-- DEDUCTIONS -->
+                    <t t-name="TBD">
+                        <div class="mt-2">
+                            <div>
+                                <button name="button_see_deductions" type="object" class="btn btn-primary">
+                                    <span>Go to Deductions</span>
+                                </button>
+                            </div>
+                            <div>
+                                <button name="button_config_deductions" type="object" class="btn btn-primary">
+                                    <span>Change Deductions shown in chart</span>
+                                </button>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_payroll_dashboard_kanban" model="ir.actions.act_window">
+        <field name="name">Payroll Dashboard</field>
+        <field name="res_model">payroll.dashboard</field>
+        <field name="view_mode">kanban</field>
+    </record>
+
+    <menuitem id="menu_payroll_dashboard" name="Dashboard" parent="l10n_us_hr_payroll.menu_us_payroll_root"
+              action="action_payroll_dashboard_kanban" groups="hr.group_hr_user" sequence="1"/>
+</odoo>

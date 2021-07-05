@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Check Top -->
+    <template id="l10n_us_payroll_check_printing.print_check_top">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div t-att-data-oe-model="o._name" t-att-data-oe-id="o.id" t-foreach="o._check_get_pages()" t-as="page" class="page article ckus_page ckus_top_page" t-attf-style="top: {{ o.company_id.account_check_printing_margin_top }}in; left: {{ o.company_id.account_check_printing_margin_left }}in;">
+                    <t t-call="l10n_us_payroll_check_printing.payslip_ckus_check" />
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Check Middle -->
+    <template id="l10n_us_payroll_check_printing.print_check_middle">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div t-att-data-oe-model="o._name" t-att-data-oe-id="o.id" t-foreach="o._check_get_pages()" t-as="page" class="page article ckus_page ckus_middle_page" t-attf-style="top: {{ o.company_id.account_check_printing_margin_top }}in; left: {{ o.company_id.account_check_printing_margin_left }}in;">
+                    <t t-call="l10n_us_payroll_check_printing.payslip_ckus_check" />
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Check Bottom -->
+    <template id="l10n_us_payroll_check_printing.print_check_bottom">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div t-att-data-oe-model="o._name" t-att-data-oe-id="o.id" t-foreach="o._check_get_pages()" t-as="page" class="page article ckus_page ckus_bottom_page" t-attf-style="top: {{ o.company_id.account_check_printing_margin_top }}in; left: {{ o.company_id.account_check_printing_margin_left }}in;">
+                    <t t-call="l10n_us_payroll_check_printing.payslip_ckus_check" />
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- IMPORTANCE: Keep style as l10n_us_check_printing, only change the template ID -->
+    <template id="payslip_ckus_check">
+        <div class="ckus_check">
+            <div class="ckus_date" t-esc="page['payment_date']"/>
+            <div class="ckus_payee_name" t-esc="page['employee_name']"/>
+            <div class="ckus_amount">
+                <t t-esc="page['net_pay'].replace(o.currency_id.symbol, '')"/>
+            </div>
+            <div class="ckus_amount_in_word" t-esc="page['net_pay_in_words']"/>
+            <div class="ckus_payee_addr">
+                <div data-oe-type="contact">
+                    <address class="mb0" itemscope="itemscope" itemtype="http://schema.org/Organization">
+                        <div>
+                            <span itemprop="name" t-esc="page['employee_name']"/>
+                        </div>
+                        <div itemprop="address" itemscope="itemscope" itemtype="http://schema.org/PostalAddress">
+                            <div>
+                                <span itemprop="streetAddress">
+                                    <t t-esc="o.street"/>
+                                    <br/>
+                                    <span t-esc="o.city"/> <span t-esc="o.state_id.code"/> <span t-esc="o.zip"/>
+                                    <br/>
+                                    <t t-if="o.country_id.code != 'US'">
+                                        <span t-esc="o.country_id.name" />
+                                    </t>
+                                </span>
+                            </div>
+                        </div>
+                    </address>
+                </div>
+            </div>
+        </div>
+    </template>
+</odoo>

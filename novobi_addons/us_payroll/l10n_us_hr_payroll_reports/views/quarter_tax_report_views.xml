@@ -1,0 +1,136 @@
+<odoo>
+    <record id="view_quarter_tax_report_form" model="ir.ui.view">
+        <field name="name">quarter.tax.report.form</field>
+        <field name="model">quarter.tax.report</field>
+        <field name="arch" type="xml">
+            <form create="0" delete="0">
+                <header>
+                    <button name="button_print_report" type="object" string="Print Report" class="btn btn-primary"/>
+                    <button name="update_941_info" type="object" string="Update Report" class="btn btn-default"/>
+                </header>
+
+                <sheet>
+                    <div class="pull-right" style="text-align: right;">
+                        <h2>
+                            Pre Final Quarter Close Form 941
+                        </h2>
+                        <h3>
+                            <field name="name" readonly="1"/>
+                            <br/>
+                            <span attrs="{'invisible': [('vat', '=', False)]}">Employers Federal ID: </span>
+                            <field name="vat" readonly="1" class="oe_inline"/>
+                        </h3>
+                        <span class="font-italic">Last Updated on: </span>
+                        <field name="write_date" class="oe_inline font-italic" readonly="1" force_save="1"/>
+                    </div>
+
+                    <group class="us_payroll_report_label">
+                        <field name="currency_id" invisible="1"/>
+                        <p class="text-muted">Note: In line 5a, 5c, and 5d, we report the actual amounts withheld during the period. </p>
+                        <br/>
+
+                        <field name="no_employees" readonly="1" force_save="1"/>
+                        <field name="total_compensation" readonly="1" force_save="1"/>
+                        <field name="federal_tax" readonly="1" force_save="1"/>
+                        <field name="tax_exempt" readonly="1" force_save="1"/>
+
+                        <label for="tax_ss_wages_1" string="5a. Taxable Social Security wages"/>
+                        <div>
+                            <field name="tax_ss_wages_1" class="oe_inline" readonly="1" force_save="1"/>
+                            x
+                            <field name="ss_rate" class="oe_inline" readonly="1" force_save="1"/>
+                            =
+                            <field name="tax_ss_wages_2" class="oe_inline" readonly="1" force_save="1"/>
+                        </div>
+                        <field name="actual_tax_ss_wages" readonly="1" force_save="1"/>
+
+                        <!--<label for="tax_ss_tips_1" string="5b. Taxable Social Security tips"/>-->
+                        <!--<div>-->
+                            <!--<field name="tax_ss_tips_1" class="oe_inline" readonly="1" force_save="1"/>-->
+                            <!--x-->
+                            <!--<field name="ss_rate" class="oe_inline" readonly="1" force_save="1"/>-->
+                            <!--=-->
+                            <!--<field name="tax_ss_tips_2" class="oe_inline" readonly="1" force_save="1"/>-->
+                        <!--</div>-->
+
+                        <label for="tax_medicare_1" string="5c. Taxable Medicare wages &amp; tips"/>
+                        <div>
+                            <field name="tax_medicare_1" class="oe_inline" readonly="1" force_save="1"/>
+                            x
+                            <field name="medicare_rate" class="oe_inline" readonly="1" force_save="1"/>
+                            =
+                            <field name="tax_medicare_2" class="oe_inline" readonly="1" force_save="1"/>
+                        </div>
+                        <field name="actual_tax_medicare" readonly="1" force_save="1"/>
+
+                        <label for="tax_add_medicare_1"
+                               string="5d. Taxable wages &amp; tips subject to Additional Medicare Tax withholding"/>
+                        <div>
+                            <field name="tax_add_medicare_1" class="oe_inline" readonly="1" force_save="1"/>
+                            x
+                            <field name="add_medicare_rate" class="oe_inline" readonly="1" force_save="1"/>
+                            =
+                            <field name="tax_add_medicare_2" class="oe_inline" readonly="1" force_save="1"/>
+                        </div>
+                        <field name="actual_tax_add_medicare" readonly="1" force_save="1"/>
+                        <field name="total_5e" readonly="1" force_save="1"/>
+                        <field name="tax_due"/>
+                        <field name="total_tax_before" readonly="1" force_save="1"/>
+                        <field name="fractions_of_cents"/>
+                        <field name="sick_pay"/>
+                        <field name="group_term_insurance"/>
+                        <field name="total_tax_after" readonly="1" force_save="1"/>
+                        <field name="tax_credit"/>
+                        <field name="total_tax_final" readonly="1" force_save="1"/>
+                        <field name="deposit"/>
+                        <field name="balance_due" readonly="1" force_save="1"/>
+                        <field name="overpayment" readonly="1" force_save="1"/>
+                    </group>
+
+                    <group string="Tax Liability (Before Adjustment)" class="us_payroll_report_label">
+                        <field name="month_1" string="Month 1" readonly="1" force_save="1"/>
+                        <field name="month_2" string="Month 2" readonly="1" force_save="1"/>
+                        <field name="month_3" string="Month 3" readonly="1" force_save="1"/>
+                        <field name="total_tax_liability" string="Total"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_quarter_tax_report_tree" model="ir.ui.view">
+        <field name="name">quarter.tax.report.tree</field>
+        <field name="model">quarter.tax.report</field>
+        <field name="arch" type="xml">
+            <tree create="0" delete="1">
+                <field name="currency_id" invisible="1"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="name"/>
+                <field name="no_employees" string="Number of Employees"/>
+                <field name="total_compensation" string="Total Compensation"/>
+                <field name="total_tax_final" string="Total Tax after Adjustments and Credits"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_quarter_tax_report_search" model="ir.ui.view">
+        <field name="name">quarter.tax.report.search</field>
+        <field name="model">quarter.tax.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="quarter"/>
+                <field name="year"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_quarter" string="Quarter" context="{'group_by':'quarter'}"/>
+                    <filter name="group_by_year" string="Year" context="{'group_by':'year'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_quarter_tax_report" model="ir.actions.act_window">
+        <field name="name">Quarterly Federal Tax Reports (941)</field>
+        <field name="res_model">quarter.tax.report</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

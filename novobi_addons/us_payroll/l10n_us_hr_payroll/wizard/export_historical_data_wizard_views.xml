@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="export_historical_data_wizard_view_compensation" model="ir.ui.view">
+        <field name="name">export.historical.data.wizard.form.compensation</field>
+        <field name="model">export.historical.data.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="o_group">
+                        <div>
+                            A few more steps to download the import template:
+                            <ol>
+                                <li>Select the payslips you want to add/update compensation.</li>
+                                <li>For some common compensations (e.g. Salary, Vacation pay...), you can select from the dropdown and add for everyone.</li>
+                                <li>You can also add/remove compensation for each employee in the list below.</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="o_group">
+                        <p class="font-weight-bold">(1) Select Payslips to add Compensations</p>
+                        <field name="payslip_ids" options="{'no_create': True, 'no_open': True}" nolabel="1">
+                            <tree editable="bottom">
+                                <field name="name" readonly="1"/>
+                                <field name="employee_id" readonly="1"/>
+                                <field name="wizard_compensation_ids" string="Compensations" widget="many2many_tags"/>
+                            </tree>
+                        </field>
+                    </div>
+                    <div class="o_group mb-5">
+                        <p class="font-weight-bold">(2) Choose Compensations to add to all Payslips</p>
+                        <div class="row">
+                            <div class="col-8">
+                                <field name="payroll_compensation_ids" options="{'no_create': True, 'no_open': True}" widget="many2many_tags"/>
+                            </div>
+                            <div class="col-4">
+                                <button name="button_add_compensation" type="object" string="(3) Apply to all payslips above"
+                                        attrs="{'invisible': ['|', ('payroll_compensation_ids', '=', []), ('payslip_ids', '=', [])]}"
+                                        class="btn btn-link m-0 p-0" icon="fa-arrow-right" />
+                            </div>
+                        </div>
+                    </div>
+                    <footer>
+                        <button name="button_export_payslip_compensation" type="object" string="Export" class="btn btn-primary"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="export_historical_data_wizard_view_deduction" model="ir.ui.view">
+        <field name="name">export.historical.data.wizard.form.deduction</field>
+        <field name="model">export.historical.data.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="o_group">
+                        <div>
+                            A few more steps to download the import template:
+                            <ol>
+                                <li>Select the payslips you want to add/update deduction.</li>
+                                <li>For some common deductions (e.g. 401k, Insurance...), you can select from the dropdown and add for everyone.</li>
+                                <li>You can also add/remove deduction for each employee in the list below.</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="o_group">
+                        <p class="font-weight-bold">(1) Select Payslips to add Deductions</p>
+                        <field name="payslip_ids" options="{'no_create': True, 'no_open': True}" nolabel="1">
+                            <tree editable="bottom">
+                                <field name="name" readonly="1"/>
+                                <field name="employee_id" readonly="1"/>
+                                <field name="wizard_deduction_ids" string="Deductions" widget="many2many_tags"/>
+                            </tree>
+                        </field>
+                    </div>
+                    <div class="o_group mb-5">
+                        <p class="font-weight-bold">(2) Choose Deductions to add to all Payslips</p>
+                        <div class="row">
+                            <div class="col-8">
+                                <field name="payroll_deduction_ids" options="{'no_create': True, 'no_open': True}" widget="many2many_tags"/>
+                            </div>
+                            <div class="col-4">
+                                <button name="button_add_deduction" type="object" string="(3) Apply to all payslips above"
+                                        attrs="{'invisible': ['|', ('payroll_deduction_ids', '=', []), ('payslip_ids', '=', [])]}"
+                                        class="btn btn-link m-0 p-0" icon="fa-arrow-right" />
+                            </div>
+                        </div>
+                    </div>
+                    <footer>
+                        <button name="button_export_payslip_deduction" type="object" string="Export" class="btn btn-primary"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

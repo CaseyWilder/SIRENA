@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record model="ir.cron" id="cron_generate_pay_period">
+        <field name="name">Pay Frequency: Auto generate pay period</field>
+        <field name="active" eval="True"/>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="model_id" ref="l10n_us_hr_payroll.model_pay_frequency"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_generate_pay_period()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="nextcall" eval="(DateTime.now().replace(hour=4, minute=0, second=0, microsecond=0) + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="numbercall">-1</field>
+    </record>
+
+    <record id="vertex_state_get_filing_status" model="ir.cron">
+        <field name="name">Payroll: Update Filing Status</field>
+        <field name="active" eval="True"/>
+        <field name="model_id" ref="model_res_country_state"/>
+        <field name="state">code</field>
+        <field name="code">model._update_filing_status()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">months</field>
+        <field name="nextcall" eval="(DateTime.now().replace(day=20, hour=4, minute=0, second=0, microsecond=0)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="numbercall">-1</field>
+    </record>
+</odoo>
