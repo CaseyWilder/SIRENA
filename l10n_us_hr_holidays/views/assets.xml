@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="assets_backend" inherit_id="web.assets_backend" name="Assets Backend: Public Holidays">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" href="/l10n_us_hr_holidays/static/src/scss/notify.scss"/>
+            <link rel="stylesheet" href="/l10n_us_hr_holidays/static/src/scss/common.scss"/>
+        </xpath>
+    </template>
+</odoo>

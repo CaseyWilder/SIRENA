@@ -1,0 +1,33 @@
+<odoo>
+    <record id="view_wage_tax_report_wizard_form" model="ir.ui.view">
+        <field name="name">semiweekly.tax.report.wizard.form</field>
+        <field name="model">wage.tax.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Wage and Tax Statement">
+                <sheet>
+                    <p class="font-italic">This is not the official W-2 report. Please refer to Federal tax law and use the official W-2 form for submission.</p>
+                    <group name="top">
+                        <group name="left">
+                            <field name="company_id" groups="base.group_multi_company" required="1" readonly="1"/>
+                            <field name="year" required="1"/>
+                        </group>
+                    </group>
+                    <group name="bottom">
+                        <field name="employee_ids" required="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="button_create_report" type="object" class="btn-primary" string="Create"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_wage_tax_report_wizard" model="ir.actions.act_window">
+        <field name="name">Wage and Tax Statement (W-2)</field>
+        <field name="res_model">wage.tax.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

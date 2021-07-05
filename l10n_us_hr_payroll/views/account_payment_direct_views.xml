@@ -1,0 +1,28 @@
+<odoo>
+    <record id="view_account_payment_direct_form" model="ir.ui.view">
+        <field name="name">account.payment.direct.form</field>
+        <field name="model">account.payment.direct</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group name="left">
+                            <field name="employee_id" readonly="1"
+                                   context="{'form_view_ref': 'l10n_us_hr_payroll.hr_employee_view_form'}"/>
+                            <field name="split_paychecks_type" readonly="1"/>
+                        </group>
+                        <group name="right">
+                            <field name="account_name"/>
+                            <field name="routing_number"/>
+                            <field name="account_number"/>
+                            <field name="account_type"/>
+                            <field name="amount_fixed" attrs="{'invisible': [('split_paychecks_type', '!=', 'amount')]}"/>
+                            <field name="amount_percentage" attrs="{'invisible': [('split_paychecks_type', '!=', 'percentage')]}"/>
+                            <field name="currency_id" invisible="1" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,65 @@
+<odoo>
+    <!--Menu-->
+    <menuitem
+            id="menu_us_payroll_root"
+            name="Payroll"
+            groups="l10n_us_hr_payroll.l10n_us_hr_payroll_group_officer"
+            web_icon="l10n_us_hr_payroll,static/description/icon.png"
+            sequence="70"/>
+
+    <!-- Employees -->
+    <menuitem
+            id="menu_us_payroll_employee_main"
+            name="Employees"
+            parent="menu_us_payroll_root"
+            groups="hr.group_hr_user"
+            sequence="5"/>
+
+    <menuitem
+            id="menu_us_payroll_employee_sub"
+            action="hr.open_view_employee_list_my"
+            parent="menu_us_payroll_employee_main"
+            sequence="5"/>
+
+    <menuitem
+            id="menu_us_payroll_department"
+            action="hr.hr_department_kanban_action"
+            parent="menu_us_payroll_employee_main"
+            sequence="10"/>
+
+    <!-- Payroll -->
+    <menuitem
+            id="menu_us_payroll_payroll"
+            name="Payroll"
+            parent="menu_us_payroll_root"
+            groups="hr.group_hr_user"
+            sequence="15"/>
+
+    <menuitem id="menu_us_payroll_pay_period"
+              name="Period"
+              parent="menu_us_payroll_payroll"
+              sequence="5"/>
+
+    <menuitem
+            id="menu_us_payroll_adhoc"
+            name="Ad hoc"
+            parent="menu_us_payroll_payroll"
+            groups="hr.group_hr_user"
+            sequence="50"/>
+
+    <!-- Reporting -->
+    <menuitem
+            id="menu_us_payroll_report"
+            name="Reporting"
+            parent="menu_us_payroll_root"
+            groups="l10n_us_hr_payroll.l10n_us_hr_payroll_group_manager"
+            sequence="80"/>
+
+    <!-- Configuration -->
+    <menuitem
+            id="menu_us_payroll_configuration"
+            name="Configuration"
+            parent="menu_us_payroll_root"
+            groups="l10n_us_hr_payroll.l10n_us_hr_payroll_group_manager"
+            sequence="100"/>
+</odoo>

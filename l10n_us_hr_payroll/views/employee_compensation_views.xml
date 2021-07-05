@@ -1,0 +1,42 @@
+<odoo>
+    <record id="view_employee_compensation_tree" model="ir.ui.view">
+        <field name="name">employee.compensation.tree</field>
+        <field name="model">employee.compensation</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="currency_id" invisible="1"/>
+                <field name="employee_id" invisible="1"/>
+                <field name="compensation_id" required="1"/>
+                <field name="label" required="1"/>
+                <field name="amount" required="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_employee_compensation_form" model="ir.ui.view">
+        <field name="name">employee.compensation.form</field>
+        <field name="model">employee.compensation</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group name="left">
+                            <field name="employee_id" required="1" readonly="1"
+                                   invisible="context.get('default_employee_id', False)"
+                                   context="{'form_view_ref': 'l10n_us_hr_payroll.hr_employee_view_form'}"/>
+                            <field name="compensation_id" required="1"/>
+                            <field name="label" required="1"/>
+                            <field name="vertex_id" invisible="1"/>
+                        </group>
+                        <group name="right">
+                            <field name="amount" required="1"/>
+                            <field name="incl_gp_deduction" readonly="1"/>
+                            <field name="active" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

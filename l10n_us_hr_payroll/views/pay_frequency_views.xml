@@ -1,0 +1,93 @@
+<odoo>
+    <record id="view_pay_frequency_form" model="ir.ui.view">
+        <field name="name">view.pay.frequency.form</field>
+        <field name="model">pay.frequency</field>
+        <field name="arch" type="xml">
+            <form string="Pay Frequency">
+                <header>
+                    <button name="button_confirm" string="Confirm" class="btn-primary" type="object" states="draft"/>
+                    <button name="button_cancel" string="Cancel" type="object" states="draft,confirm"/>
+                    <button name="button_set_to_draft" string="Set to draft" type="object" states="cancel,confirm"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group name="general">
+                        <group name="left_group">
+                            <field name="name" required="1" string="Pay Frequency Name" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="frequency" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="1"/>
+                        </group>
+                        <group name="right_group">
+                            <field name="deadline" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <div colspan="2" class="text-muted">
+                                (Number of days before Pay Date)
+                            </div>
+                        </group>
+                    </group>
+                    <group name="period">
+                        <group name="left_group">
+                            <span class="o_td_label o_form_label">
+                                <b>Pay Date <span attrs="{'invisible': [('frequency', '!=', '24')]}">#1</span></b>
+                            </span>
+                            <field name="first_pay_date" nolabel="1" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <span class="o_td_label o_form_label">
+                                <b>Last Day of Work <span attrs="{'invisible': [('frequency', '!=', '24')]}">#1</span></b>
+                            </span>
+                            <field name="first_last_day_of_work" nolabel="1" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                        </group>
+                        <group name="right_group" attrs="{'invisible': [('frequency', '!=', '24')]}">
+                            <field name="second_pay_date"
+                                   attrs="{'required': [('frequency', '=', '24')], 'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="second_last_day_of_work"
+                                   attrs="{'required': [('frequency', '=', '24')], 'readonly': [('state', '!=', 'draft')]}"/>
+                        </group>
+                    </group>
+                    <field name="preview_area"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_pay_frequency_wizard_form" model="ir.ui.view">
+        <field name="name">view.pay.frequency.wizard.form</field>
+        <field name="model">pay.frequency</field>
+        <field name="inherit_id" ref="view_pay_frequency_form"/>
+        <field name="mode">primary</field>
+        <field name="priority" eval="50"/>
+        <field name="arch" type="xml">
+            <header position="attributes">
+                <attribute name="invisible">1</attribute>
+            </header>
+            <sheet position="after">
+                <footer>
+                    <button name="button_onboarding_confirm" type="object" class="btn-primary" string="Set as company default" />
+                    <button string="Cancel" class="btn-secondary" special="cancel" />
+                </footer>
+            </sheet>
+        </field>
+    </record>
+
+    <record id="view_pay_frequency_tree" model="ir.ui.view">
+        <field name="name">pay.frequency.tree</field>
+        <field name="model">pay.frequency</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="name" />
+                <field name="frequency" />
+                <field name="first_last_day_of_work"/>
+                <field name="first_pay_date" />
+                <field name="state" widget="badge" decoration-success="state == 'confirm'" decoration-info="state == 'draft'" decoration-muted="state=='cancel'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_pay_frequency" model="ir.actions.act_window">
+        <field name="name">Pay Frequency</field>
+        <field name="res_model">pay.frequency</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem action="action_pay_frequency" id="menu_pay_frequency"
+              parent="menu_us_payroll_configuration" sequence="5"/>
+</odoo>
