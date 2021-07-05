@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_pay_period_form_inherit_timesheet" model="ir.ui.view">
+        <field name="name">pay.period.form.timesheet</field>
+        <field name="model">pay.period</field>
+        <field name="inherit_id" ref="l10n_us_hr_payroll.view_pay_period_form_include_period"/>
+        <field name="arch" type="xml">
+            <!-- Add 'Timesheets' to the message -->
+            <xpath expr="//div[@name='outdated_working_hours']/span" position="after">
+                <span>/Timesheets</span>
+            </xpath>
+        </field>
+    </record>
+</odoo>

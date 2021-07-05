@@ -1,0 +1,114 @@
+<odoo>
+    <record id="view_semiweekly_tax_report_form" model="ir.ui.view">
+        <field name="name">semiweekly.tax.report.form</field>
+        <field name="model">semiweekly.tax.report</field>
+        <field name="arch" type="xml">
+            <form create="0" delete="0" edit="0">
+                <header>
+                    <button name="button_print_report" type="object" string="Print Report" class="btn btn-primary"/>
+                    <button name="button_print_report_xls" string="Export as XLS" type="object" class="oe_highlight"/>
+                    <button name="update_report_info" type="object" string="Update Report" class="btn btn-default"/>
+                </header>
+
+                <sheet>
+                    <div class="pull-right" style="text-align: right;">
+                        <h2>
+                            Schedule B (Form 941)
+                        </h2>
+                        <h3>
+                            Report of Tax Liability for Semiweekly Schedule Depositor
+                        </h3>
+                        <h3>
+                            <field name="name" readonly="1"/>
+                            <br/>
+                            <span attrs="{'invisible': [('vat', '=', False)]}">Employers Federal ID: </span>
+                            <field name="vat" readonly="1" class="oe_inline"/>
+                        </h3>
+
+                        <span class="font-italic">Last Updated on: </span>
+                        <field name="write_date" class="oe_inline font-italic" readonly="1" force_save="1"/>
+                    </div>
+
+                    <group>
+                        <field name="line_ids" readonly="1" nolabel="1"
+                               widget="section_and_note_one2many" options="{'no_open': True}">
+                            <tree>
+                                <field name="sequence" invisible="1"/>
+                                <field name="report_id" invisible="1"/>
+                                <field name="currency_id" invisible="1"/>
+                                <field name="display_type" invisible="1"/>
+                                <field name="name" widget="section_and_note_text"/>
+                                <field name="pay_date"/>
+                                <field name="amount"/>
+                            </tree>
+                        </field>
+
+                        <group class="oe_subtotal_footer oe_right">
+                            <field name="currency_id" invisible="1"/>
+                            <field name="month_1" readonly="1" force_save="1"/>
+                            <field name="month_2" readonly="1" force_save="1"/>
+                            <field name="month_3" readonly="1" force_save="1"/>
+                            <field name="total_tax_liability" class="oe_subtotal_footer_separator"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_semiweekly_tax_report_tree" model="ir.ui.view">
+        <field name="name">semiweekly.tax.report.tree</field>
+        <field name="model">semiweekly.tax.report</field>
+        <field name="arch" type="xml">
+            <tree create="0" delete="1">
+                <field name="currency_id" invisible="1"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_semiweekly_tax_report_search" model="ir.ui.view">
+        <field name="name">semiweekly.tax.report.search</field>
+        <field name="model">semiweekly.tax.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="quarter"/>
+                <field name="year"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_quarter" string="Quarter" context="{'group_by':'quarter'}"/>
+                    <filter name="group_by_year" string="Year" context="{'group_by':'year'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_semiweekly_tax_report_line_form" model="ir.ui.view">
+        <field name="name">semiweekly.tax.report.line.form</field>
+        <field name="model">semiweekly.tax.report.line</field>
+        <field name="arch" type="xml">
+            <form create="0" delete="0">
+                <sheet>
+                    <field name="display_type" invisible="1"/>
+                    <group>
+                        <group attrs="{'invisible': [('display_type', '!=', 'line_section')]}">
+                            <field name="name" readonly="1"/>
+                        </group>
+                         <group attrs="{'invisible': [('display_type', '!=', False)]}">
+                             <field name="currency_id" invisible="1"/>
+                             <field name="report_id" readonly="1"/>
+                             <field name="pay_date" readonly="1"/>
+                             <field name="amount" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_semiweekly_tax_report" model="ir.actions.act_window">
+        <field name="name">Tax Liability for Semiweekly Schedule Depositors Reports</field>
+        <field name="res_model">semiweekly.tax.report</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

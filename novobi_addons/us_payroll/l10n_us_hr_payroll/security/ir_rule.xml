@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="employee_comp_rule" model="ir.rule">
+        <field name="name">Employee multi companies rule</field>
+        <field name="model_id" ref="model_hr_employee"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="employee_compensation_comp_rule" model="ir.rule">
+        <field name="name">Employee Compensation multi companies rule</field>
+        <field name="model_id" ref="model_employee_compensation"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="payslip_compensation_comp_rule" model="ir.rule">
+        <field name="name">Payslip Compensation multi companies rule</field>
+        <field name="model_id" ref="model_payslip_compensation"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="deduction_policy_comp_rule" model="ir.rule">
+        <field name="name">Deduction Policy multi companies rule</field>
+        <field name="model_id" ref="model_deduction_policy_template"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="employee_deduction_comp_rule" model="ir.rule">
+        <field name="name">Employee Deduction multi companies rule</field>
+        <field name="model_id" ref="model_employee_deduction"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="payslip_deduction_comp_rule" model="ir.rule">
+        <field name="name">Payslip Deduction multi companies rule</field>
+        <field name="model_id" ref="model_payslip_deduction"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="pay_frequency_comp_rule" model="ir.rule">
+        <field name="name">Pay Frequency multi companies rule</field>
+        <field name="model_id" ref="model_pay_frequency"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="pay_period_comp_rule" model="ir.rule">
+        <field name="name">Pay Period multi companies rule</field>
+        <field name="model_id" ref="model_pay_period"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="payroll_payslip_comp_rule" model="ir.rule">
+        <field name="name">Payslip multi companies rule</field>
+        <field name="model_id" ref="model_payroll_payslip"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="payslip_compout_comp_rule" model="ir.rule">
+        <field name="name">Payslip CompOut multi companies rule</field>
+        <field name="model_id" ref="model_payslip_compout"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="payslip_tax_comp_rule" model="ir.rule">
+        <field name="name">Payslip Tax multi companies rule</field>
+        <field name="model_id" ref="model_payslip_tax"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="payslip_vacation_comp_rule" model="ir.rule">
+        <field name="name">Payslip Vacation multi companies rule</field>
+        <field name="model_id" ref="model_payslip_vacation"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="hr_employee_confidential_message_user_rule" model="ir.rule">
+        <field name="name">Employee Confidential Message Internal User rule</field>
+        <field name="model_id" ref="mail.model_mail_message"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">['|', ('is_confidential', '=', False), '&amp;', ('is_confidential', '=', True), ('user_id.id', '=', user.id)]</field>
+    </record>
+
+    <record id="hr_employee_confidential_message_payroll_officer_rule" model="ir.rule">
+        <field name="name">Employee Confidential Message Payroll Officer rule</field>
+        <field name="model_id" ref="mail.model_mail_message"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="groups" eval="[(4, ref('l10n_us_hr_payroll.l10n_us_hr_payroll_group_officer'))]"/>
+    </record>
+</odoo>

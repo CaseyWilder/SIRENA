@@ -1,0 +1,20 @@
+<odoo noupdate="1">
+    <!-- Add 'Check Number' to Paycheck Detail Report template (after Payment Method) -->
+    <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'l10n_us_hr_payroll_reports'), ('name', '=', 'ir_export_paycheck_detail')]"/>
+        </function>
+        <value eval="{'noupdate': False}"/>
+    </function>
+
+    <record id="l10n_us_hr_payroll_reports.ir_export_paycheck_detail" model="ir.exports">
+        <field name="export_fields" eval="[(0, 0, {'sequence': 13,  'name': 'check_number'})]"/>
+    </record>
+
+    <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'l10n_us_hr_payroll_reports'), ('name', '=', 'ir_export_paycheck_detail')]"/>
+        </function>
+        <value eval="{'noupdate': True}"/>
+    </function>
+</odoo>
