@@ -22,6 +22,63 @@ USPS_CONTAINER_SELECTION = [
     ('NONRECTANGULAR', 'Non-rectangular')
 ]
 
+FEDEX_SMARTPOST_INDICIA_SELECTION = [
+    ('MEDIA_MAIL', 'Media Mail'),
+    ('PRESORTED_BOUND_PRINTED_MATTER', 'Bound Printed Matter'),
+    ('PRESORTED_STANDARD', 'Parcel Select Lightweight / Standard Mail'),
+    ('PARCEL_SELECT', 'Parcel Select'),
+    ('PARCEL_RETURN', 'Parcel Return')
+]
+
+FEDEX_SMARTPOST_HUBID_SELECTION = [
+    ('5185', '5185 - Allentown, Pennsylvania'),
+    ('5303', '5303 - Atlanta, Georgia'),
+    ('5213', '5213 - Baltimore, Maryland'),
+    ('5281', '5281 - Charlotte, North Carolina'),
+    ('5929', '5929 - Chino, California'),
+    ('5751', '5751 - Dallas, Texas'),
+    ('5802', '5802 - Denver, Colorado'),
+    ('5481', '5481 - Detroit, Michigan'),
+    ('5087', '5087 - Edison, New Jersey'),
+    ('5431', '5431 - Grove City, Ohio'),
+    ('5771', '5771 - Houston, Texas'),
+    ('5436', '5436 - Groveport, Ohio'),
+    ('5902', '5902 - Los Angeles, California'),
+    ('5465', '5465 - Idianapolis, Indiana'),
+    ('5648', '5648 - Kansas City, Kansas'),
+    ('5254', '5254 - Martinsburg, West Virginia'),
+    ('5183', '5183 - Macungie, Pennsylvania'),
+    ('5379', '5379 - Memphis, Tennessee'),
+    ('5552', '5552 - Minneapolis, Minnesota'),
+    ('5531', '5531 - New Berlin, Wisconsin (test environment\'s only valid value)'),
+    ('5110', '5110 - Newburgh, New York'),
+    ('5095', '5095 - Newark, New Jersey'),
+    ('5015', '5015 - Northborough, Massachusetts'),
+    ('5327', '5327 - Orlando, Florida'),
+    ('5194', '5194 - Philadelphia, Pennsylvania'),
+    ('5854', '5854 - Phoenix, Arizona'),
+    ('5150', '5150 - Pittsburgh, Pennsylvania'),
+    ('5958', '5958 - Sacramento, California'),
+    ('5097', '5097 - South Brunswick, New Jersey'),
+    ('5186', '5186 - Scranton, Pennsylvania'),
+    ('5843', '5843 - Salt Lake City, Utah'),
+    ('5983', '5983 - Seattle, Washington'),
+    ('5631', '5631 - St. Louis, Missouri'),
+    ('5893', '5893 - Reno, Nevada'),
+    ('5345', '5345 - Tampa, Florida'),
+    ('5602', '5602 - Wheeling, Illinois'),
+    ('5061', '5061 - Windsor, Connecticut'),
+]
+
+FEDEX_SMARTPOST_ANCILLARY_SELECTION = [
+    ('NONE', 'No Ancillary Endorsement'),
+    ('ADDRESS_CORRECTION', 'Address Correction'),
+    ('CARRIER_LEAVE_IF_NO_RESPONSE', 'Carrier Leave If No Response'),
+    ('CHANGE_SERVICE', 'Change Service'),
+    ('FORWARDING_SERVICE', 'Forwarding Service'),
+    ('RETURN_SERVICE', 'Return Service')
+]
+
 
 class ShippingMethodMixin(models.AbstractModel):
     _name = 'shipping.method.mixin'
@@ -49,7 +106,16 @@ class ShippingMethodMixin(models.AbstractModel):
 
     package_type = fields.Char(string='Package Type', compute='_get_package_type', store=True, copy=False)
 
-    is_residential_address = fields.Boolean(string='Residential')
+    is_residential_address = fields.Boolean(string='Residential', default='_get_default_residential_setting')
+    is_readonly = fields.Boolean(string='Readonly setting for the residential checkbox')
+
+    smartpost_indicia = fields.Selection(FEDEX_SMARTPOST_INDICIA_SELECTION, string='SmartPost Indicia',
+                                         default='PARCEL_SELECT')
+    smartpost_hubId = fields.Selection(FEDEX_SMARTPOST_HUBID_SELECTION, string='SmartPost HubID', default='5531')
+    smartpost_ancillary = fields.Selection(FEDEX_SMARTPOST_ANCILLARY_SELECTION,
+                                           string='SmartPost Ancillary Endorsement', default='NONE')
+    is_smartpost = fields.Boolean(string='Visibility for SmartPost settings',
+                                  default='_get_default_is_smartpost_setting')
 
     @api.depends('default_packaging_id', 'usps_is_first_class', 'usps_first_class_mail_type', 'usps_container')
     def _get_package_type(self):
@@ -85,8 +151,30 @@ class ShippingMethodMixin(models.AbstractModel):
 
     @api.onchange('delivery_carrier_id')
     def onchange_delivery_carrier_id(self):
+        # Set/unset residential for some specific FedEx shipping services.
+        if self.delivery_carrier_id.fedex_service_type == 'FEDEX_GROUND':
+            self.is_residential_address = False
+            self.is_readonly = True
+        elif self.delivery_carrier_id.fedex_service_type == 'GROUND_HOME_DELIVERY':
+            self.is_residential_address = True
+            self.is_readonly = True
+        else:
+            self.is_readonly = False
+
+        # Set/unset SmartPost's settings' visibility
+        self.is_smartpost = self.delivery_carrier_id.fedex_service_type == 'SMART_POST'
+
         self.update({
             'default_packaging_id': False,
             'usps_first_class_mail_type': False,
             'usps_container': False,
         })
+
+    @api.model
+    def _get_default_residential_setting(self):
+        return self.delivery_carrier_id.fedex_service_type == 'GROUND_HOME_DELIVERY'  # Add additional shipping
+        # services that require the recipient's address to be residential here
+
+    @api.model
+    def _get_default_is_smartpost_setting(self):
+        return self.delivery_carrier_id.fedex_service_type == 'SMART_POST'

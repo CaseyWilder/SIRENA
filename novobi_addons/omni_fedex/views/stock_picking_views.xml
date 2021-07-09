@@ -5,6 +5,12 @@
         <field name="model">stock.picking</field>
         <field name="inherit_id" ref="novobi_shipping_account.view_picking_create_label_form"/>
         <field name="arch" type="xml">
+            <field name="custom_packaging_name" position="after">
+                <field name="is_smartpost" invisible="1"/>
+                <field name="smartpost_indicia" attrs="{'invisible': ['|',('provider','!=','fedex'),('is_smartpost','=',False)]}"/>
+                <field name="smartpost_ancillary" attrs="{'invisible': ['|',('provider','!=','fedex'),('is_smartpost','=',False)]}"/>
+                <field name="smartpost_hubId" attrs="{'invisible': ['|',('provider','!=','fedex'),('is_smartpost','=',False)]}"/>
+            </field>
             <field name="shipping_date" position="after">
                 <field name="fedex_shipping_confirmation"
                        attrs="{'invisible': [('provider', '!=', 'fedex')]}"
@@ -16,6 +22,11 @@
                     <div class="col-6 col-lg-6">
                         <div class="o_horizontal_separator">Shipment Options</div>
                         <div>
+                            <div>
+                                <field name="is_readonly" invisible="1"/>
+                                <field name="is_residential_address" attrs="{'readonly': [('is_readonly','=',True)], 'invisible': [('provider', '!=', 'fedex')]}"/>
+                                <label for="is_residential_address" string="Residential"/>
+                            </div>
                             <div>
                                 <field name="shipping_change_billing"/>
                                 <label for="shipping_change_billing" string="Change Billing (*)"/>

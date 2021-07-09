@@ -72,6 +72,18 @@ class FedexRequest(FedexRequestBase):
         Money.Amount = amount
         self.RequestedShipment.TotalInsuredValue = Money
 
+    def set_residential(self, residential):
+        self.RequestedShipment.Recipient.Address.Residential = residential
+
+    def set_smartpost_detail(self, indicia, ancillary, hubId):
+        smart_post_detail = self.factory.SmartPostShipmentDetail()
+        smart_post_detail.HubId = hubId
+        smart_post_detail.Indicia = indicia
+        if ancillary != 'NONE':
+            smart_post_detail.AncillaryEndorsement = ancillary
+        self.RequestedShipment.SmartPostDetail = smart_post_detail
+
+
     # def shipment_label(self, label_format_type, image_type, label_stock_type, label_printing_orientation, label_order,
     #                    alcohol_shipment_label):
     #     LabelSpecification = self.factory.LabelSpecification()
