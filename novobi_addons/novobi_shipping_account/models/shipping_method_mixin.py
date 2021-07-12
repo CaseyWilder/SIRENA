@@ -106,7 +106,7 @@ class ShippingMethodMixin(models.AbstractModel):
 
     package_type = fields.Char(string='Package Type', compute='_get_package_type', store=True, copy=False)
 
-    is_residential_address = fields.Boolean(string='Residential', default='_get_default_residential_setting')
+    is_residential_address = fields.Boolean(string='Residential')
 
     smartpost_indicia = fields.Selection(FEDEX_SMARTPOST_INDICIA_SELECTION, string='SmartPost Indicia',
                                          default='PARCEL_SELECT')
@@ -150,12 +150,7 @@ class ShippingMethodMixin(models.AbstractModel):
     @api.onchange('delivery_carrier_id')
     def onchange_delivery_carrier_id(self):
         # Set/unset residential for some specific FedEx shipping services.
-        if self.delivery_carrier_id.fedex_service_type == 'FEDEX_GROUND':
-            self.is_residential_address = False
-        elif self.delivery_carrier_id.fedex_service_type == 'GROUND_HOME_DELIVERY':
-            self.is_residential_address = True
-        else:
-            self.is_residential_address = False
+        self.is_residential_address = self.delivery_carrier_id.fedex_service_type == 'GROUND_HOME_DELIVERY'
 
         self.update({
             'default_packaging_id': False,
