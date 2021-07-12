@@ -16,24 +16,11 @@ _logger = logging.getLogger(__name__)
 class ProviderFedex(models.Model):
     _inherit = 'delivery.carrier'
 
-    fedex_service_type = fields.Selection([('INTERNATIONAL_ECONOMY', 'INTERNATIONAL_ECONOMY'),
-                                           ('INTERNATIONAL_PRIORITY', 'INTERNATIONAL_PRIORITY'),
-                                           ('FEDEX_GROUND', 'FEDEX_GROUND'),
-                                           ('GROUND_HOME_DELIVERY', 'GROUND_HOME_DELIVERY'),
-                                           ('SMART_POST', 'SMART_POST'),
-                                           ('FEDEX_2_DAY', 'FEDEX_2_DAY'),
-                                           ('FEDEX_2_DAY_AM', 'FEDEX_2_DAY_AM'),
-                                           ('FEDEX_3_DAY_FREIGHT', 'FEDEX_3_DAY_FREIGHT'),
-                                           ('FIRST_OVERNIGHT', 'FIRST_OVERNIGHT'),
-                                           ('PRIORITY_OVERNIGHT', 'PRIORITY_OVERNIGHT'),
-                                           ('STANDARD_OVERNIGHT', 'STANDARD_OVERNIGHT'),
-                                           ('FEDEX_NEXT_DAY_EARLY_MORNING', 'FEDEX_NEXT_DAY_EARLY_MORNING'),
-                                           ('FEDEX_NEXT_DAY_MID_MORNING', 'FEDEX_NEXT_DAY_MID_MORNING'),
-                                           ('FEDEX_NEXT_DAY_AFTERNOON', 'FEDEX_NEXT_DAY_AFTERNOON'),
-                                           ('FEDEX_NEXT_DAY_END_OF_DAY', 'FEDEX_NEXT_DAY_END_OF_DAY'),
-                                           ('FEDEX_EXPRESS_SAVER', 'FEDEX_EXPRESS_SAVER'),
-                                           ],
-                                          default='INTERNATIONAL_PRIORITY')
+    fedex_service_type = fields.Selection(selection_add=[
+        ('FEDEX_GROUND',),
+        ('GROUND_HOME_DELIVERY', 'GROUND_HOME_DELIVERY'),
+        ('SMART_POST', 'SMART_POST')
+    ])
 
     def _fedex_convert_weight_in_ob(self, weight, unit='LB'):
         weight_uom_id = self.env.ref('uom.product_uom_lb')

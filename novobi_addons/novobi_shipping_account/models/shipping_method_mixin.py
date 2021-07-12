@@ -107,15 +107,13 @@ class ShippingMethodMixin(models.AbstractModel):
     package_type = fields.Char(string='Package Type', compute='_get_package_type', store=True, copy=False)
 
     is_residential_address = fields.Boolean(string='Residential', default='_get_default_residential_setting')
-    is_readonly = fields.Boolean(string='Readonly setting for the residential checkbox')
 
     smartpost_indicia = fields.Selection(FEDEX_SMARTPOST_INDICIA_SELECTION, string='SmartPost Indicia',
                                          default='PARCEL_SELECT')
     smartpost_hubId = fields.Selection(FEDEX_SMARTPOST_HUBID_SELECTION, string='SmartPost HubID', default='5531')
     smartpost_ancillary = fields.Selection(FEDEX_SMARTPOST_ANCILLARY_SELECTION,
                                            string='SmartPost Ancillary Endorsement', default='NONE')
-    is_smartpost = fields.Boolean(string='Visibility for SmartPost settings',
-                                  default='_get_default_is_smartpost_setting')
+    fedex_service_type = fields.Selection(related='delivery_carrier_id.fedex_service_type')
 
     @api.depends('default_packaging_id', 'usps_is_first_class', 'usps_first_class_mail_type', 'usps_container')
     def _get_package_type(self):
@@ -154,27 +152,13 @@ class ShippingMethodMixin(models.AbstractModel):
         # Set/unset residential for some specific FedEx shipping services.
         if self.delivery_carrier_id.fedex_service_type == 'FEDEX_GROUND':
             self.is_residential_address = False
-            self.is_readonly = True
         elif self.delivery_carrier_id.fedex_service_type == 'GROUND_HOME_DELIVERY':
             self.is_residential_address = True
-            self.is_readonly = True
         else:
-            self.is_readonly = False
-
-        # Set/unset SmartPost's settings' visibility
-        self.is_smartpost = self.delivery_carrier_id.fedex_service_type == 'SMART_POST'
+            self.is_residential_address = False
 
         self.update({
             'default_packaging_id': False,
             'usps_first_class_mail_type': False,
             'usps_container': False,
         })
-
-    @api.model
-    def _get_default_residential_setting(self):
-        return self.delivery_carrier_id.fedex_service_type == 'GROUND_HOME_DELIVERY'  # Add additional shipping
-        # services that require the recipient's address to be residential here
-
-    @api.model
-    def _get_default_is_smartpost_setting(self):
-        return self.delivery_carrier_id.fedex_service_type == 'SMART_POST'

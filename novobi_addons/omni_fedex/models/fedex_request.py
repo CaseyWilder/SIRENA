@@ -168,7 +168,8 @@ class FedexRequest(FedexRequestBase):
             package.SpecialServicesRequested.SpecialServiceTypes = special_services_type
 
         package.PhysicalPackaging = 'BOX'
-        if package_code == 'YOUR_PACKAGING':
+        if package_code == 'YOUR_PACKAGING' and package_dimension['height'] != 0\
+                and package_dimension['width'] != 0 and package_dimension['length'] != 0:
             package.Dimensions = self.factory.Dimensions()
             package.Dimensions.Height = int(package_dimension['height'])
             package.Dimensions.Width = int(package_dimension['width'])
