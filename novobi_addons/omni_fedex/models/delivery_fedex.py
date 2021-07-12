@@ -16,6 +16,12 @@ _logger = logging.getLogger(__name__)
 class ProviderFedex(models.Model):
     _inherit = 'delivery.carrier'
 
+    fedex_service_type = fields.Selection(selection_add=[
+        ('FEDEX_GROUND',),
+        ('GROUND_HOME_DELIVERY', 'GROUND_HOME_DELIVERY'),
+        ('SMART_POST', 'SMART_POST')
+    ])
+
     def _fedex_convert_weight_in_ob(self, weight, unit='LB'):
         weight_uom_id = self.env.ref('uom.product_uom_lb')
         if unit == 'KG':
@@ -98,6 +104,7 @@ class ProviderFedex(models.Model):
         shipper = picking.company_id.partner_id
         warehouse = picking.picking_type_id.warehouse_id.partner_id
         recipient = picking.partner_id
+        residential = picking.is_residential_address
         is_india = recipient.country_id.code == 'IN' and shipper.country_id.code == 'IN'
 
         pickup_datetime = datetime.datetime.combine(pickup_date, datetime.time(12, 0, 0))
@@ -145,6 +152,7 @@ class ProviderFedex(models.Model):
 
         request.set_shipper(shipper, warehouse)
         request.set_recipient(recipient)
+        request.set_residential(residential)
 
         if not picking.is_mul_packages:
             weight_value = self._fedex_convert_weight_in_ob(weight, unit=self.fedex_weight_unit)
@@ -214,6 +222,10 @@ class ProviderFedex(models.Model):
             request.customs_value(_convert_curr_iso_fdx(order_currency.name), total_commodities_amount, "NON_DOCUMENTS")
             request.duties_payment(warehouse, shipping_account.fedex_account_number, self.fedex_duty_payment)
 
+        # SmartPost Detail
+        if self.fedex_service_type == 'SMART_POST':
+            request.set_smartpost_detail(picking.smartpost_indicia, picking.smartpost_ancillary, picking.smartpost_hubId)
+
         # Sending Get Rate Request
         response = request.rate(return_time_in_transit=True)
 
@@ -246,6 +258,7 @@ class ProviderFedex(models.Model):
         shipper = picking.company_id.partner_id
         warehouse = picking.picking_type_id.warehouse_id.partner_id
         recipient = picking.partner_id
+        residential = picking.is_residential_address
 
         pickup_datetime = datetime.datetime.combine(pickup_date, datetime.time(12, 0, 0))
         order_currency = picking.sale_id.currency_id or picking.company_id.currency_id
@@ -306,6 +319,7 @@ class ProviderFedex(models.Model):
 
             request.set_shipper(shipper, warehouse)
             request.set_recipient(recipient)
+            request.set_residential(residential)
 
             request._shipping_charges_payment(shipping_charge_payment_account, shipping_charge_payment_type)
 
@@ -379,6 +393,10 @@ class ProviderFedex(models.Model):
                 handling_fee=picking.handling_fee
             )
             request.set_master_package(weight_value, 1)
+
+            # SmartPost Detail
+            if self.fedex_service_type == 'SMART_POST':
+                request.set_smartpost_detail(picking.smartpost_indicia, picking.smartpost_ancillary, picking.smartpost_hubId)
 
             # Request shipment to fedEx
             response = request.process_shipment()
