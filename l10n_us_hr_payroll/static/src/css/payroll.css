@@ -1,0 +1,26 @@
+/*
+ * Default z-index = 1051 ( = z-index of modal + 1)
+ * Selection list for many2one field is hide if we increase z-index of modal to blur the others.
+ */
+.ui-autocomplete,
+.dropdown-menu {
+    z-index: 1500 !important;
+}
+
+.enrollment_field {
+    font-weight: bold;
+}
+
+.o_form_editable .enrollment_deduction {
+    min-width: 200px;
+}
+
+.o_form_editable .enrollment_working_type {
+    min-width: 150px;
+}
+
+.btn-normal-text {
+    vertical-align: baseline;
+    margin: 0 !important;
+    padding: 0 !important;
+}

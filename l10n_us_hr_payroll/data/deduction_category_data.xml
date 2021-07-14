@@ -1,0 +1,303 @@
+<odoo>
+    <record model="payroll.deduction.category" id="payroll_deduction_category_0">
+		<field name="vertex_id">0</field>
+		<field name="name">125 Reg</field>
+		<field name="description">This is pre-tax deduction per Federal tax withholding. For State and local tax withholding, please refer your State Tax Law for more information.</field>
+		<field name="has_company_contribution" eval="True"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_1">
+		<field name="vertex_id">1</field>
+		<field name="name">401K Deferral Reg</field>
+		<field name="description">This is pre-tax deduction per Federal tax withholding. For State and local tax withholding, please refer your State Tax Law for more information.
+The 401K Deferred Compensation Plan is a pre‐tax deduction that allows employees to defer paying federal income tax on a portion of their salaries until they retire or start withdrawing from the funds.
+Please refer more information at www.irs.gov/retirement-plans/401k-plans</field>
+		<field name="has_company_contribution" eval="True"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_2">
+		<field name="vertex_id">2</field>
+		<field name="name">403B Deferral Reg</field>
+		<field name="description">The 403B Deferred Compensation for non-profit Organization Employees is a pre-tax deduction that creates a retirement savings program for employees of tax-exempt organizations, such as public schools, colleges and universities, religious groups, and public charities.</field>
+		<field name="has_company_contribution" eval="True"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_3">
+		<field name="vertex_id">3</field>
+		<field name="name">457 Deferral Reg</field>
+		<field name="description">The 457 Deferred Compensation for State and Local Government Employees is a pre‐tax deduction that allows employees to defer the receipt of wages that would otherwise be considered current income. These wages are paid by the employer in a scheduled amount and time frame agreed upon with the employee.</field>
+		<field name="has_company_contribution" eval="True"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_4">
+		<field name="vertex_id">4</field>
+		<field name="name">125 Sup</field>
+		<field name="description">The 125 Cafeteria Plan is a pre‐tax deduction that allows employees to choose cash instead of receiving a benefit.</field>
+		<field name="has_company_contribution" eval="True"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_5">
+		<field name="vertex_id">5</field>
+		<field name="name">401K Deferral Sup</field>
+		<field name="description">The 401K Deferred Compensation Plan is a pre‐tax deduction that allows employees to defer paying federal income tax on a portion of their salaries until they retire or start withdrawing from the funds</field>
+		<field name="has_company_contribution" eval="True"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_6">
+		<field name="vertex_id">6</field>
+		<field name="name">403B Deferral Sup</field>
+		<field name="description">the 403B Deferred Compensation for non-profit Organization Employees is a pre-tax deduction that creates a retirement savings program for employees of tax-exempt organizations, such as public schools, colleges and universities, religious groups, and public charities. </field>
+		<field name="has_company_contribution" eval="True"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_7">
+		<field name="vertex_id">7</field>
+		<field name="name">457 Deferral Sup</field>
+		<field name="description">The 457 Deferred Compensation for State and Local Government Employees is a pre‐tax deduction that allows employees to defer the receipt of wages that would otherwise be considered current income. These wages are paid by the employer in a scheduled amount and time frame agreed upon with the employee.</field>
+		<field name="has_company_contribution" eval="True"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_14">
+		<field name="vertex_id">14</field>
+		<field name="name">125DC Reg</field>
+		<field name="description">The 125DC exclusion applies to household and dependent care services you directly or indirectly pay for or provide to an employee under a dependent care assistance program that covers only your employees.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_15">
+		<field name="vertex_id">15</field>
+		<field name="name">125DC Sup</field>
+		<field name="description">The 125DC exclusion applies to household and dependent care services you directly or indirectly pay for or provide to an employee under a dependent care assistance program that covers only your employees.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_17">
+		<field name="vertex_id">17</field>
+		<field name="name">457CU Increased Limit Reg</field>
+		<field name="description">Catch-up feature for 457(b) plan participants who are within 3 years of normal retirement age. Eligible participants are limited to contributing the higher of their age 50 catch-up increase or their IRC Section 457(b)(3) catch up increase</field>
+		<field name="has_company_contribution" eval="True"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_19">
+		<field name="vertex_id">19</field>
+		<field name="name">457CU Increased Limit Sup</field>
+		<field name="description">Catch-up feature for 457(b) plan participants who are within 3 years of normal retirement age. Eligible participants are limited to contributing the higher of their age 50 catch-up increase or their IRC Section 457(b)(3) catch up increase</field>
+		<field name="has_company_contribution" eval="True"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_20">
+		<field name="vertex_id">20</field>
+		<field name="name">401K CU2 Over 50 Reg</field>
+		<field name="description">Individuals who are age 50 or over at the end of the calendar year can make annual catch-up contributions. A participant can make catch-up contributions for a year up to the lesser of the following amounts:
+•The catch-up contribution dollar limit, or
+•The excess of the participant's compensation over the elective deferral contributions that are not catch-up contributions.
+Plan participants must make catch-up contributions to a retirement plan via elective deferrals. Catch-up contributions must be made before the end of the plan year.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_21">
+		<field name="vertex_id">21</field>
+		<field name="name">401K CU2 Over 50 Sup</field>
+		<field name="description">Individuals who are age 50 or over at the end of the calendar year can make annual catch-up contributions. A participant can make catch-up contributions for a year up to the lesser of the following amounts:
+•The catch-up contribution dollar limit, or
+•The excess of the participant's compensation over the elective deferral contributions that are not catch-up contributions.
+Plan participants must make catch-up contributions to a retirement plan via elective deferrals. Catch-up contributions must be made before the end of the plan year.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_22">
+		<field name="vertex_id">22</field>
+		<field name="name">403B CU2 Over 50 Reg</field>
+		<field name="description">If permitted by the 403(b) plan, employees who are age 50 or over at the end of the calendar year can also make catch-up contributions</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_23">
+		<field name="vertex_id">23</field>
+		<field name="name">403B CU2 Over 50 Sup</field>
+		<field name="description">If permitted by the 403(b) plan, employees who are age 50 or over at the end of the calendar year can also make catch-up contributions</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_24">
+		<field name="vertex_id">24</field>
+		<field name="name">457 CU2 Over 50 Reg</field>
+		<field name="description">Individuals who are age 50 or over at the end of the calendar year can make annual catch-up contributions.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_25">
+		<field name="vertex_id">25</field>
+		<field name="name">457 CU2 Over 50 Sup</field>
+		<field name="description">Individuals who are age 50 or over at the end of the calendar year can make annual catch-up contributions.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_26">
+		<field name="vertex_id">26</field>
+		<field name="name">125FSA Reg</field>
+		<field name="description">The Flexible Spending Account allows an employee to have pre‐tax dollars deducted from wages and put into an account to pay for health care‐related expenses.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_27">
+		<field name="vertex_id">27</field>
+		<field name="name">125FSA Sup</field>
+		<field name="description">The Flexible Spending Account allows an employee to have pre‐tax dollars deducted from wages and put into an account to pay for health care‐related expenses.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_28">
+		<field name="vertex_id">28</field>
+		<field name="name">408K Deferral Reg</field>
+		<field name="description">The 408K Salary Reduction Simplified Employee Pension (SARSEP) is a SEP that includes a salary reduction arrangement. Employees can elect to make pre‐tax deductions to their IRAs through salary reductions each year. Employers may also make contributions to these plans.
+Salary reduction arrangements are not available for a SEP if there are more than 25 eligible employees in the previous year. In addition, state and local governments and tax‐exempt organizations cannot sponsor a SARSEP.
+The Small Business Job Protection Act of 1996 (SBJPA) prospectively repealed SARSEPs. No new SARSEPs can be established after December 31, 1996. However, employers that established SARSEPs prior to January 1, 1997 can continue to maintain them, and new employees of the employer hired after December 31, 1996 can participate in the existing SARSEP. The introduction of SIMPLE IRA plans under IRC Section 408(p) was intended to fill the need for retirement plans like SARSEPs.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_29">
+		<field name="vertex_id">29</field>
+		<field name="name">408K Deferral Sup</field>
+		<field name="description">The 408K Salary Reduction Simplified Employee Pension (SARSEP) is a SEP that includes a salary reduction arrangement. Employees can elect to make pre‐tax deductions to their IRAs through salary reductions each year. Employers may also make contributions to these plans.
+Salary reduction arrangements are not available for a SEP if there are more than 25 eligible employees in the previous year. In addition, state and local governments and tax‐exempt organizations cannot sponsor a SARSEP.
+The Small Business Job Protection Act of 1996 (SBJPA) prospectively repealed SARSEPs. No new SARSEPs can be established after December 31, 1996. However, employers that established SARSEPs prior to January 1, 1997 can continue to maintain them, and new employees of the employer hired after December 31, 1996 can participate in the existing SARSEP. The introduction of SIMPLE IRA plans under IRC Section 408(p) was intended to fill the need for retirement plans like SARSEPs.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_30">
+		<field name="vertex_id">30</field>
+		<field name="name">408K CU2 Over 50</field>
+		<field name="description">Under EGTRRA, Employees who are eligible to make elective salary deferrals to defined contribution plans and who would be at least 50 years old by the end of the plan year can defer an additional amount to the plan as a  "catch- up" contribution beyond the limits set by law or the plan itself.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_31">
+		<field name="vertex_id">31</field>
+		<field name="name">408K CU2 Over 50 Sup</field>
+		<field name="description">Under EGTRRA, Employees who are eligible to make elective salary deferrals to defined contribution plans and who would be at least 50 years old by the end of the plan year can defer an additional amount to the plan as a  "catch- up" contribution beyond the limits set by law or the plan itself.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_32">
+		<field name="vertex_id">32</field>
+		<field name="name">408P Deferral Reg</field>
+		<field name="description">The 408P Savings Incentive Match Plan for Employees of Small Employers (SIMPLE Plan) is either an IRA, or a part of a 401K cash or some other deferred arrangement that allows employees to defer wages into the plan.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_33">
+		<field name="vertex_id">33</field>
+		<field name="name">408P Deferral Sup</field>
+		<field name="description">The 408P Savings Incentive Match Plan for Employees of Small Employers (SIMPLE Plan) is either an IRA, or a part of a 401K cash or some other deferred arrangement that allows employees to defer wages into the plan.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_34">
+		<field name="vertex_id">34</field>
+		<field name="name">408P CU2 Over 50 Reg</field>
+		<field name="description">Under EGTRRA, Employees who are eligible to make elective salary deferrals to defined contribution plans and who would be at least 50 years old by the end of the plan year can defer an additional amount to the plan as a  "catch- up" contribution beyond the limits set by law or the plan itself.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_35">
+		<field name="vertex_id">35</field>
+		<field name="name">408P CU2 Over 50 Sup</field>
+		<field name="description">Under EGTRRA, Employees who are eligible to make elective salary deferrals to defined contribution plans and who would be at least 50 years old by the end of the plan year can defer an additional amount to the plan as a  "catch- up" contribution beyond the limits set by law or the plan itself.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_36">
+		<field name="vertex_id">36</field>
+		<field name="name">125HSA Reg</field>
+		<field name="description">HSA is a trust created or organized in the United States as a health savings account exclusively for the purpose of paying the qualified medical expenses of the account beneficiary and that satisfies other delineated requirements</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_37">
+		<field name="vertex_id">37</field>
+		<field name="name">125HSA Sup</field>
+		<field name="description">HSA is a trust created or organized in the United States as a health savings account exclusively for the purpose of paying the qualified medical expenses of the account beneficiary and that satisfies other delineated requirements</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_38">
+		<field name="vertex_id">38</field>
+		<field name="name">125HSA CU Reg</field>
+		<field name="description">In addition to the maximum contribution amount, catch-up contributions may be made by or on behalf of individuals age 55 or older and younger than 65.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_39">
+		<field name="vertex_id">39</field>
+		<field name="name">125HSA CU Sup</field>
+		<field name="description">In addition to the maximum contribution amount, catch-up contributions may be made by or on behalf of individuals age 55 or older and younger than 65.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_40">
+		<field name="vertex_id">40</field>
+		<field name="name">403B CU 15 year Reg</field>
+		<field name="description">If permitted by the 403(b) plan, an employee who has at least 15 years of service with a public school system, hospital, home health service agency, health and welfare service agency, church, or convention or association of churches (or associated organization), has a 403(b) elective deferral.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_41">
+		<field name="vertex_id">41</field>
+		<field name="name">403B CU 15 year Sup</field>
+		<field name="description">If permitted by the 403(b) plan, an employee who has at least 15 years of service with a public school system, hospital, home health service agency, health and welfare service agency, church, or convention or association of churches (or associated organization), has a 403(b) elective deferral.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_42">
+		<field name="vertex_id">42</field>
+		<field name="name">409A Deferral Reg</field>
+		<field name="description">Section 409A applies to compensation that workers earn in one year, but that is paid in a future year. This is referred to as nonqualified deferred compensation. This is different from deferred compensation in the form of elective deferrals to qualified plans (such as a 401(k) plan, a 403(b) plan, or 457(b) plan).</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_43">
+		<field name="vertex_id">43</field>
+		<field name="name">409A Deferral Sup</field>
+		<field name="description">Section 409A applies to compensation that workers earn in one year, but that is paid in a future year. This is referred to as nonqualified deferred compensation. This is different from deferred compensation in the form of elective deferrals to qualified plans (such as a 401(k) plan, a 403(b) plan, or 457(b) plan).</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_44">
+		<field name="vertex_id">44</field>
+		<field name="name">Insurance Benefits Reg</field>
+		<field name="description">This is post-tax deduction per Federal tax withholding. For State and local tax withholding , please refer your State Tax Law for more information.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_45">
+		<field name="vertex_id">45</field>
+		<field name="name">Insurance Benefits Sup</field>
+		<field name="description">This is post-tax deduction per Federal tax withholding. For State and local tax withholding , please refer your State Tax Law for more information.
+This deduction was added for benefits like Supplemental Life, Long Term Disability and Accidental Death and Dismemberment where the entire cost of the benefit is paid for with an after-tax deduction.  This deduction will be treated as a nontaxable deduction for AK state unemployment insurance.  The definition of wages in Alaska does not include the amount of payment paid into a fund that provides benefits for sickness, accident disability or death.  This deduction type will be treated as taxable for all supported taxes within the product except Alaska state unemployment insurance.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_46">
+		<field name="vertex_id">46</field>
+		<field name="name">Roth 401K Reg</field>
+		<field name="description">This is post-tax deduction per Federal tax withholding. For State and local tax withholding , please refer your State Tax Law for more information.
+Designated Roth accounts are separate accounts under 401(k), 403(b), or 457(b) plans that accept elective deferrals that are referred to as Roth contributions. These elective deferrals are included in your income, but qualified distributions from these accounts are not included in your income. Designated Roth accounts are not IRAs and should not be confused with Roth IRAs. Contributions, up to their respective limits, can be made to Roth IRAs and designated Roth accounts according to your eligibility to participate. A contribution to one does not impact your eligibility to contribute to the other. Catch-up contributions to your traditional or Roth IRA are allowable.                                                                                                                                                                                                                                                                                                A Roth IRA is an IRA that, except as explained below, is subject to the rules that apply to a traditional IRA.
+•You cannot deduct contributions to a Roth IRA.
+•If you satisfy the requirements, qualified distributions are tax-free.
+•You can make contributions to your Roth IRA after you reach age 70 ½.
+•You can leave amounts in your Roth IRA as long as you live.
+•The account or annuity must be designated as a Roth IRA when it is set up.
+
+The same combined contribution limit applies to all of your Roth and traditional IRAs.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_47">
+		<field name="vertex_id">47</field>
+		<field name="name">Roth 401K Sup</field>
+		<field name="description">This is post-tax deduction per Federal tax withholding. For State and local tax withholding , please refer your State Tax Law for more information.
+Designated Roth accounts are separate accounts under 401(k), 403(b), or 457(b) plans that accept elective deferrals that are referred to as Roth contributions. These elective deferrals are included in your income, but qualified distributions from these accounts are not included in your income. Designated Roth accounts are not IRAs and should not be confused with Roth IRAs. Contributions, up to their respective limits, can be made to Roth IRAs and designated Roth accounts according to your eligibility to participate. A contribution to one does not impact your eligibility to contribute to the other. Catch-up contributions to your traditional or Roth IRA are allowable.                                                                                                                                                                                                                                                                                                A Roth IRA is an IRA that, except as explained below, is subject to the rules that apply to a traditional IRA.
+•You cannot deduct contributions to a Roth IRA.
+•If you satisfy the requirements, qualified distributions are tax-free.
+•You can make contributions to your Roth IRA after you reach age 70 ½.
+•You can leave amounts in your Roth IRA as long as you live.
+•The account or annuity must be designated as a Roth IRA when it is set up.
+
+The same combined contribution limit applies to all of your Roth and traditional IRAs.</field>
+		<field name="has_company_contribution" eval="False"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_48">
+		<field name="vertex_id">48</field>
+		<field name="name">Qualified Parking Reg</field>
+		<field name="description">Qualified parking expenses include the following costs:  Parking a vehicle in a facility that is near the employee's place of work, parking at a location from where the employee commutes to work (for example, the cost of parking in a lot at the train station).
+
+This is employee-financed expense: employee designates a portion of salary before taxes (pre-taxed income) to pay for parking expenses.</field>
+		<field name="has_company_contribution" eval="True"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_49">
+		<field name="vertex_id">49</field>
+		<field name="name">Qualified Parking Sup</field>
+		<field name="description">Qualified parking expenses include the following costs:  Parking a vehicle in a facility that is near the employee's place of work, parking at a location from where the employee commutes to work (for example, the cost of parking in a lot at the train station).
+
+This is employee-financed expense: employee designates a portion of salary before taxes (pre-taxed income) to pay for parking expenses.</field>
+		<field name="has_company_contribution" eval="True"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_50">
+		<field name="vertex_id">50</field>
+		<field name="name">Vanpool and Transit Passes Reg</field>
+		<field name="description">Qualified mass transit expenses include transit passes for mass transportation to and from work.  Qualified amounts include the costs of any pass, token, fare card, voucher, or similar item entitles the employee to use mass transit for the purpose of traveling to and from his or her place of work.  The mass transit can be a public system, or a private enterprise provided by a company or indivdual who is in the business of trasporting people in what is know as a commuter highway vehicle.  The vehicle needs to seat at least 6 adults not including the driver.
+
+This is employee-financed expense: employee designates a portion of salary before taxes (pre-taxed income) to pay for transit expenses.</field>
+		<field name="has_company_contribution" eval="True"/>
+	</record>
+	<record model="payroll.deduction.category" id="payroll_deduction_category_51">
+		<field name="vertex_id">51</field>
+		<field name="name">Vanpool and Transit Passes Sup</field>
+		<field name="description">Qualified mass transit expenses include transit passes for mass transportation to and from work.  Qualified amounts include the costs of any pass, token, fare card, voucher, or similar item entitles the employee to use mass transit for the purpose of traveling to and from his or her place of work.  The mass transit can be a public system, or a private enterprise provided by a company or indivdual who is in the business of trasporting people in what is know as a commuter highway vehicle.  The vehicle needs to seat at least 6 adults not including the driver.
+
+This is employee-financed expense: employee designates a portion of salary before taxes (pre-taxed income) to pay for transit expenses.</field>
+		<field name="has_company_contribution" eval="True"/>
+	</record>
+</odoo>

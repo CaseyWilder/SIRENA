@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- Rainbow man when completing current period -->
+    <t t-name="PayrollRainbowMan">
+        <div class="o_reward_payroll">
+            <t t-call="rainbow_man.notification"/>
+        </div>
+    </t>
+
+    <!-- Calendar with current period information to remind user -->
+    <t t-name="CurrentPeriodCalendar">
+        <div class="current_period_calendar">
+            <div id="v-cal">
+                <div class="vcal-header">
+                    <button class="vcal-btn" data-calendar-toggle="previous">
+                        <i class="fa fa-arrow-left"/>
+                    </button>
+
+                    <div class="vcal-header__label" data-calendar-label="month">
+                        March 2017
+                    </div>
+
+                    <button class="vcal-btn" data-calendar-toggle="next">
+                        <i class="fa fa-arrow-right"/>
+                    </button>
+                </div>
+                <div class="vcal-week">
+                    <span>Sun</span>
+                    <span>Mon</span>
+                    <span>Tue</span>
+                    <span>Wed</span>
+                    <span>Thu</span>
+                    <span>Fri</span>
+                    <span>Sat</span>
+                </div>
+                <div class="vcal-body" data-calendar-area="month"/>
+            </div>
+        </div>
+    </t>
+
+    <!-- Selection for Payroll Chart -->
+    <t t-name="TimeFilter">
+        <div class="payroll_chart">
+            <!--Card contain time period selection-->
+            <t t-if="data.selection.length > 0">
+                <div class="time-filter justify-content-end">
+                    <div class="time_filter_container">
+                        <span class="dropdown-toggle time-filter-box period" data-toggle="dropdown">
+                            <span id="period_selection_name">Last Scheduled Period</span>
+                            <span class="caret"/>
+                        </span>
+                        <ul class="dropdown-menu ui-autocomplete">
+                            <t t-foreach="data.selection" t-as="item">
+                                <li class="ui-menu-item" t-att-style="item.separate and 'border-bottom: 1px solid #dee2e6;' or None">
+                                    <a t-att="{'start': item.start, 'end': item.end, 'default': item.default}" id="period_selection">
+                                        <t t-esc="item.name"/>
+                                    </a>
+                                </li>
+                            </t>
+                        </ul>
+                    </div>
+                    <t t-if="type == 'hours' || type == 'cost'">
+                        <div class="group_by_container">
+                            <t t-call="PeriodGroupBy"/>
+                        </div>
+                    </t>
+                </div>
+            </t>
+            <div class="summarized-view container"/>
+            <div class="content_kanban_view"/>
+        </div>
+    </t>
+
+    <!-- Groupby for Payroll Chart -->
+    <t t-name="PeriodGroupBy">
+        <span class="dropdown-toggle time-filter-box group-by" data-toggle="dropdown" t-att-style="group_by != false ? '' : 'cursor: not-allowed'">
+        <span id="period_group_by_name">
+            <t t-if="group_by != false"><t t-esc="group_by[0].name"/></t>
+        </span>
+        <span class="caret"/>
+    </span>
+        <ul t-attf-class="dropdown-menu ui-autocomplete {{group_by != false ? '' : 'invisible'}}" style="width: 120px;">
+            <t t-foreach="group_by" t-as="item">
+                <li class="ui-menu-item">
+                    <a t-att="{'value': item.value}" id="period_group_by">
+                        <t t-esc="item.name"/>
+                    </a>
+                </li>
+            </t>
+        </ul>
+    </t>
+
+    <!-- Summary Information on top of Payroll Chart -->
+    <t t-name="SummarizeView">
+        <div class="content-box light-gray row">
+            <div class="col-md-5 col-12" style="align-self: normal">
+                <t t-foreach="info.total" t-as="line">
+                    <div>
+                        <div class="font-weight-bold" style="font-size: 2rem;"><t t-esc="line.value"/></div>
+                        <div><t t-esc="line.name"/></div>
+                    </div>
+                </t>
+            </div>
+            <div class="offset-md-0 col-md-7 offset-2 col-10">
+                <t t-foreach="info.detail" t-as="line">
+                    <div>
+                        <span><t t-esc="line.name"/></span>
+                        <span class="float-right font-weight-bold"><t t-esc="line.value"/></span>
+                    </div>
+                </t>
+            </div>
+        </div>
+    </t>
+</templates>

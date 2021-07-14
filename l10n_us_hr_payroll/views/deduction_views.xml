@@ -1,0 +1,57 @@
+<odoo>
+    <record id="view_payroll_deduction_form" model="ir.ui.view">
+        <field name="name">payroll.deduction.form</field>
+        <field name="model">payroll.deduction</field>
+        <field name="arch" type="xml">
+            <form string="Deduction">
+                <sheet>
+                    <field name="active" invisible="1"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <group name="general">
+                        <group>
+                            <field name="name" required="1"/>
+                            <field name="type_id" required="1" options='{"no_open": True, "no_create": True}'/>
+                            <field name="category_id" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Description">
+                        <field name="description" nolabel="1" readonly="1"/>
+                    </group>
+
+                    <group name="account">
+                        <group name="left" string="Employee Settings">
+                            <field name="ee_account_payable_id" string="Account Payable" required="1"/>
+                        </group>
+                        <group name="right" string="Company Settings"
+                               attrs="{'invisible': [('category_id', '=', False)]}">
+                            <field name="er_account_payable_id" string="Account Payable"/>
+                            <field name="er_expense_account_id" string="Expense Account"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_payroll_deduction_tree" model="ir.ui.view">
+        <field name="name">payroll.deduction.tree</field>
+        <field name="model">payroll.deduction</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="type_id"/>
+                <field name="ee_account_payable_id"/>
+                <field name="er_account_payable_id"/>
+                <field name="er_expense_account_id"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_payroll_deduction_form" model="ir.actions.act_window">
+        <field name="name">Deductions</field>
+        <field name="res_model">payroll.deduction</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

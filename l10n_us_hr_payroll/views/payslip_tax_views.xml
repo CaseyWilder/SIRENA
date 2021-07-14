@@ -1,0 +1,87 @@
+<odoo>
+    <record id="view_payslip_tax_tree" model="ir.ui.view">
+        <field name="name">payslip.tax.tree</field>
+        <field name="model">payslip.tax</field>
+        <field name="arch" type="xml">
+            <tree default_order="geocode, payroll_tax_id" create="0" delete="0" editable="bottom">
+                <field name="currency_id" invisible="1"/>
+                <field name="geocode" invisible="1"/>
+                <field name="payroll_tax_id" readonly="1"/>
+                <field name="adjusted_gross" readonly="0" string="Wage Base"
+                       attrs="{'column_invisible': [('parent.is_history', '=', False)]}"/>
+                <field name="tax_amt" readonly="0"/>
+                <field name="mtd_amount" readonly="1"/>
+                <field name="qtd_amount" readonly="1"/>
+                <field name="ytd_amount" readonly="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_payslip_tax_form" model="ir.ui.view">
+        <field name="name">payslip.tax.form</field>
+        <field name="model">payslip.tax</field>
+        <field name="arch" type="xml">
+            <form default_order="pay_date, geocode, payroll_tax_id" create="0" edit="0" delete="0">
+                <group>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="geocode" invisible="1"/>
+                    <field name="pay_date" invisible="1"/>
+                    <field name="employee_id" context="{'form_view_ref': 'l10n_us_hr_payroll.hr_employee_view_form'}"/>
+                    <field name="payroll_tax_id"/>
+                    <field name="tax_amt"/>
+                    <field name="mtd_amount"/>
+                    <field name="qtd_amount"/>
+                    <field name="ytd_amount"/>
+                    <field name="state" invisible="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_payslip_tax_tree_report" model="ir.ui.view">
+        <field name="name">payslip.tax.tree.report</field>
+        <field name="model">payslip.tax</field>
+        <field name="arch" type="xml">
+            <tree default_order="geocode, payroll_tax_id" create="0" delete="0">
+                <field name="currency_id" invisible="1"/>
+                <field name="geocode" invisible="1"/>
+                <field name="employee_id" readonly="1"/>
+                <field name="payroll_tax_id" readonly="1"/>
+                <field name="pay_date" readonly="1"/>
+                <field name="tax_amt" readonly="1"/>
+                <field name="mtd_amount" readonly="1"/>
+                <field name="qtd_amount" readonly="1"/>
+                <field name="ytd_amount" readonly="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_payslip_tax_filter" model="ir.ui.view">
+        <field name="name">payslip.tax.search</field>
+        <field name="model">payslip.tax</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="pay_date"/>
+                <field name="employee_id"/>
+                <field name="payroll_tax_id"/>
+                <separator/>
+                <filter name="pay_date_filter" string="Pay date" date="pay_date"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_employee" string="Employee" context="{'group_by':'employee_id'}"/>
+                    <filter name="group_by_payroll_tax" string="Tax" context="{'group_by':'payroll_tax_id'}"/>
+                    <separator/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_payslip_tax" model="ir.actions.act_window">
+        <field name="name">Taxes</field>
+        <field name="res_model">payslip.tax</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_payslip_tax_tree_report"/>
+        <field name="context">{'search_default_group_by_payroll_tax': 1}</field>
+        <field name="domain">[('state', '=', 'done')]</field>
+    </record>
+</odoo>

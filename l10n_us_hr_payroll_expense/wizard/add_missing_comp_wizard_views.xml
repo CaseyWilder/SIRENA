@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="add_missing_compensations_wizard_view_form" model="ir.ui.view">
+        <field name="name">add.missing.comp.wizard.form</field>
+        <field name="model">add.missing.comp.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <p>
+                        These compensations haven't been added to this period.
+                        <br/>
+                        You can add them to the list below.
+                    </p>
+                    <group>
+                        <field name="pending_compensation_ids" options="{'no_create': True, 'no_open': True}" nolabel="1"/>
+                    </group>
+                    <footer>
+                        <button name="button_add_missing_compensations" type="object" string="Add to period" class="btn btn-primary"/>
+                        <button string="Cancel" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_add_missing_compensations_wizard" model="ir.actions.act_window">
+        <field name="name">Add Missing Compensations</field>
+        <field name="res_model">add.missing.comp.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="add_missing_compensations_wizard_view_form"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

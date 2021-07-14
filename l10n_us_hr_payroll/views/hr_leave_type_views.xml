@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="hr_leave_type_form_inherit_payroll" model="ir.ui.view">
+        <field name="name">hr.leave.type.form.payroll</field>
+        <field name="model">hr.leave.type</field>
+        <field name="inherit_id" ref="hr_holidays.edit_holiday_status_form" />
+        <field name="priority">50</field>
+        <field name="arch" type="xml">
+            <!--<field name="unpaid" position="replace"/>-->
+            <group name="description" position="after">
+                <group name="payroll" string="Payroll Options">
+                    <field name="unpaid"/>
+                    <field name="payroll_compensation_id"
+                           options="{'no_open': True, 'no_create': True, 'no_create_edit': True}"
+                           attrs="{'invisible': [('unpaid', '=', True)], 'required': [('unpaid', '=', False)]}"/>
+                    <label for="emp_type_salary_ovt" string="Apply for"
+                           attrs="{'invisible': [('unpaid', '=', True)], 'required': [('unpaid', '=', False)]}"/>
+                    <div attrs="{'invisible': [('unpaid', '=', True)], 'required': [('unpaid', '=', False)]}">
+                        <div>
+                            <field name="emp_type_salary_ovt"/>
+                            <label for="emp_type_salary_ovt" string="Salary/Eligible for Overtime"/>
+                        </div>
+                        <div>
+                            <field name="emp_type_salary"/>
+                            <label for="emp_type_salary" string="Salary/No Overtime"/>
+                        </div>
+                        <div>
+                            <field name="emp_type_hourly"/>
+                            <label for="emp_type_salary" string="Hourly"/>
+                        </div>
+                    </div>
+                </group>
+            </group>
+        </field>
+    </record>
+</odoo>

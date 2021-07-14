@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="action_report_direct_deposit_payroll" model="ir.actions.report">
+        <field name="name">Direct Deposit</field>
+        <field name="model">pay.period</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">l10n_us_payroll_direct_deposit_report.report_direct_deposit</field>
+        <field name="print_report_name">'Direct Deposit - %s' % object.display_name</field>
+    </record>
+
+    <template id="report_direct_deposit">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <center>
+                            <h2 class="title-list" style="margin-bottom: 50px;">
+                                <t t-if="doc.pay_frequency_id">
+                                    <span>Direct Deposit for period</span>
+                                    <span t-field="doc.start_date"/>
+                                    -
+                                    <span t-field="doc.end_date"/>
+                                </t>
+                                <t t-else="">
+                                    <span>Direct Deposit</span>
+                                </t>
+                            </h2>
+                        </center>
+                        <div class="row">
+                            <table class="table table-sm o_main_table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Full Name</th>
+                                        <th>Pay Date</th>
+                                        <th class="text-right">Net Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="total_net_pay" t-value="0"/>
+                                    <t t-foreach="doc.payslip_ids" t-as="line">
+                                        <tr t-if="line.payment_method == 'deposit'">
+                                            <t t-set="total_net_pay" t-value="total_net_pay + line.net_pay"/>
+                                            <td><span t-field="line.employee_code"/></td>
+                                            <td><span t-field="line.employee_id"/></td>
+                                            <td><span t-field="doc.pay_date"/></td>
+                                            <td class="text-right"><span t-field="line.net_pay"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div t-attf-class="#{'col-4' if report_type != 'html' else 'col-sm-7 col-md-5'} ml-auto pr-0">
+                                <table class="table table-sm o_main_table">
+                                    <tbody>
+                                        <tr class="border-black o_total font-weight-bold" style="">
+                                            <td>Total Net Amount</td>
+                                            <td class="text-right">
+                                                <span t-esc="total_net_pay" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

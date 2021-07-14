@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Must on the same line or some unexpected spaces will be added to ACH -->
+    <template id="ach_template_view"><t t-foreach="docs" t-as="period"><t t-esc="period.get_ach_file_content()"/></t></template>
+
+    <record id="ach_template" model="ir.actions.report">
+        <field name="name">Print ACH</field>
+        <field name="model">pay.period</field>
+        <field name="report_type">qweb-text</field>
+        <field name="report_name">l10n_us_hr_payroll.ach_template_view</field>
+        <field name="report_file">l10n_us_hr_payroll.ach_template_view</field>
+        <field name="print_report_name">'ACH_{}'.format(object.name)</field>
+        <field name="binding_model_id" eval="False"/>   <!-- Do not show on Print Action -->
+    </record>
+</odoo>

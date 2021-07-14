@@ -1,0 +1,252 @@
+$color-db-green: #00A09D;
+$color-db-purple: #875a7b;
+$color-db-orange: #f19848;
+$color-db-blue: #649ce7;
+
+$color-db-black: #242424;
+$color-db-normal: #666666;
+$color-db-gray: #dee2e6;
+$color-db-lightgreen: #afd393;
+$color-db-lightblue: #cceaff;
+$color-db-lightgray: #eeeeee;
+
+// Customize scroll bar
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb {
+  background: $color-db-gray;
+  border-radius: 5px;
+}
+
+.bold-text {
+  font-weight: 500;
+}
+
+// Override
+.content_kanban_view {
+  position: inherit !important;
+}
+// Override
+.content-payroll-dashboard {
+  justify-content: normal !important;
+}
+
+// Kanban Card
+.o_payroll_dashboard {
+  .o_kanban_record {
+    box-shadow: 0 1px 2px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.15) !important;
+    width: 600px !important;
+    color: $color-db-black;
+  }
+}
+
+.payroll-box-container {
+  margin: 0.5rem 0;
+  padding: 0 0.5rem;
+
+  &:first-child {
+    padding-left: 0 !important;
+  }
+  &:last-child {
+    padding-right: 0 !important;
+  }
+}
+
+.payroll-box {
+  height: 100%;
+  padding: 1rem;
+  border: 1px solid $color-db-lightgray;
+  box-shadow: 0 4px 22px 0 rgba(0, 0, 0, 0.05);
+
+  &.primary-purple {
+    box-shadow: none;
+    background-color: $color-db-purple;
+  }
+  &.primary-green {
+    box-shadow: none;
+    background-color: $color-db-green;
+  }
+  &.blue {
+    box-shadow: none;
+    background-color: $color-db-blue;
+  }
+  &.orange {
+    box-shadow: none;
+    background-color: $color-db-orange;
+  }
+  &.white-content {
+    color: white;
+  }
+  .number {
+    font-size: 2rem;
+  }
+  .text {
+    font-weight: bold;
+  }
+}
+
+.btn-dashboard {
+  margin: 0 !important;
+  padding: 0 !important;
+  white-space: normal;
+  text-align: left;
+}
+
+// To use with btn
+.btn-outline {
+  margin: 0 !important;
+  text-align: center;
+  min-width: 5rem;
+  text-transform: initial;
+  color: $color-db-green;
+  border: 1px solid $color-db-green;
+  background-color: transparent;
+
+  &.white {
+    color: white;
+    border: 1px solid white;
+
+    &:focus, &:hover {
+      background-color: rgba(0, 0, 0, 0.25);
+    }
+  }
+}
+
+.img-dashboard {
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+// Scrollable Box containing holidays or birthday
+.list-box {
+  overflow-x: hidden;
+  overflow-y: scroll;
+  max-height: 300px !important;
+  height: auto;
+  margin-top: 0.8rem;
+}
+
+// To display summarized data showed above chart, used in dashboard.js and graph_item.xml.
+.summarized-view {
+  width: 100%;
+}
+
+// Box containing summarized data (above chart) / Upcoming days
+.content-box,
+.upcoming-date {
+  display: flex;
+  align-items: center;
+
+  &.light-blue {
+    background-color: $color-db-lightblue;
+  }
+  &.light-green {
+    background-color: $color-db-lightgreen;
+  }
+  &.light-gray {
+    background-color: $color-db-lightgray;
+  }
+  &.gray {
+    background-color: $color-db-gray;
+  }
+  &.border-item {
+    &:not(:last-child) {
+      border-bottom: 1px solid $color-db-gray;
+    }
+  }
+}
+
+.content-box {
+  padding: 0.5rem 1rem;
+}
+
+.upcoming-date {
+  padding: 0.8rem 0;
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  .date-container {
+    width: 25%;
+    min-width: 4rem;
+
+    .date {
+      text-align: center;
+
+      .month {
+        font-size: 0.8rem;
+      }
+      .day {
+        font-size: 1.5rem;
+        margin-top: -5px;
+      }
+    }
+  }
+
+  .name {
+    width: 75%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &:hover {
+      white-space: normal;
+      overflow: visible;
+    }
+  }
+}
+
+// Select box for time filter selection
+.payroll_chart {
+
+  .time-filter {
+    margin: 1rem 0;
+    display: flex;
+
+    .time_filter_container,
+    .group_by_container {
+      display: inline-flex;
+
+      .dropdown-toggle::after {
+        margin-left: auto !important;
+      }
+
+      .time-filter-box {
+        height: 2.5rem;
+        text-align: left;
+        padding: 0.5rem 1.5rem;
+        right: 0;
+        box-shadow: 0 0 3px rgba(0, 0, 0, 0.2), 0 0 2px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+
+        &.period {
+          width: 200px;
+        }
+        &.group-by {
+          width: 120px;
+        }
+      }
+
+      .dropdown-menu {
+        width: 200px;
+        .ui-menu-item {
+          width: 100%;
+          cursor: pointer;
+          &:hover {
+            background-color: $color-db-gray;
+          }
+          a {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}

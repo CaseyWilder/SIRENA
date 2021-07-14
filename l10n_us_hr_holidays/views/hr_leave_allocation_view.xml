@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="hr_leave_allocation_view_form_manager_payroll" model="ir.ui.view">
+        <field name="name">hr.leave.allocation.form.manager.payroll</field>
+        <field name="model">hr.leave.allocation</field>
+        <field name="inherit_id" ref="hr_holidays.hr_leave_allocation_view_form_manager"/>
+        <field name="arch" type="xml">
+            <!-- Hide "Start Date <date_from> Run until <date_to>" -->
+            <label for="date_from" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </label>
+            <xpath expr="//field[@name='date_from']/.." position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <!-- Replace by "Start Date <date_from> Run <interval_unit> until <date_to> / indefinitely" -->
+            <xpath expr="//field[@name='date_from']/.." position="after">
+                <label for="date_from" attrs="{'invisible': [('allocation_type', '=', 'regular')]}"/>
+                <div class="o_row" attrs="{'invisible': [('allocation_type', '=', 'regular')]}">
+                    <field name="date_from" widget="date" class="mr-2" attrs="{'required': [('allocation_type', '=', 'accrual')]}"/>
+                    <span>Run</span>
+                    <field name="interval_unit" attrs="{'required': [('allocation_type', '=', 'accrual')]}"/>
+                    <span class="oe_read_only" attrs="{'invisible': [('date_to', '!=', False)]}">indefinitely</span>
+                    <span class="oe_read_only" attrs="{'invisible': [('date_to', '=', False)]}">until</span>
+                    <span class="oe_edit_only">until</span>
+                    <field name="date_to" string="Run Until" help="If no value set, runs indefinitely" class="ml-2" widget="date"/>
+                </div>
+            </xpath>
+
+            <!-- Hide "Add <number_per_interval> <unit_per_interval> of time off every <interval_number> <interval_unit>" -->
+            <xpath expr="//field[@name='number_per_interval']/../.." position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <!-- Replace by "Add <number_per_interval> <unit_per_interval> of time off" +
+                "every <interval_number> days/weeks/months/years" or
+                "on the day <semimonthly_start> and <semimonthly_end>" if using semi-monthly -->
+            <xpath expr="//field[@name='number_per_interval']/../.." position="after">
+                <label for="date_from" invisible="1"/>
+                <div attrs="{'invisible': [('allocation_type', '=', 'regular')]}">
+                    <div class="o_row payroll-input-min-width">
+                        <span>Add</span>
+                        <field name="number_per_interval" attrs="{'required': [('allocation_type', '=', 'accrual')]}"/>
+                        <field name="unit_per_interval" attrs="{'required': [('allocation_type', '=', 'accrual')]}"/>
+                        <span>of time off</span>
+                        <span class="o_row" attrs="{'invisible': [('interval_unit', '=', 'semimonthly')]}">
+                            <span>every</span>
+                            <field name="interval_number" attrs="{'required': [('allocation_type', '=', 'accrual')]}"/>
+                            <span attrs="{'invisible': [('interval_unit', '!=', 'days')]}">day(s)</span>
+                            <span attrs="{'invisible': [('interval_unit', '!=', 'weeks')]}">week(s)</span>
+                            <span attrs="{'invisible': [('interval_unit', '!=', 'months')]}">month(s)</span>
+                            <span attrs="{'invisible': [('interval_unit', '!=', 'years')]}">year(s)</span>
+                        </span>
+                        <span class="o_row" attrs="{'invisible': [('interval_unit', '!=', 'semimonthly')]}">
+                            <span>on the day</span>
+                            <field name="semimonthly_start" attrs="{'required': [('allocation_type', '=', 'accrual'), ('interval_unit', '=', 'semimonthly')]}"/>
+                            <span>and</span>
+                            <field name="semimonthly_end" attrs="{'required': [('allocation_type', '=', 'accrual'), ('interval_unit', '=', 'semimonthly')]}"/>
+                            <span>of a month.</span>
+                        </span>
+                    </div>
+                    <button name="update_immediate_accrual" string="Update Accrual" class="btn-secondary" type="object"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_leave_allocation_view_tree_inherit" model="ir.ui.view">
+        <field name="name">hr.leave.allocation.view.tree.inherit</field>
+        <field name="model">hr.leave.allocation</field>
+        <field name="inherit_id" ref="hr_holidays.hr_leave_allocation_view_tree"/>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <field name="duration_display" position="after">
+                <field name="holiday_type"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_hr_leave_allocation_filter_inherit" model="ir.ui.view">
+        <field name="name">view.hr.leave.allocation.filter.inherit</field>
+        <field name="model">hr.leave.allocation</field>
+        <field name="inherit_id" ref="hr_holidays.view_hr_leave_allocation_filter"/>
+        <field name="arch" type="xml">
+            <filter name="group_type" position="after">
+                <filter name="group_holiday_type" string="Mode" context="{'group_by':'holiday_type'}"/>
+            </filter>
+        </field>
+    </record>
+</odoo>

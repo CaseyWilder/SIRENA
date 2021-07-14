@@ -1,0 +1,118 @@
+<odoo>
+    <record id="view_deduction_policy_template_form" model="ir.ui.view">
+        <field name="name">deduction.policy.template.form</field>
+        <field name="model">deduction.policy.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="active" invisible="1"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <group name="top">
+                        <group>
+                            <field name="vertex_id" invisible="1"/>
+                            <field name="name" required="1"/>
+                            <field name="deduction_id" required="1"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="has_company_contribution" attrs="{'invisible': [('vertex_id', '=', False)]}"/>
+                        </group>
+                    </group>
+                    <group name="btm">
+                        <group name="employee_deduction" string="Employee Deduction">
+                            <field name="ee_amount_type" string="Amount Type"
+                                   attrs="{'required': [('vertex_id', '!=', False)], 'invisible': [('vertex_id', '=', False)]}"/>
+                            <field name="ee_post_amount_type" string="Amount Type"
+                                   attrs="{'required': [('vertex_id', '=', False)], 'invisible': [('vertex_id', '!=', False)]}"/>
+                            <label for="ee_amount" string="Amount"/>
+                            <div>
+                                <span attrs="{'invisible': ['|', '&amp;', ('vertex_id', '!=', False), ('ee_amount_type', '!=', 'fixed'),
+                                '&amp;', ('vertex_id', '=', False), ('ee_post_amount_type', '!=', 'fixed')]}"
+                                      class="oe_inline">$</span>
+                                <field name="ee_amount" class="oe_inline"/>
+                                <span attrs="{'invisible': ['|', '&amp;', ('vertex_id', '!=', False), ('ee_amount_type', '=', 'fixed'),
+                                '&amp;', ('vertex_id', '=', False), ('ee_post_amount_type', '=', 'fixed')]}"
+                                      class="oe_inline">%</span>
+                            </div>
+                            <field name="ee_max_amount_type" string="Maximum Type"
+                                   attrs="{'required': [('ee_max_amount', '!=', 0)]}"/>
+                            <label for="ee_max_amount" string="Maximum Amount"/>
+                            <div>
+                                <span attrs="{'invisible': [('ee_max_amount_type', '=', 'percentage')]}"
+                                      class="oe_inline">$</span>
+                                <field name="ee_max_amount" class="oe_inline" />
+                                <span attrs="{'invisible': [('ee_max_amount_type', '!=', 'percentage')]}"
+                                      class="oe_inline">%</span>
+                                <field name="ee_maximum_period" class="oe_inline"
+                                       attrs="{'invisible': [('ee_max_amount_type', '!=', 'fixed')],
+                                       'required': [('ee_max_amount', '!=', 0), ('ee_max_amount_type', '=', 'fixed')]}"/>
+                            </div>
+                            <div colspan="2">
+                               <p class="text-muted oe_edit_only">
+                                You can set the maximum amount to withhold from employee's paycheck by: <br/>
+                                - Fixed amount: per paycheck or per year. <br/>
+                                - Percent of Net Pay per paycheck: usually use for Child Support. <br/>
+                                - Total Amount Owed: we'll stop withholding when the total amount is reached. This is usually used for Tax Lien/Garnishment.
+                                </p>
+                            </div>
+                        </group>
+                        <group name="employer_deduction" string="Company Contribution"
+                               attrs="{'invisible': [('has_company_contribution', '==', False)]}">
+                            <field name="er_amount_type" string="Amount Type"
+                                   attrs="{'required': [('has_company_contribution', '!=', False)]}"/>
+                            <label for="er_amount" string="Amount"/>
+                            <div>
+                                <span attrs="{'invisible': [('er_amount_type', '!=', 'fixed')]}"
+                                      class="oe_inline">$</span>
+                                <field name="er_amount" class="oe_inline"/>
+                                <span attrs="{'invisible': [('er_amount_type', '==', 'fixed')]}"
+                                      class="oe_inline">%</span>
+                            </div>
+
+                            <label for="maximum_amount" string="Maximum Amount"/>
+                            <div>
+                                <field name="maximum_amount" class="oe_inline" />
+                                <field name="maximum_period" class="oe_inline"
+                                       attrs="{'required': [('maximum_amount', '!=', 0)]}"/>
+                            </div>
+                        </group>
+                    </group>
+                    <group name="employee" string="Employees">
+                        <field name="employee_deduction_ids" nolabel="1"
+                               context="{'default_deduction_policy_id': active_id}">
+                            <tree>
+                                <field name="currency_id" invisible="1"/>
+                                <field name="employee_id" required="1"/>
+                                <field name="ee_amount_type_label" string="Employee Deduction Type"/>
+                                <field name="ee_amount" required="1"/>
+                                <field name="maximum_amount" string="Company Contribution Maximum Amount"/>
+                                <field name="maximum_period" string="Company Contribution Maximum Amount Period"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_deduction_policy_template_tree" model="ir.ui.view">
+        <field name="name">deduction.policy.template.tree</field>
+        <field name="model">deduction.policy.template</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="deduction_id"/>
+                <field name="ee_amount_type_label" string="Employee Deduction Type"/>
+                <field name="ee_amount"/>
+                <field name="has_company_contribution"/>
+                <field name="er_amount_type"/>
+                <field name="er_amount"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_deduction_policy_template_form" model="ir.actions.act_window">
+        <field name="name">Deduction Policies</field>
+        <field name="res_model">deduction.policy.template</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>
