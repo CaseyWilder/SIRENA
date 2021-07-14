@@ -1,3 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_payroll_dashboard_user,payroll.dashboard user,model_payroll_dashboard,l10n_us_hr_payroll.l10n_us_hr_payroll_group_officer,1,1,1,0
-access_payroll_dashboard_manager,payroll.dashboard manager,model_payroll_dashboard,l10n_us_hr_payroll.l10n_us_hr_payroll_group_manager,1,1,1,1
