@@ -7,6 +7,8 @@ from odoo import api, fields, models, _
 _logger = logging.getLogger(__name__)
 
 FEDEX_SERVICES = [('FEDEX_GROUND', 'FedEx Ground®'),
+                  ('GROUND_HOME_DELIVERY', 'FedEx Home Delivery®'),
+                  ('SMART_POST', 'FedEx SmartPost®'),
                   ('FEDEX_2_DAY', 'FedEx 2Day®'),
                   ('FEDEX_2_DAY_AM', 'FedEx 2Day® A.M.'),
                   ('FEDEX_3_DAY_FREIGHT', 'FedEx 3Day® Freight'),
