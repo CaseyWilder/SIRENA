@@ -10,7 +10,7 @@
     'author': 'Novobi LLC',
     "license": "OPL-1",
     'website': 'https://www.novobi.com',
-    'depends': ['product'],
+    'depends': ['product', 'novobi_shipping_account'],
     'data': [
         # ============================== DATA =================================
 
@@ -18,6 +18,7 @@
 
         # ============================== VIEWS ================================
         'views/product_template_views.xml',
+        'views/product_packaging_views.xml',
 
         # ============================== REPORT ===============================
 
