@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_pay_period_form_bonus_inherit_us_payroll_expense" model="ir.ui.view">
+        <field name="name">view_pay_period_form_bonus_inherit_us_payroll_expense</field>
+        <field name="model">pay.period</field>
+        <field name="inherit_id" ref="l10n_us_hr_payroll.view_pay_period_form_bonus"/>
+        <field name="arch" type="xml">
+            <!-- Alert and button to add missing compensations to this pay period -->
+            <sheet position="before">
+                <field name="missing_compensations" invisible="1"/>
+                <div name="missing_compensations" class="alert alert-info" role="alert"
+                     attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('missing_compensations', '=', False)]}">
+                    Some pending compensations haven't been added to this period.
+                    <button name="button_add_missing_compensations" type="object" string="Click here" class="btn-link btn-normal-text"/>
+                    to review.
+                </div>
+            </sheet>
+            <div name="button_box" position="inside">
+                <field name="hr_expense_sheet_ids" invisible="1"/>
+                <button name="action_open_expense_reports" type="object" class="oe_stat_button"
+                        attrs="{'invisible': [('hr_expense_sheet_ids', '=', [])]}"
+                        groups="l10n_us_hr_payroll.l10n_us_hr_payroll_group_officer"
+                        icon="fa-file-text-o" string="Expense Reports"/>
+            </div>
+        </field>
+    </record>
+</odoo>

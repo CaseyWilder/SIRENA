@@ -1,0 +1,4 @@
+// Message content of notification should approve text format such as "\n"...
+.o_notification_content {
+  white-space: pre-line;
+}

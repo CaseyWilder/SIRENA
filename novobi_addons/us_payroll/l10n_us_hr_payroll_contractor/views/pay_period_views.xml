@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_pay_period_form_include_period_inherit_payroll_contractor" model="ir.ui.view">
+        <field name="name">view_pay_period_form_include_period_inherit_payroll_contractor</field>
+        <field name="model">pay.period</field>
+        <field name="inherit_id" ref="l10n_us_hr_payroll.view_pay_period_form_include_period"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payslip_ids']/tree/field[@name='overtime']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', '|', ('employee_type', '=', 'salary'), ('employee_type', '=', 'contractor'), '&amp;', ('weekly_ovt_apply', '=', False), ('daily_ovt_apply', '=', False)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='payslip_ids']/tree/field[@name='double_overtime']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', '|', ('employee_type', '=', 'salary'), ('employee_type', '=', 'contractor'), ('daily_double_ovt_apply', '=', False)]}</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

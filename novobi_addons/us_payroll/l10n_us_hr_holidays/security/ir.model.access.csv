@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_public_holidays_user,access_hr_public_holidays,model_hr_public_holidays,base.group_user,1,0,0,0
+access_hr_public_holidays_manager,access_hr_public_holidays,model_hr_public_holidays,hr_holidays.group_hr_holidays_manager,1,1,1,1
+access_hr_public_holidays_line_user,access_hr_public_holidays_line,model_hr_public_holidays_line,base.group_user,1,0,0,0
+access_hr_public_holidays_line_manager,access_hr_public_holidays_line,model_hr_public_holidays_line,hr_holidays.group_hr_holidays_manager,1,1,1,1
+access_generate_holidays_wizard,generate_holidays_wizard user,model_generate_holidays_wizard,base.group_user,1,1,1,1

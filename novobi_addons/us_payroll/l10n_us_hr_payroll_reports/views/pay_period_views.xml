@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_pay_period_form_inherit_paycheck" model="ir.ui.view">
+        <field name="name">pay.period.form.paycheck</field>
+        <field name="model">pay.period</field>
+        <field name="inherit_id" ref="l10n_us_hr_payroll.view_pay_period_form_bonus"/>
+        <field name="arch" type="xml">
+            <button name="button_open_move_id" position="after">
+                <button name="button_export_paycheck" states="confirmed,done" type="object" string="Paycheck Details"
+                        class="oe_stat_button" icon="fa-pencil-square-o"/>
+            </button>
+        </field>
+    </record>
+</odoo>

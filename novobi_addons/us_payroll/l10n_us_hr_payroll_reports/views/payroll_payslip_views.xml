@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_payslip_tree_paycheck" model="ir.ui.view">
+        <field name="name">payroll.payslip.tree.paycheck</field>
+        <field name="model">payroll.payslip</field>
+        <field name="mode">primary</field>
+        <field name="priority">50</field>
+        <field name="arch" type="xml">
+            <tree create="false" edit="false" delete="false">
+                <field name="name"/>
+                <field name="employee_code"/>
+                <field name="employee_id"/>
+                <field name="working_type"/>
+                <field name="pay_date"/>
+                <field name="payment_method"/>
+                <field name="worked_hours"/>
+                <field name="holiday"/>
+                <field name="total_hours"/>
+                <field name="gross_pay"/>
+                <field name="total_ee_deduction"/>
+                <field name="total_ee_tax"/>
+                <field name="net_pay"/>
+                <field name="total_er_deduction"/>
+                <field name="total_er_tax"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

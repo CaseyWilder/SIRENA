@@ -1,0 +1,120 @@
+<odoo>
+    <record id="view_payslip_compensation_tree" model="ir.ui.view">
+        <field name="name">payslip.compensation.tree</field>
+        <field name="model">payslip.compensation</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom" decoration-muted="is_posttax" default_order="sequence">
+                <field name="sequence" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="pay_date" invisible="1"/>
+                <field name="employee_id" invisible="1"/>
+                <field name="compensation_id" required="1"/>
+                <field name="is_posttax" invisible="1"/>
+                <field name="label" required="1"/>
+                <field name="rate" readonly="1" attrs="{'column_invisible': [('parent.state', '=', 'draft')]}"/>
+                <field name="hours" readonly="1" attrs="{'column_invisible': [('parent.state', '=', 'draft')]}"/>
+                <field name="amount" required="1"/>
+                <field name="mtd_amount" readonly="1" attrs="{'column_invisible': [('parent.state', '=', 'draft')]}"/>
+                <field name="qtd_amount" readonly="1" attrs="{'column_invisible': [('parent.state', '=', 'draft')]}"/>
+                <field name="ytd_amount" readonly="1" attrs="{'column_invisible': [('parent.state', '=', 'draft')]}"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_payslip_compensation_form" model="ir.ui.view">
+        <field name="name">payslip.compensation.form</field>
+        <field name="model">payslip.compensation</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0" delete="0" default_order="sequence">
+                <group>
+                    <field name="sequence" invisible="1"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="pay_date" invisible="1"/>
+                    <field name="employee_id" invisible="1" context="{'form_view_ref': 'l10n_us_hr_payroll.hr_employee_view_form'}"/>
+                    <field name="compensation_id"/>
+                    <field name="label"/>
+                    <field name="amount"/>
+                    <field name="mtd_amount"/>
+                    <field name="qtd_amount"/>
+                    <field name="ytd_amount"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_payslip_compensation_tree_report" model="ir.ui.view">
+        <field name="name">payslip.compensation.tree.report</field>
+        <field name="model">payslip.compensation</field>
+        <field name="arch" type="xml">
+            <tree default_order="pay_date" create="0" delete="0">
+                <field name="sequence" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="employee_id" readonly="1"/>
+                <field name="pay_date" readonly="1"/>
+                <field name="compensation_id" readonly="1"/>
+                <field name="label" readonly="1"/>
+                <field name="amount" readonly="1"/>
+                <field name="mtd_amount" readonly="1"/>
+                <field name="qtd_amount" readonly="1"/>
+                <field name="ytd_amount" readonly="1"/>
+                <field name="state" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_payslip_compensation_filter" model="ir.ui.view">
+        <field name="name">payslip.compensation.search</field>
+        <field name="model">payslip.compensation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id" />
+                <field name="pay_date" />
+                <field name="compensation_id" />
+                <field name="label" />
+                <field name="employee_id"/>
+                <separator/>
+                <filter name="pay_date_filter" string="Pay date" date="pay_date"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_employee" string="Employee" context="{'group_by':'employee_id'}"/>
+                    <filter name="group_by_compensation" string="Compensation" context="{'group_by':'compensation_id'}"/>
+                    <separator/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_payslip_compensation" model="ir.actions.act_window">
+        <field name="name">Compensations</field>
+        <field name="res_model">payslip.compensation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_payslip_compensation_tree_report"/>
+        <field name="context">{'search_default_group_by_compensation': 1}</field>
+        <field name="domain">[('state', '=', 'done')]</field>
+    </record>
+
+    <!-- Adhoc Compensation -->
+    <record id="view_adhoc_payslip_compensation_tree" model="ir.ui.view">
+        <field name="name">payslip.compensation.tree.adhoc</field>
+        <field name="model">payslip.compensation</field>
+        <field name="priority" eval="30"/>
+        <field name="arch" type="xml">
+            <tree default_order="pay_date" editable="bottom">
+                <field name="currency_id" invisible="1"/>
+                <field name="pay_date" invisible="1"/>
+                <field name="payslip_id" domain="[('state', '=', 'draft')]" options="{'no_create': True}"/>
+                <field name="employee_id" readonly="1" force_save="1" context="{'form_view_ref': 'l10n_us_hr_payroll.hr_employee_view_form'}"/>
+                <field name="compensation_id" options="{'no_create': True}"/>
+                <field name="label"/>
+                <field name="amount"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_adhoc_payslip_compensation" model="ir.actions.act_window">
+        <field name="name">Compensations</field>
+        <field name="res_model">payslip.compensation</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_adhoc_payslip_compensation_tree"/>
+        <field name="domain">[('is_regular', '=', False), ('payslip_id.state', '=', 'draft')]</field>
+    </record>
+</odoo>

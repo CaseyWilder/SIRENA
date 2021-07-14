@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+	<record model="payroll.compensation" id="payroll_compensation_salary">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_0"/>
+		<field name="name">Salary</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_ot">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_0"/>
+		<field name="name">Overtime Pay</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_dot">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_0"/>
+		<field name="name">Double Overtime Pay</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_sick">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_0"/>
+		<field name="name">Sick Pay</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_vacation">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_0"/>
+		<field name="name">Vacation Pay</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_holiday">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_0"/>
+		<field name="name">Holiday Pay</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_fmla">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_0"/>
+		<field name="name">FMLA Leave</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_funeral">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_0"/>
+		<field name="name">Bereavement Pay</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_jury_duty">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_0"/>
+		<field name="name">Jury Duty</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_personal">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_0"/>
+		<field name="name">Personal Leave</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_military">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_0"/>
+		<field name="name">Military Leave</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_0">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_0"/>
+		<field name="name">Cash</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_1">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_1"/>
+		<field name="name">Group Term Life Over $50000</field>
+		<field name="w2_code">C</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_2">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_2"/>
+		<field name="name">Bonus</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_3">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_3"/>
+		<field name="name">Stock Options</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_4">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_4"/>
+		<field name="name">Educational Asst (Job Related)</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_5">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_5"/>
+		<field name="name">Educational Asst (Non-job Related)</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_6">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_6"/>
+		<field name="name">Adoption Assistance</field>
+		<field name="w2_code">T</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_7">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_7"/>
+		<field name="name">Qualified Moving Expense Reimbursements</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_8">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_8"/>
+		<field name="name">Van Pool &amp; Transit Passes</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_9">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_9"/>
+		<field name="name">Qualified Parking</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_10">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_10"/>
+		<field name="name">Reported Tips</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_11">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_11"/>
+		<field name="name">125HSA</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_12">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_12"/>
+		<field name="name">HSA</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_14">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_14"/>
+		<field name="name">409A Distribution</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_15">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_15"/>
+		<field name="name">ER STD 125 plan</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_16">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_16"/>
+		<field name="name">ER LTD 125 plan</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_17">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_17"/>
+		<field name="name">Agent STD 125 plan</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_18">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_18"/>
+		<field name="name">Agent LTD 125 plan</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_19">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_19"/>
+		<field name="name">3rd Party STD 125 plan</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_20">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_20"/>
+		<field name="name">3rd Party LTD 125 plan</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_21">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_21"/>
+		<field name="name">Golden Parachute</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_22">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_22"/>
+		<field name="name">Domestic Partner Benefit Non-Dependent</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_23">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_23"/>
+		<field name="name">Domestic Partner Benefit Dependent</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_24">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_24"/>
+		<field name="name">Adult Child Health Coverage</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_25">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_25"/>
+		<field name="name">Meals for the convenience of ER</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_26">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_26"/>
+		<field name="name">Military Differential Pay</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_28">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_28"/>
+		<field name="name">Severance Pay</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_29">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_29"/>
+		<field name="name">Severance Pay required by law</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_30">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_30"/>
+		<field name="name">Deceased Worker Pay</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_31">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_31"/>
+		<field name="name">Clergy Housing Allowance</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_32">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_32"/>
+		<field name="name">Expanded Family and Medical Leave</field>
+	</record>
+	<record model="payroll.compensation" id="payroll_compensation_33">
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_compensation_category_33"/>
+		<field name="name">Emergency Paid Sick Leave</field>
+	</record>
+</odoo>

@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <record model="payroll.deduction" id="payroll_deduction_0">
+		<field name="name">125 Cafeteria Plan - Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_0"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_other_benefits"/>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_1">
+		<field name="name">401K - Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_1"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">D</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_2">
+		<field name="name">403B - Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_2"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">E</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_3">
+		<field name="name">457 - Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_3"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">G</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_4">
+		<field name="name">125 Cafeteria Plan - Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_4"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_other_benefits"/>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_5">
+		<field name="name">401K - Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_5"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">D</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_6">
+		<field name="name">403B - Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_6"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">E</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_7">
+		<field name="name">457 - Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_7"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">G</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_14">
+		<field name="name">Household &amp; Dependent Care Benefit - 125DC - Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_14"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_other_benefits"/>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_15">
+		<field name="name">Household &amp; Dependent Care Benefit - 125DC - Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_15"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_other_benefits"/>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_17">
+		<field name="name">457CU - Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_17"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">G</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_19">
+		<field name="name">457CU - Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_19"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">G</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_20">
+		<field name="name">401K CU2 Over 50 - Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_20"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">D</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_21">
+		<field name="name">401K CU2 Over 50 - Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_21"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">D</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_22">
+		<field name="name">403B CU2 Over 50 - Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_22"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">E</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_23">
+		<field name="name">403B CU2 Over 50 - Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_23"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">E</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_24">
+		<field name="name">457 CU2 Over 50 - Deferred Comp Catch-Up - Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_24"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">G</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_25">
+		<field name="name">457 CU2 Over 50 - Deferred Comp Catch-Up - Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_25"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">G</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_26">
+		<field name="name">Flexible Spending Account 125 FSA - Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_26"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_fsa"/>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_27">
+		<field name="name">Flexible Spending Account 125 FSA - Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_27"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_fsa"/>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_28">
+		<field name="name">408K - Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_28"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">F</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_29">
+		<field name="name">408K - Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_29"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">F</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_30">
+		<field name="name">408K - CU2 Over 50 - Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_30"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">F</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_31">
+		<field name="name">Retirement Plan - 408K - CU2 Over 50 - Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_31"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">F</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_32">
+		<field name="name">408P - Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_32"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">S</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_33">
+		<field name="name">408P - Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_33"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">S</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_34">
+		<field name="name">408P CU2 Over 50 - Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_34"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">S</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_35">
+		<field name="name">408P CU2 Over 50 - Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_35"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">S</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_36">
+		<field name="name">125 HSA - Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_36"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_fsa"/>
+		<field name="w2_code">W</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_37">
+		<field name="name">125 HSA - Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_37"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_fsa"/>
+		<field name="w2_code">W</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_38">
+		<field name="name">125 HSA CU - Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_38"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_fsa"/>
+		<field name="w2_code">W</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_39">
+		<field name="name">125 HSA CU - Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_39"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_fsa"/>
+		<field name="w2_code">W</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_40">
+		<field name="name">403B CU 15Y - Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_40"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">E</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_41">
+		<field name="name">403B CU 15Y - Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_41"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">E</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_42">
+		<field name="name">Nonqualified Deferred Compensation Plan - 409A - Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_42"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_other_benefits"/>
+		<field name="w2_code">Y</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_43">
+		<field name="name">Nonqualified Deferred Compensation Plan - 409A - Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_43"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_other_benefits"/>
+		<field name="w2_code">Y</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_44">
+		<field name="name">Insurance - Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_44"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_health"/>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_441">
+		<field name="name">Medical Insurance</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_44"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_health"/>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_442">
+		<field name="name">Dental Insurance</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_44"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_health"/>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_443">
+		<field name="name">Vision Insurance</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_44"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_health"/>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_45">
+		<field name="name">Insurance - Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_45"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_health"/>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_46">
+		<field name="name">Roth 401K - Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_46"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">AA, BB, EE</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_47">
+		<field name="name">Roth 401K - Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_47"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_retirement"/>
+		<field name="w2_code">AA, BB, EE</field>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_48">
+		<field name="name">Qualified Parking Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_48"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_transportation"/>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_49">
+		<field name="name">Qualified Parking Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_49"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_transportation"/>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_50">
+		<field name="name">Vanpool And Transit Passes Regular</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_50"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_transportation"/>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_51">
+		<field name="name">Vanpool And Transit Passes Supplement</field>
+		<field name="category_id" ref="l10n_us_hr_payroll.payroll_deduction_category_51"/>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_transportation"/>
+	</record>
+	<!--Post-tax Deduction-->
+	<record model="payroll.deduction" id="payroll_deduction_child">
+		<field name="name">Child Support</field>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_other_deductions"/>
+	</record>
+	<record model="payroll.deduction" id="payroll_deduction_garnishment">
+		<field name="name">Garnishment</field>
+		<field name="type_id" ref="l10n_us_hr_payroll.payroll_deduction_type_other_deductions"/>
+	</record>
+</odoo>

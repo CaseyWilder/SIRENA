@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="generate_holidays_wizard_view" model="ir.ui.view">
+        <field name="name">generate.holidays.wizard.form</field>
+        <field name="model">generate.holidays.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create Next Year Public Holidays">
+                <sheet>
+                    <group name="group_main_left">
+                        <field name="year_str" required="1" string="Calendar Year"/>
+                        <field name="year" invisible="1"/>
+                        <field name="country_id" readonly="1"/>
+                        <field name="company_id" required="1"/>
+                        <field name="state_ids" widget="many2many_tags" options="{'no_create': True, 'no_edit': True}" required="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="button_generate_public_holidays" type="object" class="btn-primary" string="Generate"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_generate_holidays" model="ir.actions.act_window">
+        <field name="name">Generate Public Holidays</field>
+        <field name="res_model">generate.holidays.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>
