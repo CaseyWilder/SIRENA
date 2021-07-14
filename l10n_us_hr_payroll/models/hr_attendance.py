@@ -6,8 +6,8 @@ from ..utils.utils import convert_time_zone
 class HrAttendance(models.Model):
     _inherit = 'hr.attendance'
 
-    # Override to rename
-    worked_hours = fields.Float(string='Working Hours', compute='_compute_worked_hours', store=True, readonly=True)
+    # Override to rename and add digits
+    worked_hours = fields.Float(string='Working Hours', compute='_compute_worked_hours', store=True, readonly=True, digits=(16, 2))
 
     date = fields.Date('Date', compute='_compute_date', store=True,
                        help='This field is to determine that an attendance belongs to an exact day and will be used to calculate working hours')

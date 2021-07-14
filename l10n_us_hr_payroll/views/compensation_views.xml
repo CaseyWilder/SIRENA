@@ -70,11 +70,8 @@
     </record>
 
     <record id="action_payroll_compensation_form" model="ir.actions.act_window">
-        <field name="name">Compensation</field>
+        <field name="name">Compensations</field>
         <field name="res_model">payroll.compensation</field>
         <field name="view_mode">tree,form</field>
     </record>
-
-    <menuitem action="action_payroll_compensation_form" id="menu_action_payroll_compensation_form"
-              parent="menu_us_payroll_configuration" sequence="20"/>
 </odoo>

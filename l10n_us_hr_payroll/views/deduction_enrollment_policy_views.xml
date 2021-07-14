@@ -49,12 +49,9 @@
     </record>
 
     <record id="action_deduction_enrollment_policy_form" model="ir.actions.act_window">
-        <field name="name">Deduction Enrollment Policy</field>
+        <field name="name">Deduction Enrollment Policies</field>
         <field name="res_model">deduction.enrollment.policy</field>
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="view_deduction_enrollment_policy_tree"/>
     </record>
-
-    <menuitem action="action_deduction_enrollment_policy_form" id="menu_action_deduction_enrollment_policy_form"
-              parent="menu_us_payroll_configuration" sequence="31"/>
 </odoo>

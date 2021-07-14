@@ -18,7 +18,7 @@ DEDUCTION_TRACKED_FIELDS = [
 
 # Confidential fields for Payroll
 PAYROLL_CONFIDENTIAL_FIELDS = {
-    'employee_type', 'pay_frequency_id', 'time_tracking_id', 'payment_method', 'checkin_method',
+    'employee_type', 'pay_frequency_id', 'time_tracking_id', 'payment_method', 'split_paychecks_type', 'checkin_method',
 
     'exempt_social_security', 'exempt_federal_tax', 'exempt_medicare',
     'alternate_calculation_id', 'work_alternate_calculation_id',
@@ -52,29 +52,22 @@ def convert_time_zone(dt, tz):
     return utc_dt.astimezone(timezone(tz))
 
 
-def sync_record(record, values, sync_fields):
+def sync_record(rec, fields):
     """
-    Check if new values are different from synchronized record's => return those values.
-    :param record:      record needs to be synchronized.
-    :param values:      new values
-    :param sync_fields: field names need to be synchronized
-    :return: sync:
+    Get sync values of all fields in `fields` from record `rec`
+    :param rec:
+    :param fields:
+    :return: dict of values
     """
-    sync = dict()
-    for field in values:
-        if field in sync_fields:
-            if not record:
-                # Create new res_partner
-                sync[field] = values[field]
-            else:
-                # Only sync values which are changed
-                if record[field] != values[field]:
-                    try:
-                        if record[field].id != values[field]:
-                            sync[field] = values[field]
-                    except AttributeError:
-                        sync[field] = values[field]
-    return sync
+    sync_values = dict()
+    for field in fields:
+        # many2one fields
+        try:
+            sync_values[field] = rec[field].id
+        # Normal fields
+        except AttributeError:
+            sync_values[field] = rec[field]
+    return sync_values
 
 
 def get_min_value(value_1, value_2, precision_digits=2):

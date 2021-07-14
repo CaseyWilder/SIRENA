@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_payroll_payslip_form_inherit_payroll_contractor" model="ir.ui.view">
+        <field name="name">payroll.payslip.form</field>
+        <field name="model">payroll.payslip</field>
+        <field name="inherit_id" ref="l10n_us_hr_payroll.view_payroll_payslip_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='compensations']/group[@name='salary']//field[@name='salary_annual']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('employee_type', '=', 'hourly'), ('employee_type', '=', 'contractor')]}</attribute>
+            </xpath>
+            <xpath expr="//page[@name='compensations']/group[@name='salary']//label[@for='salary_per_paycheck']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', '|', ('state', '!=', 'draft'), ('employee_type', '=', 'hourly'), ('employee_type', '=', 'contractor')]}</attribute>
+            </xpath>
+            <xpath expr="//page[@name='compensations']/group[@name='salary']//div" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', '|', ('state', '!=', 'draft'), ('employee_type', '=', 'hourly'), ('employee_type', '=', 'contractor')]}</attribute>
+            </xpath>
+
+            <xpath expr="//page[@name='working_hours']//field[@name='overtime']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('employee_type', '=', 'salary'), ('employee_type', '=', 'contractor')], 'readonly': ['|', ('state', '!=', 'draft'), ('manual_working_hours', '=', False)]}</attribute>
+            </xpath>
+            <xpath expr="//page[@name='working_hours']//field[@name='double_overtime']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', '|', ('employee_type', '=', 'salary'), ('daily_double_ovt_apply', '=', False), ('employee_type', '=', 'contractor')], 'readonly': ['|', ('state', '!=', 'draft'), ('manual_working_hours', '=', False)]}</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

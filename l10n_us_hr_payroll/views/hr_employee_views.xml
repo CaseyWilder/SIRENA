@@ -31,7 +31,7 @@
                 <field name="outdated_holiday_leaves" invisible="1"/>
 
                 <!-- Show warning to Regenerate holiday leaves if users change working state. -->
-                <div class="alert alert-warning" role="alert" attrs="{'invisible': [('outdated_holiday_leaves', '=', False)]}">
+                <div class="alert alert-warning" role="alert" attrs="{'invisible': [('outdated_holiday_leaves', '=', False)]}" groups="hr.group_hr_user">
                     The Working State or Working Hours has been changed and may affect holiday leave requests. Please
                     <button name="button_generate_holiday_leave" type="object" class="btn-link p-0 m-0" style="vertical-align: baseline">
                          regenerate holiday leaves
@@ -40,14 +40,14 @@
                 </div>
 
                 <!-- Show info to choose county if there are multiple choices for this address -->
-                <div class="alert alert-info" role="alert" attrs="{'invisible': [('geocode_status', '!=', 'choice')]}">
+                <div class="alert alert-info" role="alert" attrs="{'invisible': [('geocode_status', '!=', 'choice')]}" groups="hr.group_hr_user">
                     We found more than one counties for this Mailing Address. Please
                     <button name="action_choose_geocode" type="object" class="btn-link p-0 m-0" style="vertical-align: baseline">
                         select a county
                     </button>
                     from the county list.
                 </div>
-                <div class="alert alert-info" role="alert" attrs="{'invisible': [('work_geocode_status', '!=', 'choice')]}">
+                <div class="alert alert-info" role="alert" attrs="{'invisible': [('work_geocode_status', '!=', 'choice')]}" groups="hr.group_hr_user">
                     We found more than one counties for this Work Address. Please
                     <button name="action_choose_work_geocode" type="object" class="btn-link p-0 m-0" style="vertical-align: baseline">
                         select a county
@@ -56,10 +56,10 @@
                 </div>
 
                 <!-- Show warning for wrong address -->
-                <div class="alert alert-danger" role="alert" attrs="{'invisible': [('geocode_status', '!=', 'empty')]}">
+                <div class="alert alert-danger" role="alert" attrs="{'invisible': [('geocode_status', '!=', 'empty')]}" groups="hr.group_hr_user">
                     The <b>city, state, and ZIP code don't match</b>. Please make sure the Mailing Address is correct.
                 </div>
-                <div class="alert alert-danger" role="alert" attrs="{'invisible': [('work_geocode_status', '!=', 'empty')]}">
+                <div class="alert alert-danger" role="alert" attrs="{'invisible': [('work_geocode_status', '!=', 'empty')]}" groups="hr.group_hr_user">
                     The <b>city, state, and ZIP code don't match</b>. Please make sure the Work Address is correct.
                 </div>
             </sheet>
@@ -109,12 +109,15 @@
             </group>
 
             <!-- PRIVATE INFORMATION -->
+            <page name="personal_information" position="attributes">
+                <attribute name="groups">l10n_us_hr_payroll.l10n_us_hr_payroll_group_manager</attribute>
+            </page>
             <!-- Citizenship & Other Information -->
             <field name="country_id" position="attributes">
                 <attribute name="invisible">1</attribute>
             </field>
             <field name="country_id" position="after">
-                <field name="ssnid" placeholder="E.g. 123-45-6789" groups="hr.group_hr_user" required="1"/>
+                <field name="ssnid" placeholder="E.g. 123-45-6789" groups="hr.group_hr_user"/>
                 <field name="sinid" groups="hr.group_hr_user"/>
             </field>
             <field name="passport_id" position="after">
@@ -137,11 +140,11 @@
                 <div class="o_address_format">
                     <field name="street" placeholder="Street..." class="o_address_street"/>
                     <field name="street2" placeholder="Street 2..." class="o_address_street"/>
-                    <field name="city" placeholder="City" class="o_address_city" required="1"/>
+                    <field name="city" placeholder="City" class="o_address_city"/>
                     <field name="county" placeholder="County" class="o_address_city"/>
-                    <field name="state_id" class="o_address_state" placeholder="State" options='{"no_open": True, "no_create": True}' required="1"/>
-                    <field name="zip" placeholder="ZIP" class="o_address_zip" required="1"/>
-                    <field name="country_id" placeholder="Country" class="o_address_country" options='{"no_open": True, "no_create": True}' required="1"/>
+                    <field name="state_id" class="o_address_state" placeholder="State" options='{"no_open": True, "no_create": True}'/>
+                    <field name="zip" placeholder="ZIP" class="o_address_zip"/>
+                    <field name="country_id" placeholder="Country" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
                 </div>
             </field>
             <field name="km_home_work" position="attributes">
@@ -154,10 +157,6 @@
             <xpath expr="//page[@name='personal_information']//field[@name='children']/.." position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
-            <!-- Birth -->
-            <field name="birthday" position="attributes">
-                <attribute name="required">1</attribute>
-            </field>
 
             <!-- WORK HISTORY -->
             <page name="hr_settings" position="after">
@@ -208,6 +207,27 @@
             <div name="button_box" position="inside">
                 <button name="button_see_payslip_ids" type="object" class="oe_stat_button" string="Payslips" icon="fa-money"/>
             </div>
+            <page name="personal_information" position="attributes">
+                <attribute name="groups">hr.group_hr_user</attribute>
+            </page>
+            <field name="ssnid" position="attributes">
+                <attribute name="required">1</attribute>
+            </field>
+            <field name="city" position="attributes">
+                <attribute name="required">1</attribute>
+            </field>
+            <field name="state_id" position="attributes">
+                <attribute name="required">1</attribute>
+            </field>
+            <field name="zip" position="attributes">
+                <attribute name="required">1</attribute>
+            </field>
+            <field name="country_id" position="attributes">
+                <attribute name="required">1</attribute>
+            </field>
+            <field name="birthday" position="attributes">
+                <attribute name="required">1</attribute>
+            </field>
             <page name="personal_information" position="after">
                 <!-- PAYROLL INFORMATION -->
                 <page name="payroll_information" string="Payroll Information">
@@ -222,7 +242,7 @@
                             <field name="checkin_method" required="1" widget="radio"/>
                             <field name="time_tracking_id" attrs="{'required': [('employee_type', '!=', 'salary')]}" options="{'no_create_edit': True}"/>
                             <field name="payment_method" required="1"/>
-                            <field name="split_paychecks_type" attrs="{'invisible' : [('payment_method', '==', 'check')]}"/>
+                            <field name="split_paychecks_type" attrs="{'invisible' : [('payment_method', '==', 'check')], 'required': [('payment_method', '==', 'deposit')]}"/>
                         </group>
                         <!-- Tax Exemption -->
                         <div name="tax_exemption" class="o_group">
@@ -375,14 +395,14 @@
                             <div>
                                 <field name="salary_amount" class="oe_inline" required="1"/>
                                 <span class="oe_inline"> per </span>
-                                <span attrs="{'invisible': [('employee_type', '!=', 'hourly')]}" class="oe_inline">Hour</span>
+                                <span attrs="{'invisible': [('employee_type', '!=', 'hourly')]}" class="oe_inline" name="hour">Hour</span>
                                 <field name="salary_period" attrs="{'invisible': [('employee_type', '=', 'hourly')]}" class="oe_inline" required="1"/>
-                                <span attrs="{'invisible': ['|', ('employee_type', '=', 'hourly'), ('calculate_salary_by', '=', 'hour')]}">
+                                <span attrs="{'invisible': ['|', ('employee_type', '=', 'hourly'), ('calculate_salary_by', '=', 'hour')]}" name="per_paycheck">
                                     &amp;rarr; <b><field name="salary_per_paycheck" class="oe_inline"/></b> per paycheck
                                 </span>
                             </div>
                             <label for="salary_annual" attrs="{'invisible': [('employee_type', '=', 'hourly')]}"/>
-                            <div attrs="{'invisible': [('employee_type', '=', 'hourly')]}">
+                            <div attrs="{'invisible': [('employee_type', '=', 'hourly')]}" name="salary_annual">
                                 <field name="salary_annual" class="oe_inline" required="1"/>
                                 <span attrs="{'invisible': [('calculate_salary_by', '=', 'hour')]}"> / <field name="num_of_paychecks" class="oe_inline"/> paychecks</span>
                             </div>
@@ -453,7 +473,7 @@
         </field>
     </record>
 
-    <!-- Open Employee Action -->
+    <!-- Open Employee Action in Payroll app -->
     <record id="hr_employee_action_payroll" model="ir.actions.act_window">
         <field name="name">Employees</field>
         <field name="res_model">hr.employee</field>
@@ -478,9 +498,5 @@
                 contact data, job position, availability, etc.
             </p>
         </field>
-    </record>
-
-    <record id="l10n_us_hr_payroll.menu_us_payroll_employee_sub" model="ir.ui.menu">
-        <field name="action" ref="l10n_us_hr_payroll.hr_employee_action_payroll"/>
     </record>
 </odoo>

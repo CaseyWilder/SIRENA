@@ -50,12 +50,8 @@
     </record>
 
     <record id="action_payroll_deduction_form" model="ir.actions.act_window">
-        <field name="name">Deduction</field>
+        <field name="name">Deductions</field>
         <field name="res_model">payroll.deduction</field>
-
         <field name="view_mode">tree,form</field>
     </record>
-
-    <menuitem action="action_payroll_deduction_form" id="menu_action_payroll_deduction_form"
-              parent="menu_us_payroll_configuration" sequence="25"/>
 </odoo>

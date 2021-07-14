@@ -7,7 +7,8 @@ class Employee(models.Model):
     _inherit = 'hr.employee'
 
     # Technical fields
-    outdated_holiday_leaves = fields.Boolean('Holiday Leaves Outdated', help='Technical fields for handling public holiday leaves')
+    outdated_holiday_leaves = fields.Boolean('Holiday Leaves Outdated', groups="hr.group_hr_user",
+                                             help='Technical fields for handling public holiday leaves')
 
     def _get_work_state(self):
         return self.address_id.state_id or False
