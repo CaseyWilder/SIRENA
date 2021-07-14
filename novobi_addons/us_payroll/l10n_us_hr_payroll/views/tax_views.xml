@@ -84,12 +84,9 @@
     </record>
 
     <record id="action_payroll_tax_form" model="ir.actions.act_window">
-        <field name="name">Tax</field>
+        <field name="name">Taxes</field>
         <field name="res_model">payroll.tax</field>
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="view_payroll_tax_tree"/>
     </record>
-
-    <menuitem action="action_payroll_tax_form" id="menu_action_payroll_tax_form"
-              parent="menu_us_payroll_configuration" sequence="40"/>
 </odoo>

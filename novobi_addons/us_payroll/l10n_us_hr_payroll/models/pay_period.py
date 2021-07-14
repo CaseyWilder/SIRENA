@@ -33,7 +33,8 @@ class PayPeriod(models.Model):
 
     name = fields.Char('Name', compute='_compute_name', inverse='_inverse_name', store=True)
     is_history = fields.Boolean('Is this a historical payroll data?')
-    pay_frequency_id = fields.Many2one('pay.frequency', ondelete='restrict')
+    pay_frequency_id = fields.Many2one('pay.frequency', compute='_compute_pay_frequency_id',
+                                       inverse='_inverse_pay_frequency_id', store=True, ondelete='restrict')
     payslip_ids = fields.One2many('payroll.payslip', 'pay_period_id', string='Payslips')
     start_date = fields.Date('Start Date')
     end_date = fields.Date('End Date')
@@ -64,14 +65,6 @@ class PayPeriod(models.Model):
     currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.company.currency_id)
     total_gross_pay = fields.Monetary('Total Gross Pay', compute='_compute_total_amount', store=True)
     total_net_pay = fields.Monetary('Total Net Pay', compute='_compute_total_amount', store=True)
-
-    # ===== Dashboard =====
-    total_regular = fields.Float('Total Regular Hours', digits=(16, 2))
-    total_overtime = fields.Float('Total Overtime Hours', digits=(16, 2))
-    total_double = fields.Float('Total Double Overtime Hours', digits=(16, 2))
-    total_holiday = fields.Float('Total Paid Leaves Hours', digits=(16, 2))
-    total_er_tax = fields.Monetary('Total Company Taxes')
-    total_er_deduction = fields.Monetary('Total Company Contribution')
 
     ####################################################################################################################
     # CONSTRAINTS
@@ -126,14 +119,18 @@ class PayPeriod(models.Model):
     ####################################################################################################################
     # ONCHANGE, COMPUTE/INVERSE
     ####################################################################################################################
-    @api.onchange('payslip_ids')
-    def _onchange_payslip_ids(self):
+    @api.depends('payslip_ids', 'payslip_ids.pay_frequency_id', 'pay_type')
+    def _compute_pay_frequency_id(self):
         """
         Pay frequency of a pay.period (except Scheduled Payroll) will be same to pay frequency of the first payslip
         to make sure all payslips in this payroll having same pay frequency.
         """
-        if self.pay_type != 'frequency':
-            self.pay_frequency_id = self.payslip_ids and self.payslip_ids[0].pay_frequency_id or False
+        for record in self:
+            if record.pay_type != 'frequency':
+                record.pay_frequency_id = record.payslip_ids and record.payslip_ids[0].pay_frequency_id or False
+
+    def _inverse_pay_frequency_id(self):
+        pass
 
     @api.depends('pay_frequency_id', 'pay_type')
     def _compute_name(self):
@@ -419,7 +416,6 @@ class PayPeriod(models.Model):
             'move_id': account_move.id,
             'state': 'done',
         })
-        self._update_total_period_data()
         self.move_id.action_post()
 
         return {
@@ -437,8 +433,6 @@ class PayPeriod(models.Model):
         self.ensure_one()
         self.payslip_ids._calculate_accumulated_amount(tax=True, compout=True)
         self.payslip_ids._calculate_net_pay_history_done()
-        # Historical periods still need to be calculated total data to show on dashboard.
-        self._update_total_period_data()
         self.state = 'done'
 
     def button_generate_ach_file(self):
@@ -798,6 +792,7 @@ class PayPeriod(models.Model):
         self.ensure_one()
         self._check_run_payroll_confirmed()
         self._check_run_payroll_empty()
+        self._check_unique_frequency()
         self._check_standard_working_hours()
         self._check_run_payroll_geocode()
         self._check_run_payroll_update_period()

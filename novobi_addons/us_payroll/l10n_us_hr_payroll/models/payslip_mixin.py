@@ -6,7 +6,7 @@ from ..utils.utils import PAYROLL_CONFIDENTIAL_FIELDS
 
 # Fields need to be synchronized between hr.employee and payroll_payslip.
 EE_PAYSLIP_SYNC_FIELDS = [
-    'company_id', 'employee_code', 'working_type', 'resource_calendar_id', 'address_id',
+    'employee_code', 'working_type', 'resource_calendar_id', 'address_id',
     'street', 'street2', 'city', 'county', 'zip', 'state_id', 'geocode',
     'work_street', 'work_street2', 'work_city', 'work_county', 'work_zip', 'work_state_id', 'work_geocode',
 ] + list(PAYROLL_CONFIDENTIAL_FIELDS)
@@ -21,102 +21,105 @@ class PayslipMixin(models.AbstractModel):
     _inherit = ['address.mixin', 'geocode.mixin']
     _description = 'Payroll Payslip Mixin'
 
-    currency_id = fields.Many2one('res.currency', related='company_id.currency_id', readonly=True, store=True)
-    employee_code = fields.Char(string='Employee ID', readonly=True, index=True, copy=False)
+    currency_id = fields.Many2one('res.currency', related='company_id.currency_id', readonly=True, store=True, groups="hr.group_hr_user")
+    employee_code = fields.Char(string='Employee ID', readonly=True, index=True, copy=False, groups="hr.group_hr_user")
     working_type = fields.Selection([('full', 'Full-time'), ('part', 'Part-time')], string='Working Type',
-                                    tracking=True, default='full')
-    resource_calendar_id = fields.Many2one('resource.calendar', 'Working Schedule', tracking=True,
+                                    tracking=True, default='full', groups="hr.group_hr_user")
+    resource_calendar_id = fields.Many2one('resource.calendar', 'Working Schedule', tracking=True, groups="hr.group_hr_user",
                                            default=lambda self: self.env.company.resource_calendar_id)
 
     # General Info
-    pay_frequency_id = fields.Many2one('pay.frequency', 'Pay Frequency', tracking=True,
+    pay_frequency_id = fields.Many2one('pay.frequency', 'Pay Frequency', tracking=True, groups="hr.group_hr_user",
                                        domain="[('company_id', '=', company_id), ('state', '=', 'confirm')]")
-    num_of_paychecks = fields.Integer('Number of Paychecks per year', compute='_compute_num_of_paychecks', store=True)
-    time_tracking_id = fields.Many2one('time.tracking.rule', 'Overtime Rule', tracking=True)
+    num_of_paychecks = fields.Integer('Number of Paychecks per year', compute='_compute_num_of_paychecks', store=True, groups="hr.group_hr_user")
+    time_tracking_id = fields.Many2one('time.tracking.rule', 'Overtime Rule', tracking=True, groups="hr.group_hr_user")
     payment_method = fields.Selection([('check', 'Check'), ('deposit', 'Direct Deposit')],
-                                      string='Payment Method', default='check', tracking=True)
-    checkin_method = fields.Selection([('attendance', 'Attendances')], string='Check-in App',
+                                      string='Payment Method', default='check', tracking=True, groups="hr.group_hr_user")
+    split_paychecks_type = fields.Selection([('percentage', 'By Percentage (%)'), ('amount', 'By Amount ($)')],
+                                            string='Split Paychecks', default='percentage', tracking=True, groups="hr.group_hr_user")
+    checkin_method = fields.Selection([('attendance', 'Attendances')], string='Check-in App', groups="hr.group_hr_user",
                                       default=lambda self: self.env.company.checkin_method, tracking=True)
 
     # Employee Type & Salary
     employee_type = fields.Selection(
         [('salary_ovt', 'Salary/Eligible for Overtime'), ('salary', 'Salary/No Overtime'), ('hourly', 'Hourly')],
-        string='Employee Type', tracking=True, default='salary')
+        string='Employee Type', tracking=True, default='salary', groups="hr.group_hr_user")
 
-    salary_amount = fields.Monetary('Salary', tracking=True)
+    salary_amount = fields.Monetary('Salary', tracking=True, groups="hr.group_hr_user")
     salary_period = fields.Selection([('52', 'Week'), ('12', 'Month'), ('1', 'Year')], string='Salary per period',
-                                     tracking=True, default='52')
-    salary_annual = fields.Monetary('Annual Salary', compute='_compute_payroll_salary', store=True, tracking=True)
-    pay_rate = fields.Monetary('Pay Rate', compute='_compute_payroll_salary', store=True, tracking=True)
+                                     tracking=True, default='52', groups="hr.group_hr_user")
+    salary_annual = fields.Monetary('Annual Salary', compute='_compute_payroll_salary', store=True, tracking=True, groups="hr.group_hr_user")
+    pay_rate = fields.Monetary('Pay Rate', compute='_compute_pay_rate', store=True, tracking=True, groups="hr.group_hr_user")
     # This field is to show Salary per Paycheck on employee form. On payslip, it is used as Salary Amount for current period.
     salary_per_paycheck = fields.Monetary('Salary per Paycheck', compute='_compute_payroll_salary', store=True,
-                                          tracking=True)
+                                          tracking=True, groups="hr.group_hr_user")
     calculate_salary_by = fields.Selection([
         ('hour', 'Standard Working Hours'),
         ('paycheck', 'Fixed per Paycheck')
-    ], string='Salary calculated by', default=lambda self: self.env.company.calculate_salary_by)
+    ], string='Salary calculated by', default=lambda self: self.env.company.calculate_salary_by, groups="hr.group_hr_user")
     salary_overridden = fields.Boolean('Sync salary with employee on updating information?', default=False,
-                                       help='Technical field to decide if Salary is updated from Employee to Payslip or not.')
+                                       help='Technical field to decide if Salary is updated from Employee to Payslip or not.',
+                                       groups="hr.group_hr_user")
 
     address_id = fields.Many2one('res.partner', 'Work Address')
-    vertex_id = fields.Char(string="Vertex ID", copy=False)
+    vertex_id = fields.Char(string="Vertex ID", copy=False, groups="hr.group_hr_user")
 
     # Tax Exemption
-    exempt_social_security = fields.Boolean('Social Security', default=False, tracking=True)
-    exempt_federal_tax = fields.Boolean('Federal Income Tax', default=False, tracking=True)
-    exempt_medicare = fields.Boolean('Medicare', default=False, tracking=True)
+    exempt_social_security = fields.Boolean('Social Security', default=False, tracking=True, groups="hr.group_hr_user")
+    exempt_federal_tax = fields.Boolean('Federal Income Tax', default=False, tracking=True, groups="hr.group_hr_user")
+    exempt_medicare = fields.Boolean('Medicare', default=False, tracking=True, groups="hr.group_hr_user")
 
     # Federal Info
     def _get_federal_filing_status_domain(self):
         return [('is_federal', '=', True)]
 
-    fed_allow = fields.Integer('Federal Allowances', tracking=True)
-    fed_add_wh = fields.Monetary('Federal Additional Withholding', tracking=True)
+    fed_allow = fields.Integer('Federal Allowances', tracking=True, groups="hr.group_hr_user")
+    fed_add_wh = fields.Monetary('Federal Additional Withholding', tracking=True, groups="hr.group_hr_user")
     fed_filing_status_id = fields.Many2one('filing.status', 'Federal Filing Status', tracking=True,
-                                           domain=_get_federal_filing_status_domain)
+                                           domain=_get_federal_filing_status_domain, groups="hr.group_hr_user")
 
     # State Info
     # Living State
-    state_pri_allow = fields.Integer('Living State Primary Allowances', tracking=True)
-    state_sec_allow = fields.Integer('Living State Secondary Allowances', tracking=True)
-    state_add_wh = fields.Monetary('Living State Additional Withholding', tracking=True)
-    filing_status_id = fields.Many2one('filing.status', 'Living Filing Status', tracking=True)
-    alternate_calculation_id = fields.Many2one('alternate.calculation', 'Living Tax Rate Table', tracking=True)
+    state_pri_allow = fields.Integer('Living State Primary Allowances', tracking=True, groups="hr.group_hr_user")
+    state_sec_allow = fields.Integer('Living State Secondary Allowances', tracking=True, groups="hr.group_hr_user")
+    state_add_wh = fields.Monetary('Living State Additional Withholding', tracking=True, groups="hr.group_hr_user")
+    filing_status_id = fields.Many2one('filing.status', 'Living Filing Status', tracking=True, groups="hr.group_hr_user")
+    alternate_calculation_id = fields.Many2one('alternate.calculation', 'Living Tax Rate Table', tracking=True, groups="hr.group_hr_user")
 
     # Working State Info
-    work_state_pri_allow = fields.Integer('Work State Primary Allowances', tracking=True)
-    work_state_sec_allow = fields.Integer('Work State Secondary Allowances', tracking=True)
-    work_state_add_wh = fields.Monetary('Work State Additional Withholding', tracking=True)
-    work_filing_status_id = fields.Many2one('filing.status', 'Work Filing Status', tracking=True)
-    work_alternate_calculation_id = fields.Many2one('alternate.calculation', 'Working Tax Rate Table', tracking=True)
-    is_same_state = fields.Boolean('Work and Live in the same State?', compute='_compute_same_state', store=True)
+    work_state_pri_allow = fields.Integer('Work State Primary Allowances', tracking=True, groups="hr.group_hr_user")
+    work_state_sec_allow = fields.Integer('Work State Secondary Allowances', tracking=True, groups="hr.group_hr_user")
+    work_state_add_wh = fields.Monetary('Work State Additional Withholding', tracking=True, groups="hr.group_hr_user")
+    work_filing_status_id = fields.Many2one('filing.status', 'Work Filing Status', tracking=True, groups="hr.group_hr_user")
+    work_alternate_calculation_id = fields.Many2one('alternate.calculation', 'Working Tax Rate Table', tracking=True, groups="hr.group_hr_user")
+    is_same_state = fields.Boolean('Work and Live in the same State?', compute='_compute_same_state', store=True, groups="hr.group_hr_user")
 
     # W4 Label
-    w4_primary_exempt = fields.Char(related='state_id.w4_primary_exempt')
-    w4_second_exempt = fields.Char(related='state_id.w4_second_exempt')
-    w4_primary_exempt_work = fields.Char(string='W4 Work Primary Exemption', related='work_state_id.w4_primary_exempt')
-    w4_second_exempt_work = fields.Char(string='W4 Work Secondary Exemption', related='work_state_id.w4_second_exempt')
+    w4_primary_exempt = fields.Char(related='state_id.w4_primary_exempt', groups="hr.group_hr_user")
+    w4_second_exempt = fields.Char(related='state_id.w4_second_exempt', groups="hr.group_hr_user")
+    w4_primary_exempt_work = fields.Char(string='W4 Work Primary Exemption', related='work_state_id.w4_primary_exempt', groups="hr.group_hr_user")
+    w4_second_exempt_work = fields.Char(string='W4 Work Secondary Exemption', related='work_state_id.w4_second_exempt', groups="hr.group_hr_user")
 
     # County Info
-    county_allow = fields.Integer('Living County Allowance', tracking=True)
-    county_add_wh = fields.Monetary('Living County Additional Withholding', tracking=True)
-    work_county_allow = fields.Integer('Work County Allowance', tracking=True)
-    work_county_add_wh = fields.Monetary('Work County Additional Withholding', tracking=True)
-    is_same_county = fields.Boolean('Work and Live in the same County?', compute='_compute_same_county', store=True)
+    county_allow = fields.Integer('Living County Allowance', tracking=True, groups="hr.group_hr_user")
+    county_add_wh = fields.Monetary('Living County Additional Withholding', tracking=True, groups="hr.group_hr_user")
+    work_county_allow = fields.Integer('Work County Allowance', tracking=True, groups="hr.group_hr_user")
+    work_county_add_wh = fields.Monetary('Work County Additional Withholding', tracking=True, groups="hr.group_hr_user")
+    is_same_county = fields.Boolean('Work and Live in the same County?', compute='_compute_same_county', store=True, groups="hr.group_hr_user")
 
     # City
-    city_allow = fields.Integer('Living City Allowance', tracking=True)
-    city_add_wh = fields.Monetary('Living City Additional Withholding', tracking=True)
-    work_city_allow = fields.Integer('Work City Allowance', tracking=True)
-    work_city_add_wh = fields.Monetary('Work City Additional Withholding', tracking=True)
-    is_same_city = fields.Boolean('Work and Live in the same City?', compute='_compute_same_city', store=True)
+    city_allow = fields.Integer('Living City Allowance', tracking=True, groups="hr.group_hr_user")
+    city_add_wh = fields.Monetary('Living City Additional Withholding', tracking=True, groups="hr.group_hr_user")
+    work_city_allow = fields.Integer('Work City Allowance', tracking=True, groups="hr.group_hr_user")
+    work_city_add_wh = fields.Monetary('Work City Additional Withholding', tracking=True, groups="hr.group_hr_user")
+    is_same_city = fields.Boolean('Work and Live in the same City?', compute='_compute_same_city', store=True, groups="hr.group_hr_user")
 
     # New W4 Form
-    use_w4_2020 = fields.Boolean('Use 2020 Federal Form W-4?', default=False, tracking=True)
-    multiple_jobs = fields.Boolean('Step 2: Multiple Jobs', tracking=True)
-    claim_dependents = fields.Monetary('Step 3: Claim Dependents', tracking=True)
-    other_income = fields.Monetary('Step 4a: Other Income', tracking=True)
-    other_deduction = fields.Monetary('Step 4b: Other Deduction', tracking=True)
+    use_w4_2020 = fields.Boolean('Use 2020 Federal Form W-4?', default=False, tracking=True, groups="hr.group_hr_user")
+    multiple_jobs = fields.Boolean('Step 2: Multiple Jobs', tracking=True, groups="hr.group_hr_user")
+    claim_dependents = fields.Monetary('Step 3: Claim Dependents', tracking=True, groups="hr.group_hr_user")
+    other_income = fields.Monetary('Step 4a: Other Income', tracking=True, groups="hr.group_hr_user")
+    other_deduction = fields.Monetary('Step 4b: Other Deduction', tracking=True, groups="hr.group_hr_user")
 
     ####################################################################################################################
     # CONSTRAINTS
@@ -185,8 +188,12 @@ class PayslipMixin(models.AbstractModel):
                     salary_per_paycheck = salary_annual / record.num_of_paychecks
 
             record.salary_annual = salary_annual
-            record.pay_rate = record._calculate_hourly_rate()
             record.salary_per_paycheck = salary_per_paycheck
+
+    @api.depends('employee_type', 'salary_annual', 'salary_amount', 'resource_calendar_id', 'resource_calendar_id.hours_per_week')
+    def _compute_pay_rate(self):
+        for record in self:
+            record.pay_rate = record._calculate_hourly_rate()
 
     ####################################################################################################################
     # CRUD

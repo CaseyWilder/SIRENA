@@ -301,13 +301,13 @@ class PayFrequency(models.Model):
 
     @api.model
     def generate_pay_period(self, start, end, pay_date, frequency):
-        period_id = self.env['pay.period'].create({
+        self.env['pay.period'].create({
             'pay_type': 'frequency',
             'start_date': start,
             'end_date': end,
             'pay_date': pay_date,
             'pay_frequency_id': frequency.id,
-            'company_id': frequency.company_id and frequency.company_id.id or False,
+            'company_id': frequency.company_id.id,
         })
 
     ####################################################################################################################

@@ -16,6 +16,9 @@ class ResConfigSettings(models.TransientModel):
     overtime_rate = fields.Float(related='company_id.overtime_rate', readonly=False)
     double_overtime_rate = fields.Float(related='company_id.double_overtime_rate', readonly=False)
 
+    # Sync employee & contact
+    sync_employee_contact = fields.Boolean(related='company_id.sync_employee_contact', readonly=False)
+
     # Payroll Account
     payroll_expense_account_id = fields.Many2one(related='company_id.payroll_expense_account_id', readonly=False)
     bank_account_id = fields.Many2one(related='company_id.bank_account_id', readonly=False)
@@ -29,6 +32,8 @@ class ResConfigSettings(models.TransientModel):
     us_payroll_dashboard_onboarding_state = fields.Selection(related='company_id.us_payroll_dashboard_onboarding_state')
 
     module_l10n_us_hr_timesheet = fields.Boolean('Timesheets for working hours')
+
+    module_l10n_us_hr_payroll_contractor = fields.Boolean('Payroll Contractors')
 
     def button_action_sui_tax_view(self):
         return {

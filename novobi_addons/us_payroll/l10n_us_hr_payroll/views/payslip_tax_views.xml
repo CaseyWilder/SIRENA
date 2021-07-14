@@ -84,9 +84,4 @@
         <field name="context">{'search_default_group_by_payroll_tax': 1}</field>
         <field name="domain">[('state', '=', 'done')]</field>
     </record>
-
-    <menuitem action="action_payslip_tax"
-              id="menu_payslip_tax"
-              parent="menu_us_payroll_report"
-              sequence="30"/>
 </odoo>

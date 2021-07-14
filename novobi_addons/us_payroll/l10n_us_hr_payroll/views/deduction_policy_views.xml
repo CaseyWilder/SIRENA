@@ -111,12 +111,8 @@
     </record>
 
     <record id="action_deduction_policy_template_form" model="ir.actions.act_window">
-        <field name="name">Deduction Policy</field>
+        <field name="name">Deduction Policies</field>
         <field name="res_model">deduction.policy.template</field>
-
         <field name="view_mode">tree,form</field>
     </record>
-
-    <menuitem action="action_deduction_policy_template_form" id="menu_action_deduction_policy_template_form"
-              parent="menu_us_payroll_configuration" sequence="30"/>
 </odoo>

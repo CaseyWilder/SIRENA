@@ -1,3 +1,96 @@
+1.4.5:
+  time_line: [2021-07-07]
+  upgrade_modules:
+    - l10n_us_hr_payroll
+  install_modules:
+  database:
+    - payroll-14-qa
+  release_notes:
+    - Upgrade Payroll
+
+1.4.4:
+  time_line: [2021-06-18]
+  upgrade_modules:
+    - l10n_us_hr_payroll
+  install_modules:
+  database:
+    - payroll-14-qa
+  release_notes:
+    - Upgrade Payroll
+
+1.4.3:
+  time_line: [2021-04-28]
+  upgrade_modules:
+    - l10n_us_payroll_check_printing
+  install_modules:
+  database:
+    - payroll-14-qa
+  release_notes:
+    - Upgrade Payroll Paystub
+
+1.4.2:
+  time_line: [2021-04-28]
+  upgrade_modules:
+    - l10n_us_hr_payroll
+  install_modules:
+  database:
+    - payroll-14-qa
+  release_notes:
+    - Upgrade Payroll
+
+1.4.1:
+  time_line: [2021-04-28]
+  upgrade_modules:
+    - l10n_us_hr_payroll
+  install_modules:
+  database:
+    - payroll-14-qa
+  release_notes:
+    - Upgrade Payroll
+
+1.4.0:
+  time_line: [2021-04-15]
+  upgrade_modules:
+    - l10n_us_hr_payroll
+  install_modules:
+  database:
+    - payroll-14-qa
+  release_notes:
+    - Upgrade Payroll
+
+1.3.9:
+  time_line: [2021-04-10]
+  upgrade_modules:
+    - l10n_us_hr_payroll
+    - l10n_us_hr_payroll_dashboard
+  install_modules:
+  database:
+    - payroll-14-qa
+  release_notes:
+    - Upgrade Payroll Dashboard
+
+1.3.8:
+  time_line: [2021-04-09]
+  upgrade_modules:
+    - l10n_us_hr_payroll
+    - l10n_us_payroll_check_printing
+  install_modules:
+  database:
+    - payroll-14-qa
+  release_notes:
+    - Upgrade Payroll and Check Printing
+
+1.3.7:
+  time_line: [2021-04-08]
+  upgrade_modules:
+    - l10n_us_hr_payroll
+    - l10n_us_hr_holidays
+  install_modules:
+  database:
+    - payroll-14-qa
+  release_notes:
+    - Upgrade Payroll
+
 1.3.6:
   time_line: [2021-03-17]
   upgrade_modules:

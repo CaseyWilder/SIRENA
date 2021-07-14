@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from odoo import models, fields, api
-from odoo.tools.float_utils import float_compare, float_round
+from odoo.tools.float_utils import float_round
 
 
 class PayrollPayslip(models.Model):
@@ -9,7 +9,8 @@ class PayrollPayslip(models.Model):
 
     timesheet_ids = fields.Many2many('account.analytic.line', compute='_compute_timesheet_ids_payslip', store=True, compute_sudo=True)
 
-    @api.depends('start_date', 'end_date', 'employee_id.timesheet_ids', 'workweek_start', 'employee_type', 'checkin_method')
+    @api.depends('start_date', 'end_date', 'workweek_start', 'employee_type', 'checkin_method',
+                 'employee_id.timesheet_ids', 'employee_id.timesheet_ids.date', 'employee_id.timesheet_ids.unit_amount')
     def _compute_timesheet_ids_payslip(self):
         """
         Module project_timesheet_holidays will be installed if 'Record Time Off' is checked in Timesheet Settings.
@@ -20,24 +21,24 @@ class PayrollPayslip(models.Model):
         So, when calculating working hours using Timesheets, we must remove all timesheet log which having `holiday_id`
         """
         for record in self:
-            timesheet_ids = False
             if (
-                    record.employee_type != 'salary'
-                    and record.start_date and record.end_date
-                    and record.checkin_method == 'timesheet'
+                    record.employee_type == 'salary'
+                    or record.checkin_method != 'timesheet'
+                    or not (record.start_date and record.end_date)
+                    or not record.employee_id.timesheet_ids
             ):
-                start_date = record.start_date
-                end_date = record.end_date
+                record.timesheet_ids = False
+                continue
 
-                if record.time_tracking_id :
-                    workweek = int(record.time_tracking_id.workweek_start)
-                    start = start_date.weekday()
-                    start_date -= timedelta(days=start - workweek if start >= workweek else 7 + start - workweek)
+            timesheet_ids = record.employee_id.timesheet_ids
+            start_date = record.start_date
+            end_date = record.end_date
 
-                timesheet_ids = record.employee_id.timesheet_ids.filtered(lambda timesheet:
-                                                                          not timesheet.holiday_id and
-                                                                          start_date <= timesheet.date <= end_date)
-            record.timesheet_ids = timesheet_ids
+            if record.workweek_start:
+                workweek = int(record.workweek_start)
+                start = start_date.weekday()
+                start_date -= timedelta(days=start - workweek if start >= workweek else 7 + start - workweek)
+            record.timesheet_ids = timesheet_ids.filtered(lambda r: not r.holiday_id and start_date <= r.date <= end_date)
 
     def get_working_hours(self):
         self.ensure_one()

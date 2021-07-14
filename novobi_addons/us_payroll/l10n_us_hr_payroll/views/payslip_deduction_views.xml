@@ -204,18 +204,13 @@
     </record>
 
     <record id="action_payslip_deduction" model="ir.actions.act_window">
-        <field name="name">Deduction</field>
+        <field name="name">Deductions</field>
         <field name="res_model">payslip.deduction</field>
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="view_payslip_deduction_tree_report"/>
         <field name="context">{'search_default_group_by_deduction': 1}</field>
         <field name="domain">[('state', '=', 'done')]</field>
     </record>
-
-    <menuitem action="action_payslip_deduction"
-              id="menu_payslip_deduction"
-              parent="menu_us_payroll_report"
-              sequence="20"/>
 
     <!-- Ad hoc Deduction -->
     <record id="view_adhoc_payslip_deduction_tree" model="ir.ui.view">
@@ -238,15 +233,10 @@
     </record>
 
     <record id="action_adhoc_payslip_deduction" model="ir.actions.act_window">
-        <field name="name">Deduction</field>
+        <field name="name">Deductions</field>
         <field name="res_model">payslip.deduction</field>
         <field name="view_mode">tree</field>
         <field name="view_id" ref="view_adhoc_payslip_deduction_tree"/>
         <field name="domain">[('is_regular', '=', False), ('payslip_id.state', '=', 'draft')]</field>
     </record>
-
-    <menuitem action="action_adhoc_payslip_deduction"
-              id="menu_adhoc_payslip_deduction"
-              parent="menu_us_payroll_adhoc"
-              sequence="20"/>
 </odoo>
