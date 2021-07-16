@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_pending_compensation_tree" model="ir.ui.view">
+        <field name="name">view_pending_compensation_tree</field>
+        <field name="model">pending.compensation</field>
+        <field name="arch" type="xml">
+            <tree create="0" edit="0" delete="0">
+                <field name="employee_code"/>
+                <field name="employee_id"/>
+                <field name="hr_expense_sheet_id"/>
+                <field name="date"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="amount"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_pending_compensation_form" model="ir.ui.view">
+        <field name="name">view_pending_compensation_form</field>
+        <field name="model">pending.compensation</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0" delete="0">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_code"/>
+                            <field name="employee_id"/>
+                            <field name="hr_expense_sheet_id"/>
+                        </group>
+                        <group>
+                            <field name="payslip_id"/>
+                            <field name="date"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="amount"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_pending_compensation" model="ir.actions.act_window">
+        <field name="name">Pending Compensations</field>
+        <field name="res_model">pending.compensation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('payslip_compensation_ids', '=', False)]</field>
+    </record>
+
+    <menuitem id="menu_us_payroll_pending_compensation"
+              action="action_pending_compensation"
+              parent="l10n_us_hr_payroll.menu_us_payroll_employee_main" sequence="20"/>
+</odoo>

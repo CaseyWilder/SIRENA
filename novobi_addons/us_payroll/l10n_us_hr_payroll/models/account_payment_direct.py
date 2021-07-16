@@ -10,7 +10,7 @@ class DirectPaymentAccount(models.Model):
 
     currency_id = fields.Many2one('res.currency', related='employee_id.company_id.currency_id', readonly=True)
     sequence = fields.Integer('Sequence', default=10)
-    employee_id = fields.Many2one('hr.employee', 'Employee', auto_join=True, required=True)
+    employee_id = fields.Many2one('hr.employee', 'Employee', auto_join=True, required=True, ondelete='cascade')
 
     account_name = fields.Char('Account Name', help='Displayed on the employee paystub to represent the employee bank account.')
     routing_number = fields.Char('Routing Number', required=1)

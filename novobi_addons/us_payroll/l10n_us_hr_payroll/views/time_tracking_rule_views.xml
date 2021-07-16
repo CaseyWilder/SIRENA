@@ -92,11 +92,8 @@
     </record>
 
     <record id="action_view_time_tracking_rule" model="ir.actions.act_window">
-        <field name="name">Overtime Rule</field>
+        <field name="name">Overtime Rules</field>
         <field name="res_model">time.tracking.rule</field>
         <field name="view_mode">tree,form</field>
     </record>
-
-    <menuitem action="action_view_time_tracking_rule" id="menu_view_time_tracking_rule"
-              parent="menu_us_payroll_configuration" sequence="10"/>
 </odoo>

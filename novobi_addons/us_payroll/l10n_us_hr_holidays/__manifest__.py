@@ -19,7 +19,6 @@
         'data/ir_cron_data.xml',
         'data/ir_config_parameter_data.xml',
 
-
         # ============================== VIEWS ================================
         'views/hr_public_holidays_views.xml',
         'views/hr_leave_allocation_view.xml',
@@ -30,6 +29,7 @@
 
         # ============================== SECURITY =============================
         'security/ir.model.access.csv',
+        'security/ir_rule.xml',
 
         # ============================== REPORT ===============================
 

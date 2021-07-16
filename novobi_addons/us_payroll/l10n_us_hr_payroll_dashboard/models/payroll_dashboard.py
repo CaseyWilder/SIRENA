@@ -5,10 +5,11 @@ from odoo import models, fields, api, _
 from datetime import timedelta
 
 from ..utils.dashboard import BY_PERIOD, BY_MONTH, BY_QUARTER, BY_YEAR, BY_LAST_MONTH, BY_LAST_QUARTER, BY_LAST_YEAR, \
-    GROUP_BY_PERIOD, GROUP_BY_WEEK, GRAPH_COLOR,\
+    GROUP_BY_PERIOD, GROUP_BY_WEEK, GRAPH_COLOR, \
     get_json_data_for_selection, get_json_render, format_currency, format_value, group_graph_data
 
-from odoo.addons.l10n_custom_dashboard.utils.graph_setting import get_chartjs_setting, get_barchart_format, get_piechart_format, get_chart_json
+from odoo.addons.l10n_custom_dashboard.utils.graph_setting import get_chartjs_setting, get_barchart_format, \
+    get_piechart_format, get_chart_json
 
 pieColor = [
     GRAPH_COLOR['blue'], GRAPH_COLOR['orange'], GRAPH_COLOR['green'],
@@ -56,13 +57,13 @@ class PayrollDashboard(models.Model):
     #   2. This Month/Quarter/Year
     #   3. Last Month/Quarter/Year
     time_filter = [
-        {'name': 'Last Scheduled Period',   'delta': 0,     'type': BY_PERIOD,          'separate': True},
-        {'name': 'This Month',              'delta': 0,     'type': BY_MONTH,           'separate': False},
-        {'name': 'This Quarter',            'delta': 0,     'type': BY_QUARTER,         'separate': False},
-        {'name': 'This Year',               'delta': 0,     'type': BY_YEAR,            'separate': True},
-        {'name': 'Last Month',              'delta': -1,    'type': BY_LAST_MONTH,      'separate': False},
-        {'name': 'Last Quarter',            'delta': -1,    'type': BY_LAST_QUARTER,    'separate': False},
-        {'name': 'Last Year',               'delta': -1,    'type': BY_LAST_YEAR,       'separate': False},
+        {'name': 'Last Scheduled Period', 'delta': 0, 'type': BY_PERIOD, 'separate': True},
+        {'name': 'This Month', 'delta': 0, 'type': BY_MONTH, 'separate': False},
+        {'name': 'This Quarter', 'delta': 0, 'type': BY_QUARTER, 'separate': False},
+        {'name': 'This Year', 'delta': 0, 'type': BY_YEAR, 'separate': True},
+        {'name': 'Last Month', 'delta': -1, 'type': BY_LAST_MONTH, 'separate': False},
+        {'name': 'Last Quarter', 'delta': -1, 'type': BY_LAST_QUARTER, 'separate': False},
+        {'name': 'Last Year', 'delta': -1, 'type': BY_LAST_YEAR, 'separate': False},
     ]
     default_time_filter = BY_PERIOD
 
@@ -70,10 +71,14 @@ class PayrollDashboard(models.Model):
     current_period_id = fields.Many2one('pay.period', string='Current Period', compute='_compute_current_period')
     period_calendar = fields.Text(compute='_compute_current_period')
     period_rainbow_man = fields.Text(compute='_compute_current_period')
-    number_pending_leaves = fields.Integer('Number of Pending Leaves Requests', compute='_compute_number_pending_leaves')
-    number_pending_paid = fields.Integer('Number of Termed Employees but not yet paid', compute='_compute_number_pending_paid')
-    number_term_payroll = fields.Integer('Number of Termination Payroll in progress', compute='_compute_number_term_payroll')
-    number_deduction_enrollment = fields.Integer('Number of Deduction Enrollment', compute='_compute_number_deduction_enrollment')
+    number_pending_leaves = fields.Integer('Number of Pending Leaves Requests',
+                                           compute='_compute_number_pending_leaves')
+    number_pending_paid = fields.Integer('Number of Termed Employees but not yet paid',
+                                         compute='_compute_number_pending_paid')
+    number_term_payroll = fields.Integer('Number of Termination Payroll in progress',
+                                         compute='_compute_number_term_payroll')
+    number_deduction_enrollment = fields.Integer('Number of Deduction Enrollment',
+                                                 compute='_compute_number_deduction_enrollment')
 
     # Employees
     number_total_emp = fields.Integer('Number of Total Employees', compute='_compute_number_total_emp')
@@ -97,7 +102,9 @@ class PayrollDashboard(models.Model):
             get_json_data_for_selection(record, selection)
             function_retrieve = 'retrieve_payroll_dashboard'
             extra_param = dashboard_type
-            record.kanban_dashboard_graph = json.dumps(get_json_render(type_data, False, graph_data, dashboard_type, selection, function_retrieve, extra_param))
+            record.kanban_dashboard_graph = json.dumps(
+                get_json_render(type_data, False, graph_data, dashboard_type, selection, function_retrieve,
+                                extra_param))
 
     def get_general_kanban_section_data(self):
         return False, [{
@@ -117,9 +124,7 @@ class PayrollDashboard(models.Model):
     ####################################################################################################################
     # THINGS TO DO
     ####################################################################################################################
-    def _compute_current_period(self):
-        # Get the last in-progress period
-        frequency_id = self.env.company.pay_frequency_id
+    def get_period_id_in_frequency(self, frequency_id):
         period_id = self.env['pay.period']
         if frequency_id:
             period_id = period_id.search([
@@ -127,7 +132,12 @@ class PayrollDashboard(models.Model):
                 ('pay_frequency_id', '=', frequency_id.id),
                 ('state', '!=', 'done')
             ], order='pay_date desc', limit=1)
+        return period_id
 
+    def _compute_current_period(self):
+        # Get the last in-progress period
+        frequency_id = self.env.company.pay_frequency_id
+        period_id = self.get_period_id_in_frequency(frequency_id)
         for record in self:
             period_rainbow_man = current_period_id = period_calendar = False
             if record.type == 'todo':
@@ -253,8 +263,8 @@ class PayrollDashboard(models.Model):
     # Pending Deduction Enrollment
     def _get_deduction_enrollment_ids(self):
         # 'eligible_employee_ids' is not stored so cannot use domain to search.
-        return self.env['deduction.enrollment.policy']\
-            .search([])\
+        return self.env['deduction.enrollment.policy'] \
+            .search([]) \
             .filtered('eligible_employee_ids').ids
 
     def _compute_number_deduction_enrollment(self):
@@ -332,7 +342,8 @@ class PayrollDashboard(models.Model):
         Get number of absent employees today.
         """
         domain = self._get_domain_absent_employees()
-        employee_ids = self.env['hr.leave'].search(domain).mapped('employee_id').filtered(lambda r: not r.departure_date)
+        employee_ids = self.env['hr.leave'].search(domain).mapped('employee_id').filtered(
+            lambda r: not r.departure_date)
         number = len(employee_ids)
         for record in self:
             record.number_absent_emp = number
@@ -461,6 +472,16 @@ class PayrollDashboard(models.Model):
             record.holidays = html
 
     # Upcoming Birthday
+    def build_birthday_query(self):
+        query = """
+            SELECT name, birthday
+            FROM
+                (SELECT *, EXTRACT(MONS from age(birthday)) AS mons, EXTRACT(DAYS from age(birthday)) AS days
+                FROM hr_employee) bd
+            WHERE company_id = {} AND departure_date IS NULL AND (mons = 11 OR mons = 0 AND days <= 0);
+        """.format(self.env.company.id)
+        return query
+
     def _compute_birthday(self):
         # Query structure:
         #   SELECT name, date
@@ -477,13 +498,8 @@ class PayrollDashboard(models.Model):
         #       date = 18/10/2019 => age(date) = 0 years 0 mons -3 days ...
         #       date = 26/12/2019 => age(date) = 0 years -2 mons -11 days ...
         #   => For upcoming date in a month: mons = 11 or mons = 0 and days <= 0
-        query = """
-            SELECT name, birthday
-            FROM
-                (SELECT *, EXTRACT(MONS from age(birthday)) AS mons, EXTRACT(DAYS from age(birthday)) AS days
-                FROM hr_employee) bd
-            WHERE company_id = {} AND departure_date IS NULL AND (mons = 11 OR mons = 0 AND days <= 0);
-        """.format(self.env.company.id)
+
+        query = self.build_birthday_query()
         self.env.cr.execute(query)
         query_result = self.env.cr.fetchall()
         html = self._get_upcoming_date(query_result, field='birthday', sort=True)
@@ -549,7 +565,10 @@ class PayrollDashboard(models.Model):
         if start and end:
             company_id = self.env.company
             frequency_id = company_id.pay_frequency_id
-            extra_condition = """AND pp.pay_frequency_id = {}""".format(frequency_id.id) if frequency_id and start == end else ''
+            extra_condition = """
+                AND pp.pay_frequency_id = {}
+                AND pp.pay_type = 'frequency'
+            """.format(frequency_id.id) if frequency_id and start == end else ''
             conditions = """
                 pp.company_id = {company} AND
                 pp.pay_date BETWEEN '{start}' AND '{end}' AND
@@ -651,7 +670,8 @@ class PayrollDashboard(models.Model):
             get_barchart_format(self, er_data, _('Company'), GRAPH_COLOR['orange']),
         ]
 
-        return get_chart_json(self, graph_data, graph_label, get_chartjs_setting(chart_type='bar', stacked=True), info_data)
+        return get_chart_json(self, graph_data, graph_label, get_chartjs_setting(chart_type='bar', stacked=True),
+                              info_data)
 
     def _retrieve_grosspay_breakdowns(self, result):
         """
@@ -667,7 +687,8 @@ class PayrollDashboard(models.Model):
 
         # Create summary data and graph data
         for data in result:
-            compensation_id = model_env.search([('model', '=', 'payroll.compensation'), ('res_id', '=', data[0])], limit=1)
+            compensation_id = model_env.search([('model', '=', 'payroll.compensation'), ('res_id', '=', data[0])],
+                                               limit=1)
             external_id = compensation_id.name
             name = _('Regular Pay' if external_id == 'payroll_compensation_salary' else data[1])
             graph_label.append(name)
@@ -690,7 +711,7 @@ class PayrollDashboard(models.Model):
             'total': [{'name': _('Total Gross Pay'), 'value': format_value(self, sum(gross_data))}],
             'detail': info_detail
         }
-        background_color = (pieColor * ceil(len(graph_label)/len(pieColor)))[:len(graph_label)]
+        background_color = (pieColor * ceil(len(graph_label) / len(pieColor)))[:len(graph_label)]
         graph_data = [get_piechart_format(gross_data, background_color)]
 
         return get_chart_json(self, graph_data, graph_label, get_chartjs_setting(chart_type='pie'), info_data)
@@ -710,8 +731,10 @@ class PayrollDashboard(models.Model):
         ]
 
         info_data = {
-            'total': [{'name': _('Total Hours'), 'value': format_value(self, sum(sum(x['value']) for x in data), is_currency=False)}],
-            'detail': [{'name': x['label'], 'value': format_value(self, sum(x['value']), is_currency=False)} for x in data]
+            'total': [{'name': _('Total Hours'),
+                       'value': format_value(self, sum(sum(x['value']) for x in data), is_currency=False)}],
+            'detail': [{'name': x['label'], 'value': format_value(self, sum(x['value']), is_currency=False)} for x in
+                       data]
         }
 
         graph_data = [get_barchart_format(self, x['value'], x['label'], x['color']) for x in data]
@@ -736,10 +759,11 @@ class PayrollDashboard(models.Model):
         ]
 
         info_data = {
-            'total': [{'name': _('Total Cost'), 'value': format_value(self, sum(sum(x['value']) for x in data),)}],
+            'total': [{'name': _('Total Cost'), 'value': format_value(self, sum(sum(x['value']) for x in data), )}],
             'detail': [{'name': x['label'], 'value': format_value(self, sum(x['value']))} for x in data]
         }
 
         graph_data = [get_barchart_format(self, x['value'], x['label'], x['color']) for x in data]
 
-        return get_chart_json(self, graph_data, graph_label, get_chartjs_setting(chart_type='bar', stacked=True), info_data)
+        return get_chart_json(self, graph_data, graph_label, get_chartjs_setting(chart_type='bar', stacked=True),
+                              info_data)

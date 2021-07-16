@@ -1,4 +1,8 @@
+import logging
+
 from odoo import fields, models, api, _
+
+_logger = logging.getLogger(__name__)
 
 
 class ResCompany(models.Model):
@@ -18,6 +22,9 @@ class ResCompany(models.Model):
     # Payroll Rate
     overtime_rate = fields.Float('Overtime Rate', default=1.5)
     double_overtime_rate = fields.Float('Double Overtime Rate', default=2)
+
+    # Sync employee & contact
+    sync_employee_contact = fields.Boolean('Sync Employee & Contact Information', default=False)
 
     # Payroll Account
     payroll_expense_account_id = fields.Many2one('account.account', 'Expense Account')
@@ -121,32 +128,54 @@ class ResCompany(models.Model):
         return self.env.ref('l10n_us_hr_payroll.action_create_historical_period_wizard_view').read()[0]
 
     @api.model
-    def init_payroll_journal(self, apply_to_current=True):
+    def init_payroll_journal(self, create=False):
         """
-        Create Payroll Journal and assign to selected companies.
+        Handle 2 cases:
+            1. On installing new l10n_us_hr_payroll (create=False):
+                - Assign default Payroll Journal to current company
+                - Create and assign Payroll Journal for other companies
+
+            2. Create new company (create=True)
+                - Create and assign Payroll Journal for that new company.
         """
         payroll_journal = self.sudo().env.ref('l10n_us_hr_payroll.account_journal_us_payroll')
 
-        # Set default Payroll Journal to current company.
-        # Note: Only run on installing module. In other cases it should be ignored.
-        if apply_to_current:
+        if not create:
             self.env.company.payroll_journal_id = payroll_journal.id
 
-        for record in self:
-            journal = payroll_journal.copy(default={'company_id': record.id})
-            journal.name = payroll_journal.name
+        # This is to apply for installing new l10n_us_hr_payroll (no company is passed to self)
+        if not self:
+            self = self.search([('payroll_journal_id', '=', False)])
 
-            self.env['ir.model.data'].create({
-                'module': 'l10n_us_hr_payroll',
-                'name': 'account_journal_us_payroll' + str(record.id),
-                'model': 'account.journal',
-                'noupdate': True,
-                'res_id': journal.id,
-            })
-            record.payroll_journal_id = journal
+        for record in self:
+            # We should auto create Chart of Accounts for this company first, then assign Payroll Journal later.
+            if not record.chart_template_id:
+                record.install_chart_of_account()
+            record.install_payroll_journal(payroll_journal)
+
+    def install_chart_of_account(self):
+        self.ensure_one()
+        self = self.sudo()
+        chart_template_id = self.env.ref('l10n_generic_coa.configurable_chart_template')
+        chart_template_id._load(15.0, 15.0, self)
+        _logger.info('Chart of Accounts are installed for Company: {} ({})'.format(self.name, self.id))
+
+    def install_payroll_journal(self, payroll_journal):
+        self.ensure_one()
+        journal = payroll_journal.copy(default={'company_id': self.id})
+        journal.name = payroll_journal.name
+
+        self.env['ir.model.data'].create({
+            'module': 'l10n_us_hr_payroll',
+            'name': 'account_journal_us_payroll' + str(self.id),
+            'model': 'account.journal',
+            'noupdate': True,
+            'res_id': journal.id,
+        })
+        self.payroll_journal_id = journal
 
     @api.model
     def create(self, values):
         res = super().create(values)
-        res.init_payroll_journal(apply_to_current=False)
+        res.init_payroll_journal(create=True)
         return res

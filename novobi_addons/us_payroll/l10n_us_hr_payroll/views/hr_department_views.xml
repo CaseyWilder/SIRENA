@@ -33,7 +33,7 @@
         </field>
     </record>
 
-    <!-- Open Department Action -->
+    <!-- Open Department Action in Payroll app -->
     <record id="hr_department_action_payroll" model="ir.actions.act_window">
         <field name="name">Departments</field>
         <field name="res_model">hr.department</field>
@@ -56,9 +56,5 @@
                 leaves, recruitments, etc.
             </p>
         </field>
-    </record>
-
-    <record id="l10n_us_hr_payroll.menu_us_payroll_department" model="ir.ui.menu">
-        <field name="action" ref="l10n_us_hr_payroll.hr_department_action_payroll"/>
     </record>
 </odoo>

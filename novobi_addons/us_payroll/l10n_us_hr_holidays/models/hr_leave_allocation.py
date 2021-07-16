@@ -11,7 +11,7 @@ from odoo.exceptions import ValidationError
 class HolidaysAllocation(models.Model):
     _inherit = "hr.leave.allocation"
 
-    number_of_hours_display = fields.Float(store=True)
+    number_of_hours_display = fields.Float(store=True, tracking=True)
     state_id = fields.Many2one('res.country.state', string='Related State', related='holiday_status_id.state_id', store=True)
 
     # Override to add semi-monthly and rename other options.
@@ -35,6 +35,26 @@ class HolidaysAllocation(models.Model):
                 raise ValidationError(_('First Day and Second Day are required to run accrual allocation by semi-monthly.'))
             if record.semimonthly_end <= record.semimonthly_start:
                 raise ValidationError(_('Second Day must be greater than First Day.'))
+
+    @api.depends('number_of_days', 'employee_id')
+    def _compute_number_of_hours_display(self):
+        for allocation in self:
+            allocation.number_of_hours_display = allocation.number_of_days * (allocation.employee_id.sudo().resource_id.calendar_id.hours_per_day or HOURS_PER_DAY)
+
+    def _prepare_holiday_values(self, employee):
+        self.ensure_one()
+        """
+        Re-calculate number_of_days of employee's allocation
+        """
+        values = super()._prepare_holiday_values(employee=employee)
+        emp_hours_per_day = employee.sudo().resource_id.calendar_id.hours_per_day
+        values['number_of_days'] = (self.number_of_days * HOURS_PER_DAY) / emp_hours_per_day
+        return values
+
+    def update_immediate_accrual(self):
+        self.ensure_one()
+        self._update_accrual()
+        return True
 
     @api.model
     def _update_accrual(self):

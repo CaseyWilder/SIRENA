@@ -15,6 +15,12 @@
             <xpath expr="//form[@name='Product Template']/sheet[1]/notebook[1]/page[@name='general_information']/group[1]/group[@name='group_standard_price']/label[1]" position="before">
                 <field name="pricelist_id"/>
             </xpath>
+
+            <group name="invoicing" position="after">
+                <group name="delivery" string="Delivery">
+                    <field name="packaging_id"/>
+                </group>
+            </group>
         </field>
     </record>
 </odoo>

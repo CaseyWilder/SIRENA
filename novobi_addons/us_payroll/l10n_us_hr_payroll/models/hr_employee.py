@@ -1,5 +1,7 @@
+import ast
 import re
 import copy
+import json
 
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError, UserError
@@ -28,33 +30,31 @@ class Employee(models.Model):
     _inherit = ['hr.employee', 'payslip.mixin']
 
     # Private Information
-    ethnicity_id = fields.Many2one('hr.employee.ethnicity', string='Ethnicity')
+    ethnicity_id = fields.Many2one('hr.employee.ethnicity', string='Ethnicity', groups="hr.group_hr_user")
     veteran_status = fields.Selection([
         ('protected', 'A Protected Veteran'),
         ('not_veteran', 'Not A Veteran'),
         ('not_protected', 'Not A Protected Veteran'),
         ('not_identify', 'Not to identify veteran status')
-    ], string='Veteran Status')
+    ], string='Veteran Status', groups="hr.group_hr_user")
 
     # Recruitment
-    hire_date = fields.Date('Hire Date', tracking=True, copy=False)
-    old_employee_id = fields.Many2one('hr.employee', 'Link to Old Profile', tracking=True, copy=False)
+    hire_date = fields.Date('Hire Date', tracking=True, copy=False, default=fields.Date.today, groups="hr.group_hr_user")
+    old_employee_id = fields.Many2one('hr.employee', 'Link to Old Profile', tracking=True, copy=False, groups="hr.group_hr_user")
 
     # Re-Recruitment
-    rehire_date = fields.Date('Rehire Date', tracking=True, copy=False)
-    new_employee_id = fields.Many2one('hr.employee', 'Link to New Profile', tracking=True, copy=False)
+    rehire_date = fields.Date('Rehire Date', tracking=True, copy=False, groups="hr.group_hr_user")
+    new_employee_id = fields.Many2one('hr.employee', 'Link to New Profile', tracking=True, copy=False, groups="hr.group_hr_user")
 
     # Override
-    address_home_id = fields.Many2one('res.partner', ondelete='restrict')
-    payslip_ids = fields.One2many('payroll.payslip', 'employee_id', string='Payslips')
+    address_home_id = fields.Many2one('res.partner', ondelete='restrict', copy=False)
+    payslip_ids = fields.One2many('payroll.payslip', 'employee_id', string='Payslips', groups="hr.group_hr_user")
 
     # Split Paychecks
-    payment_account_ids = fields.One2many('account.payment.direct', 'employee_id', string='Payment Accounts', copy=True)
-    split_paychecks_type = fields.Selection([('percentage', 'By Percentage (%)'), ('amount', 'By Amount ($)')],
-                                            string='Split Paychecks', default='percentage', required=1)
+    payment_account_ids = fields.One2many('account.payment.direct', 'employee_id', string='Payment Accounts', copy=True, groups="hr.group_hr_user")
 
-    employee_compensation_ids = fields.One2many('employee.compensation', 'employee_id', string='Compensations')
-    employee_deduction_ids = fields.One2many('employee.deduction', 'employee_id', string='Deductions')
+    employee_compensation_ids = fields.One2many('employee.compensation', 'employee_id', string='Compensations', groups="hr.group_hr_user")
+    employee_deduction_ids = fields.One2many('employee.deduction', 'employee_id', string='Deductions', groups="hr.group_hr_user")
 
     @api.model
     def default_get(self, fields_list):
@@ -75,7 +75,7 @@ class Employee(models.Model):
     ####################################################################################################################
     @api.constrains('ssnid')
     def _check_ssnid(self):
-        for record in self:
+        for record in self.filtered(lambda r: r.ssnid):
             regex = r"^(?!000|666)[0-8][0-9]{2}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}$"
             if not re.match(regex, record.ssnid):
                 raise ValidationError(_('SSN is not in the correct format'))
@@ -250,18 +250,12 @@ class Employee(models.Model):
         :return: action
         """
         self.ensure_one()
-        ctx = self._context.copy()
-        ctx.update({'not_archived': True})
+        action = self.env.ref('hr.hr_departure_wizard_action').read()[0]
+        context = ast.literal_eval(action.get('context', '{}'))
+        context['not_archived'] = True
+        action['context'] = context
 
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Register Departure'),
-            'res_model': 'hr.departure.wizard',
-            'view_mode': 'form',
-            'target': 'new',
-            'context': ctx,
-            'views': [[False, 'form']]
-        }
+        return action
 
     def button_rehire(self):
         """
@@ -320,18 +314,15 @@ class Employee(models.Model):
 
         result = super(Employee, self).create(values)
 
-        # Note: change the order of calling '_sync_related_res_partner' and '_sync_geocode'
-        # will create a duplicate res_partner
-        result._sync_related_res_partner(values, create=True)
         result._sync_geocode(values)
+        result._sync_related_res_partner(values)
 
         return result
 
     def write(self, values):
         result = super(Employee, self).write(values)
         self._sync_geocode(values)
-        if self._context.get('from_partner', False) != '1':
-            self.with_context(from_employee='1')._sync_related_res_partner(values)
+        self._sync_related_res_partner(values)
         return result
 
     def _init_column(self, column_name):
@@ -373,6 +364,18 @@ class Employee(models.Model):
         new_partner = self.env['res.partner'].create(values)
         self.address_home_id = new_partner.id
 
+    def copy(self, default=None):
+        """
+        Override
+        Add "name" to create values dict when duplicating employee record because "name" is related field
+        """
+        self.ensure_one()
+        if default is None:
+            default = {}
+        if not default.get('name'):
+            default.update(name=_('{} (copy)'.format(self.name)))
+        return super(Employee, self).copy(default)
+
     ####################################################################################################################
     # HELPER METHODS
     ####################################################################################################################
@@ -410,33 +413,27 @@ class Employee(models.Model):
             GROUP BY h.employee_id""", (tuple(self.ids),))
         return dict((row['employee_id'], row['hours']) for row in self._cr.dictfetchall())
 
-    def _sync_related_res_partner(self, values, create=False):
+    def _sync_related_res_partner(self, values):
         """
         Synchronize the res_partner when creating/writing employees.
-        :param values
-        :param create:  * if True:  Create new res_partner has employee_id = current employee.id
-                        * else:     Check address_home_id
-                            * if True:  Update res_partner
-                            * else:     Create new res_partner
         """
-        for record in self:
-            if create:
-                values = sync_record(dict(), values, EE_PARTNER_SYNC_FIELDS)
-                record._create_new_res_partner(values)
-            else:
-                res_partner = record.address_home_id
-                if res_partner:
-                    if any(ele in values for ele in EE_PARTNER_SYNC_FIELDS):
-                        sync_values = sync_record(res_partner, values, EE_PARTNER_SYNC_FIELDS)
-                        if sync_values:
-                            res_partner.write(sync_values)
-                else:
-                    for field in EE_PARTNER_SYNC_FIELDS:
-                        try:
-                            values.update({field: record[field].id})
-                        except AttributeError:
-                            values.update({field: record[field]})
-                    record._create_new_res_partner(values)
+        if self._context.get('sync_from_partner', False):
+            return
+
+        self = self.with_context(sync_from_employee=True)
+        sync_employee_contact = self.env.company.sync_employee_contact
+        sync_fields = set(values.keys()) & set(sync_employee_contact and EE_PARTNER_SYNC_FIELDS or ['name'])
+
+        # On update (employee are linked to partner) -> only sync changed fields
+        if sync_fields:
+            for record in self.filtered('address_home_id'):
+                sync_values = sync_record(record, sync_fields)
+                record.address_home_id.sudo().write(sync_values)
+
+            # On create (or remove partner) -> sync all fields to create new partner and link to this employee
+            for record in self.filtered(lambda r: not r.address_home_id):
+                sync_values = sync_record(record, sync_fields)
+                record._create_new_res_partner(sync_values)
 
     def _sync_geocode(self, values):
         """
@@ -504,6 +501,13 @@ class Employee(models.Model):
                     'employee_deduction_id': line.id
                 })[0] for line in employee.employee_deduction_ids] if employee.employee_deduction_ids else []
                 values['deduction_ids'] = [(0, 0, line) for line in deduction_ids]
+
+            # Direct Account Deposit
+            accounts = employee.payment_account_ids.read([
+                'account_name', 'routing_number', 'account_number', 'account_type',
+                'split_paychecks_type', 'amount_fixed', 'amount_percentage'
+            ])
+            values['payment_account_text'] = json.dumps(accounts)
 
             return values
 

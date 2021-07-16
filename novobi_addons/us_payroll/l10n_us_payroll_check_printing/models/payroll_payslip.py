@@ -253,12 +253,41 @@ class PayrollPayslip(models.Model):
     ####################################################################################################################
     # SEPARATED PAYSTUB
     ####################################################################################################################
-    def get_compensation_lines(self):
+    # Compensations ----------------------------------------------------------------------------------------------------
+    def get_historical_compensation_lines(self, lines):
+        """
+        Find all historical compensations in current years, excepts the ones whose compensation type is in current payslip.
+        :param lines: list containing dictionary of each compensation value.
+        """
         self.ensure_one()
-        currency_id = self.currency_id
+        query = """
+                    SELECT DISTINCT ON (compensation_id) id
+                    FROM payslip_compensation
+                    WHERE
+                        employee_id = %s AND
+                        pay_date BETWEEN %s AND %s AND
+                        compensation_id NOT IN %s
+                    ORDER BY compensation_id, pay_date DESC, sequence;
+                """
+        self._cr.execute(query, [self.employee_id.id,
+                                 fields.Date.to_string(self.pay_date.replace(day=1, month=1)),
+                                 fields.Date.to_string(self.pay_date),
+                                 tuple(self.compensation_ids.mapped('compensation_id').ids or [-1])])
+
+        old_compensation_ids = self.env['payslip.compensation'].browse([data[0] for data in self._cr.fetchall()])
+
+        for compensation in old_compensation_ids.sorted(key=lambda r: r.sequence):
+            line = [compensation.label, '_', '_', '_']
+            self.group_lines(lines, compensation.compensation_id.id, line, compensation.ytd_amount)
+
+    def get_current_compensation_lines(self, lines):
+        """
+        Find all compensations in current payslip.
+        :param lines: list containing dictionary of each compensation value.
+        """
+        self.ensure_one()
         env = self.env
-        compensation_lines = []
-        total_ytd = 0
+        currency_id = self.currency_id
 
         for compensation in self.compensation_ids.sorted(key=lambda r: r.sequence):
             line = [
@@ -267,7 +296,18 @@ class PayrollPayslip(models.Model):
                 formatLang(env, compensation.rate, currency_obj=currency_id),
                 formatLang(env, compensation.amount, currency_obj=currency_id),
             ]
-            self.group_lines(compensation_lines, compensation.compensation_id.id, line, compensation.ytd_amount)
+            self.group_lines(lines, compensation.compensation_id.id, line, compensation.ytd_amount)
+
+    def get_compensation_lines(self):
+        self.ensure_one()
+        env = self.env
+        currency_id = self.currency_id
+        total_ytd = 0
+
+        compensation_lines = []
+        self.get_current_compensation_lines(compensation_lines)
+        if self.company_id.include_historical_paystub:
+            self.get_historical_compensation_lines(compensation_lines)
 
         for group in compensation_lines:
             total_ytd += group['ytd']
@@ -275,38 +315,121 @@ class PayrollPayslip(models.Model):
 
         return compensation_lines, total_ytd
 
-    def get_deduction_lines(self):
+    # Deductions & Taxes -----------------------------------------------------------------------------------------------
+    def get_historical_deduction_lines(self, lines, er_lines):
+        """
+        Find all historical deductions in current years, excepts the ones whose deduction type is in current payslip.
+        :param lines: list containing dictionary of each deduction value.
+        :param er_lines: list containing dictionary of each company contribution value.
+        """
         self.ensure_one()
-        currency_id = self.currency_id
-        env = self.env
-        deduction_lines = []
-        tax_lines = []
-        total_ytd = 0
-        # Company Contribution
-        contribution_lines = []
-        total_er_ytd = 0
+        query = """
+                    SELECT DISTINCT ON (deduction_id) id
+                    FROM payslip_deduction
+                    WHERE
+                        employee_id = %s AND
+                        pay_date BETWEEN %s AND %s AND
+                        deduction_id NOT IN %s
+                    ORDER BY deduction_id, pay_date DESC;
+                """
+        self._cr.execute(query, [self.employee_id.id,
+                                 fields.Date.to_string(self.pay_date.replace(day=1, month=1)),
+                                 fields.Date.to_string(self.pay_date),
+                                 tuple(self.deduction_ids.mapped('deduction_id').ids or [-1])])
 
-        for deduction in self.deduction_ids:
+        old_deduction_ids = self.env['payslip.deduction'].browse([data[0] for data in self._cr.fetchall()])
+
+        for deduction in old_deduction_ids.sorted(key=lambda r: r.label):
+            line = [deduction.label, '_']
+            self.group_lines(lines, deduction.deduction_id.id, line, deduction.ytd_amount)
+
+            if deduction.er_dollar_amt:
+                line = [deduction.label, '_']
+                self.group_lines(er_lines, deduction.deduction_id.id, line, deduction.er_ytd_amount)
+
+    def get_current_deduction_lines(self, lines, er_lines):
+        """
+        Find all deductions in current payslip.
+        :param lines: list containing dictionary of each deduction value.
+        :param er_lines: list containing dictionary of each company contribution value.
+        """
+        self.ensure_one()
+        env = self.env
+        currency_id = self.currency_id
+
+        for deduction in self.deduction_ids.sorted(key=lambda r: r.label):
             line = [
                 deduction.label,
                 formatLang(env, deduction.amount, currency_obj=currency_id),
             ]
-            self.group_lines(deduction_lines, deduction.deduction_id.id, line, deduction.ytd_amount)
+            self.group_lines(lines, deduction.deduction_id.id, line, deduction.ytd_amount)
 
-            # Company contribution
             if deduction.er_dollar_amt:
                 line = [
                     deduction.label,
                     formatLang(env, deduction.er_dollar_amt, currency_obj=currency_id),
                 ]
-                self.group_lines(contribution_lines, deduction.deduction_id.id, line, deduction.er_ytd_amount)
+                self.group_lines(er_lines, deduction.deduction_id.id, line, deduction.er_ytd_amount)
+
+    def get_historical_tax_lines(self, lines):
+        """
+        Find all historical taxes in current years, excepts the ones whose tax type is in current payslip.
+        :param lines: list containing dictionary of each tax value.
+        """
+        self.ensure_one()
+        query = """
+                    SELECT DISTINCT ON (payroll_tax_id) id
+                    FROM payslip_tax
+                    WHERE
+                        employee_id = %s AND
+                        pay_date BETWEEN %s AND %s AND
+                        payroll_tax_id NOT IN %s AND
+                        NOT is_er_tax
+                    ORDER BY payroll_tax_id, pay_date DESC;
+                """
+        self._cr.execute(query, [self.employee_id.id,
+                                 fields.Date.to_string(self.pay_date.replace(day=1, month=1)),
+                                 fields.Date.to_string(self.pay_date),
+                                 tuple(self.tax_ids.mapped('payroll_tax_id').ids or [-1])])
+
+        old_tax_ids = self.env['payslip.tax'].browse([data[0] for data in self._cr.fetchall()])
+
+        for tax in old_tax_ids:
+            line = [tax.payroll_tax_id.label, '_']
+            self.group_lines(lines, tax.payroll_tax_id.id, line, tax.ytd_amount)
+
+    def get_current_tax_lines(self, lines):
+        """
+        Find all taxes in current payslip
+        :param lines: list containing dictionary of each tax value.
+        """
+        self.ensure_one()
+        env = self.env
+        currency_id = self.currency_id
 
         for tax in self.tax_ids.filtered(lambda t: not t.is_er_tax):
             line = [
                 tax.payroll_tax_id.label,
                 formatLang(env, tax.tax_amt, currency_obj=currency_id),
             ]
-            self.group_lines(tax_lines, tax.payroll_tax_id.id, line, tax.ytd_amount)
+            self.group_lines(lines, tax.payroll_tax_id.id, line, tax.ytd_amount)
+
+    def get_deduction_lines(self):
+        self.ensure_one()
+        currency_id = self.currency_id
+        env = self.env
+        total_ytd = 0
+        total_er_ytd = 0
+
+        deduction_lines = []
+        contribution_lines = []
+        tax_lines = []
+        self.get_current_deduction_lines(deduction_lines, contribution_lines)
+        self.get_current_tax_lines(tax_lines)
+
+        if self.company_id.include_historical_paystub:
+            self.get_historical_deduction_lines(deduction_lines, contribution_lines)
+            self.get_historical_tax_lines(tax_lines)
 
         result = deduction_lines + tax_lines
         for group in result:
@@ -319,17 +442,13 @@ class PayrollPayslip(models.Model):
 
         return result, total_ytd, contribution_lines, total_er_ytd
 
+    # Leaves -----------------------------------------------------------------------------------------------------------
     def get_leave_lines(self):
         self.ensure_one()
         compensation_holiday_id = self.env.ref('l10n_us_hr_payroll.payroll_compensation_holiday')
         return self.payroll_vacation_ids.filtered(lambda pv: pv.payroll_compensation_id != compensation_holiday_id)
 
-    def _calculate_ytd_deduction(self):
-        self.ensure_one()
-        total_ytd_deduction = self.deduction_ids and sum(self.deduction_ids.mapped('ytd_amount')) or 0.0
-        total_ytd_tax = self.tax_ids and sum(self.tax_ids.filtered(lambda t: not t.is_er_tax).mapped('ytd_amount')) or 0.0
-        return total_ytd_deduction + total_ytd_tax
-
+    # PAYSTUB ==========================================================================================================
     def get_stub_info(self):
         self.ensure_one()
         env = self.env
@@ -342,7 +461,6 @@ class PayrollPayslip(models.Model):
         len_compensation_lines = len(compensation_lines)
         employee_id = self.employee_id
         ytd_net_pay = self._calculate_ytd_net_pay()
-        # ytd_deduction = self._calculate_ytd_deduction()
 
         return {
             'name': 'Payslip of {}'.format(employee_id.name),

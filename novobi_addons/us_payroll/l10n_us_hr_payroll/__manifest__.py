@@ -12,6 +12,7 @@
         'base',
         'hr_attendance',
         'account_accountant',
+        'l10n_generic_coa',
         'l10n_us_hr_holidays',
     ],
     'data': [
@@ -34,9 +35,6 @@
         'data/res_country_state_data.xml',
         'data/hr_employee_data.xml',
         'data/pay_period_data.xml',
-
-        # ============================== MENU =================================
-        'views/main_menu_view.xml',
 
         # ============================== VIEWS ================================
         'views/payroll_onboarding_templates.xml',
@@ -71,6 +69,9 @@
         'views/res_company_views.xml',
         'views/res_config_settings_views.xml',
         'views/resource_views.xml',
+
+        # ============================== MENU =================================
+        'views/payroll_menu_view.xml',
 
         # ============================== WIZARD =============================
         'wizard/open_payroll_report_wizard_views.xml',
