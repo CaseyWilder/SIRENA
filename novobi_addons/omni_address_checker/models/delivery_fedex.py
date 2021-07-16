@@ -5,7 +5,7 @@ from odoo.tools import pdf, DEFAULT_SERVER_DATE_FORMAT
 from odoo import api, models, fields, _, tools
 from odoo.addons.delivery_fedex.models.delivery_fedex import _convert_curr_iso_fdx
 
-from .fedex_request import FedexRequest
+from ..utils.fedex_request import FedexRequest
 from decimal import Decimal
 
 import datetime

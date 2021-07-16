@@ -14,14 +14,5 @@ class StockPicking(models.Model):
 
     @api.model
     def update_address(self, validated_address):
-        self.partner_id.street = validated_address.StreetLines[0]
-        self.partner_id.street2 = validated_address.StreetLines[1] or ''
-        self.partner_id.city = validated_address.City
-        self.partner_id.zip = validated_address.PostalCode
-        for state in self.env['res.country.state'].search([]):
-            if state.code == validated_address.StateOrProvinceCode:
-                self.partner_id.state_id = state
-        for country in self.env['res.country'].search([]):
-            if country.code == validated_address.CountryCode:
-                self.partner_id.country_id = country
+        self.partner_id.update_validated_address(validated_address)
         self.partner_id.is_address_validated = True
