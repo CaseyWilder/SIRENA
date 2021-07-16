@@ -28,4 +28,5 @@ class ProviderFedex(models.Model):
                                           shipping_account.fedex_developer_password)
         request.client_detail(shipping_account.fedex_account_number,
                               shipping_account.fedex_meter_number)
-        request.process_validation(delivery_address)
+        request.add_address_to_validation_request(delivery_address)
+        return request.process_validation(delivery_address)
