@@ -24,5 +24,4 @@ class StockPicking(models.Model):
         for country in self.env['res.country'].search([]):
             if country.code == validated_address.CountryCode:
                 self.partner_id.country_id = country
-        self.is_address_validated = True
-        self.partner_id.is_address_validated = True # Not sure if we need to set this or the above line will set it for us.
+        self.partner_id.is_address_validated = True
