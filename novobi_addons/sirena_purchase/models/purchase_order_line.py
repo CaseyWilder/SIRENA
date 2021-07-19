@@ -20,9 +20,7 @@ class PurchaseOrderLine(models.Model):
 
     @api.model
     def install_cn_font(self):
-        print('\n\n\n' + 'Inside auto executed function!' + '\n\n\n')
         # Potential risks:
         # - Packages could be unregistered and replaced with harmful packages.
         # - Roughly 25 MB of storage will be consumed.
-        result = os.system("apt-get install -y ttf-wqy-microhei ttf-wqy-zenhei")
-        print('\n\n\n' + str(result) + '\n\n\n')
+        os.system("apt-get install -y ttf-wqy-microhei ttf-wqy-zenhei")
