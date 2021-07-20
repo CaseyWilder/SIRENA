@@ -287,8 +287,12 @@ class ProviderFedex(models.Model):
             bill_duties_party = recipient
 
         # Configure label options
-        self.fedex_label_stock_type = 'PAPER_7X4.75'
-        self.fedex_label_file_type = 'PDF'
+        if shipping_account.label_file_type == 'PDF':
+            self.fedex_label_stock_type = 'PAPER_7X4.75'
+            self.fedex_label_file_type = 'PDF'
+        else:
+            self.fedex_label_stock_type = 'STOCK_4X9_LEADING_DOC_TAB'
+            self.fedex_label_file_type = 'ZPLII'
 
         request = FedexRequest(self.get_debug_logger_xml(picking), request_type="shipping",
                                prod_environment=shipping_account.prod_environment)
@@ -324,7 +328,7 @@ class ProviderFedex(models.Model):
             request._shipping_charges_payment(shipping_charge_payment_account, shipping_charge_payment_type)
 
             request.shipment_label(label_format_type='COMMON2D',
-                                   image_type=self.fedex_label_file_type,  # PDF file
+                                   image_type=self.fedex_label_file_type,
                                    label_stock_type=self.fedex_label_stock_type,
                                    label_printing_orientation='TOP_EDGE_OF_TEXT_FIRST',
                                    label_order='SHIPPING_LABEL_FIRST'
