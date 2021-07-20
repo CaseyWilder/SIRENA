@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="po_customized" inherit_id="purchase.report_purchaseorder_document">
+        <!-- Table headers -->
+        <xpath expr="//th[@name='th_date_req']" position="attributes">
+            <attribute name="style">display:none</attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_taxes']" position="attributes">
+            <attribute name="style">display:none</attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_quantity']/strong" position="replace">
+            <strong>Qty Per Unit</strong>
+        </xpath>
+        <xpath expr="//th[@name='th_price_unit']/strong" position="replace">
+            <strong>Price</strong>
+        </xpath>
+        <xpath expr="//th[@name='th_description']" position="after">
+            <th name="th_drawingnumber"><strong>Drawing Number</strong></th>
+            <th name="th_substance"><strong>Substance</strong></th>
+            <th name="th_partspeccolor"><strong>Part Spec/Color</strong></th>
+        </xpath>
+        <xpath expr="//th[@name='th_description']" position="before">
+            <th name="th_number"><strong>No.</strong></th>
+            <th name="th_partcode"><strong>Part Code</strong></th>
+            <th name="th_partnameinchinese"><strong>Part Name in Chinese</strong></th>
+        </xpath>
+        <xpath expr="//th[@name='th_price_unit']" position="after">
+            <th name="th_feature"><strong>Feature</strong></th>
+        </xpath>
+
+        <!-- Table body -->
+        <xpath expr="//td[3]" position="attributes">
+            <attribute name="style">display:none</attribute>
+        </xpath>
+        <xpath expr="//td[@name='td_taxes']" position="attributes">
+            <attribute name="style">display:none</attribute>
+        </xpath>
+        <xpath expr="//td[@id='product']" position="after">
+            <td name="td_drawingnumber">
+                <span t-field="line.drawing_number"/>
+            </td>
+            <td name="td_substance">
+                <span t-field="line.substance"/>
+            </td>
+            <td name="td_partsspeccolor">
+                <span t-field="line.parts_spec_color"/>
+            </td>
+        </xpath>
+        <xpath expr="//td[@id='product']" position="before">
+            <td name="td_number">
+                <span t-esc="line_index + 1"/>
+            </td>
+            <td name="td_partcode">
+                <span t-field="line.part_code"/>
+            </td>
+            <td name="td_partnameinchinese">
+                <span t-field="line.part_name_in_chinese"/>
+            </td>
+        </xpath>
+        <xpath expr="//td[11]" position="after">
+            <td name="td_feature">
+                <img t-att-src="'data:image/png;base64,%s' % to_text(line.product_image_1920)"/>
+            </td>
+        </xpath>
+    </template>
+
+</odoo>
