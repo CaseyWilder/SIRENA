@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="amazon_view_order_line_tree" model="ir.ui.view">
+            <field name="name">amazon.view.order.line.tree</field>
+            <field name="model">sale.order.line</field>
+            <field name="inherit_id" ref="sale_stock.view_order_line_tree_inherit_sale_stock"/>
+            <field name="arch" type="xml">
+                <field name="name" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                  <field name="route_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                  <field name="product_uom" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                  <field name="qty_to_invoice" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                  <field name="qty_invoiced" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                  <field name="qty_delivered" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                  <field name="salesman_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="price_subtotal" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="order_id" position="before">
+                    <field name="date_order"/>
+                    <field name="product_id"/>
+                </field>
+                <field name="price_subtotal" position="after">
+                    <field name="retail_price" sum="Total"/>
+                    <field name="amazon_fee" sum="Total"/>
+                    <field name="gross_pay" sum="Total"/>
+                    <field name="shipping_cost" sum="Total"/>
+                    <field name="gross_profit" sum="Total"/>
+                    <field name="dealer_cost" sum="Total"/>
+                    <field name="net_profit" sum="Total"/>
+                    <field name="line_tax_amount" sum="Total" optional="hide" string="Tax"/>
+                    <field name="is_florida_tax" optional="hide"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="action_amazon_margin_report" model="ir.actions.act_window" >
+            <field name="name">Amazon Margin Report</field>
+            <field name="res_model">sale.order.line</field>
+            <field name="domain">[('is_amazon_order_item', '=', True)]</field>
+            <field name="view_id" ref="amazon_view_order_line_tree"/>
+        </record>
+
+        <menuitem id="menu_action_amazon_margin_report" name="Amazon Margin Report"
+            parent="amazon_ept.menu_amazon_main_statements"
+            groups="account.group_account_user,amazon_ept.group_amazon_manager_ept"
+            action="action_amazon_margin_report" sequence="19"/>
+    </data>
+</odoo>
