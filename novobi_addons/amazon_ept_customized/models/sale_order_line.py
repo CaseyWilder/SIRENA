@@ -17,20 +17,14 @@ class SaleOrderLine(models.Model):
 
     @api.depends('product_id')
     def _compute_is_amazon_order_item(self):
-        products = self.env['amazon.product.ept'].search([]).mapped('product_id')
+        products = self.env['amazon.product.ept'].search([('product_id', 'in', self.mapped('product_id').ids)]).mapped('product_id')
         for rec in self:
-            if rec.product_id in products:
-                rec.is_amazon_order_item = True
-            else:
-                rec.is_amazon_order_item = False
+            rec.is_amazon_order_item = bool(rec.product_id in products)
 
     @api.depends('order_partner_id')
     def _compute_is_florida_tax(self):
         for rec in self:
-            if rec.order_id.partner_shipping_id.state_id.code == 'FL':
-                rec.is_florida_tax = True
-            else:
-                rec.is_florida_tax = False
+            rec.is_florida_tax = bool(rec.order_id.partner_shipping_id.state_id.code == 'FL')
 
     @api.depends('order_id.state','price_subtotal')
     def _compute_gross_pay(self):
@@ -38,8 +32,10 @@ class SaleOrderLine(models.Model):
         for rec in self.filtered(lambda x: x.is_amazon_order_item and x.order_id.state == 'sale'):
             related_lines = sale_order_line_obj.search([('is_amazon_order_item', '=', False), ('amazon_order_item_id', 'ilike', rec.amazon_order_item_id)])
             rec.retail_price = rec.price_subtotal + related_lines.filtered(lambda x: x.product_id.id == x.order_id.amz_seller_id.promotion_discount_product_id.id).price_subtotal
-            rec.amazon_fee = 0.15*(rec.retail_price + sum(related_lines.mapped('price_subtotal')))
-            rec.gross_pay = rec.price_subtotal - rec.amazon_fee
+            rec.amazon_fee = 0.15*(rec.price_subtotal + sum(related_lines.mapped('price_subtotal')))
+            if rec.order_id.amz_instance_id.market_place_id == 'A2EUQ1WTGCTBG2':
+                rec.amazon_fee += 0.029*rec.line_tax_amount
+            rec.gross_pay = rec.retail_price - rec.amazon_fee
 
     @api.depends('gross_pay','shipping_cost','dealer_cost')
     def _compute_net_profit(self):
