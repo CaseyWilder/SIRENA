@@ -3,29 +3,29 @@
 
     <template id="po_customized" inherit_id="purchase.report_purchaseorder_document">
         <!-- Table headers -->
-        <xpath expr="//table/thead/tr/th[3]" position="attributes">
+        <xpath expr="//th[@name='th_date_req']" position="attributes">
             <attribute name="style">display:none</attribute>
         </xpath>
-        <xpath expr="//table/thead/tr/th[2]" position="attributes">
+        <xpath expr="//th[@name='th_taxes']" position="attributes">
             <attribute name="style">display:none</attribute>
         </xpath>
-        <xpath expr="//table/thead/tr/th[4]/strong" position="attributes">
-            <attribute name="string">Qty Per Unit</attribute>
+        <xpath expr="//th[@name='th_quantity']/strong" position="replace">
+            <strong>Qty Per Unit</strong>
         </xpath>
-        <xpath expr="//table/thead/tr/th[5]/strong" position="attributes">
-            <attribute name="string">Price</attribute>
+        <xpath expr="//th[@name='th_price_unit']/strong" position="replace">
+            <strong>Price</strong>
         </xpath>
-        <xpath expr="//table/thead/tr/th" position="after">
+        <xpath expr="//th[@name='th_description']" position="after">
             <th name="th_drawingnumber"><strong>Drawing Number</strong></th>
             <th name="th_substance"><strong>Substance</strong></th>
             <th name="th_partspeccolor"><strong>Part Spec/Color</strong></th>
         </xpath>
-        <xpath expr="//table/thead/tr/th" position="before">
+        <xpath expr="//th[@name='th_description']" position="before">
             <th name="th_number"><strong>No.</strong></th>
             <th name="th_partcode"><strong>Part Code</strong></th>
             <th name="th_partnameinchinese"><strong>Part Name in Chinese</strong></th>
         </xpath>
-        <xpath expr="//table/thead/tr/th[11]" position="after">
+        <xpath expr="//th[@name='th_price_unit']" position="after">
             <th name="th_feature"><strong>Feature</strong></th>
         </xpath>
 
@@ -33,10 +33,10 @@
         <xpath expr="//td[3]" position="attributes">
             <attribute name="style">display:none</attribute>
         </xpath>
-        <xpath expr="//td[2]" position="attributes">
+        <xpath expr="//td[@name='td_taxes']" position="attributes">
             <attribute name="style">display:none</attribute>
         </xpath>
-        <xpath expr="//td" position="after">
+        <xpath expr="//td[@id='product']" position="after">
             <td name="td_drawingnumber">
                 <span t-field="line.drawing_number"/>
             </td>
@@ -47,7 +47,7 @@
                 <span t-field="line.parts_spec_color"/>
             </td>
         </xpath>
-        <xpath expr="//td" position="before">
+        <xpath expr="//td[@id='product']" position="before">
             <td name="td_number">
                 <span t-esc="line_index + 1"/>
             </td>
