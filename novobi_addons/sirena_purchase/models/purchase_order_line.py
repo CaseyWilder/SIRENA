@@ -1,5 +1,8 @@
 import os
 from odoo import models, fields, api
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class PurchaseOrderLine(models.Model):
@@ -23,4 +26,7 @@ class PurchaseOrderLine(models.Model):
         # Potential risks:
         # - Packages could be unregistered and replaced with harmful packages.
         # - Roughly 25 MB of storage will be consumed.
-        os.system("apt-get install -y ttf-wqy-microhei ttf-wqy-zenhei")
+        try:
+            os.system("apt-get install -y ttf-wqy-microhei ttf-wqy-zenhei")
+        except Exception as e:
+            _logger.error(e)
