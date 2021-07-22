@@ -1,10 +1,11 @@
+import json
 from datetime import datetime, time, timedelta
 
 from odoo import api, fields, models, _
 from odoo.tools.float_utils import float_compare, float_round
 from odoo.exceptions import UserError, ValidationError
 
-from ..utils.utils import get_default_date_format, convert_time_zone
+from ..utils.utils import get_default_date_format
 from ..utils.vertex import Vertex
 from ..utils.time_tracking import get_all_working_hours
 
@@ -43,6 +44,9 @@ class PayrollPayslip(models.Model):
     name = fields.Char('Name', compute='_compute_name', inverse='_inverse_name', store=True)
     employee_id = fields.Many2one('hr.employee', 'Employee', ondelete='restrict')
     pay_period_id = fields.Many2one('pay.period', 'Pay Period', ondelete='restrict')
+
+    # Override
+    company_id = fields.Many2one(related='pay_period_id.company_id', store=True)
 
     compensation_ids = fields.One2many('payslip.compensation', 'payslip_id', string='Compensations')
     deduction_ids = fields.One2many('payslip.deduction', 'payslip_id', string='Deductions')
@@ -113,6 +117,13 @@ class PayrollPayslip(models.Model):
 
     is_negative_net_pay = fields.Boolean('Is Net Pay Negative?', default=False)
 
+    # Technical fields for Account Direct Deposit
+    payment_account_text = fields.Text('Payment Accounts (Json)')
+    payment_account_html = fields.Html('Payment Accounts (Html)', compute='_compute_payment_account_html', store=True)
+
+    period_pay_frequency_id = fields.Many2one(related='pay_period_id.pay_frequency_id', string='Frequency in Period',
+                                              help='Technical field to know if Pay Frequency in this payslip is different from in the period.')
+
     ####################################################################################################################
     # CONSTRAINTS
     ####################################################################################################################
@@ -150,7 +161,10 @@ class PayrollPayslip(models.Model):
 
         period = self.pay_period_id
 
-        emp_domain = [('id', 'not in', period.payslip_ids.mapped('employee_id').ids)]
+        emp_domain = [
+            ('company_id', '=', self.company_id.id),
+            ('id', 'not in', period.payslip_ids.mapped('employee_id').ids)
+        ]
         if period.pay_frequency_id:
             emp_domain.append(('pay_frequency_id', '=', period.pay_frequency_id.id))
 
@@ -206,28 +220,28 @@ class PayrollPayslip(models.Model):
             record.gross_pay_deduction = gross_pay + sum(com.amount for com in
                                                          record.compensation_ids.filtered(lambda x: x.incl_gp_deduction))
 
-    @api.depends('start_date', 'end_date', 'employee_id.attendance_ids', 'workweek_start', 'employee_type')
+    @api.depends('start_date', 'end_date', 'workweek_start', 'employee_type',
+                 'employee_id.attendance_ids', 'employee_id.attendance_ids.date', 'employee_id.attendance_ids.worked_hours')
     def _compute_attendance_ids_payslip(self):
-        admin = self.env.ref('base.user_admin', raise_if_not_found=False)
-        tz = self.env.user.tz or admin and admin.tz or 'UTC'
-        payslip_ids = self.filtered(lambda r: r.employee_type != 'salary')
+        for record in self:
+            if (
+                    record.employee_type == 'salary'
+                    or record.checkin_method != 'attendance'
+                    or not (record.start_date and record.end_date)
+                    or not record.employee_id.attendance_ids
+            ):
+                record.attendance_ids = False
+                continue
 
-        for record in payslip_ids:
-            employee_id = record.employee_id
-            attendance_ids = employee_id and employee_id.attendance_ids or False
+            attendance_ids = record.employee_id.attendance_ids
             start_date = record.start_date
             end_date = record.end_date
 
-            if attendance_ids and start_date and end_date:
-                time_tracking_id = record.time_tracking_id
-                if time_tracking_id:
-                    workweek = int(time_tracking_id.workweek_start)
-                    start = start_date.weekday()
-                    start_date -= timedelta(days=start - workweek if start >= workweek else 7 + start - workweek)
-
-                record.attendance_ids = attendance_ids.filtered(
-                    lambda a: a.check_out and start_date <= convert_time_zone(a.check_in, tz).date() <= end_date
-                )
+            if record.workweek_start:
+                workweek = int(record.workweek_start)
+                start = start_date.weekday()
+                start_date -= timedelta(days=start - workweek if start >= workweek else 7 + start - workweek)
+            record.attendance_ids = attendance_ids.filtered(lambda r: start_date <= r.date <= end_date)
 
     @api.depends('worked_hours', 'holiday')
     def _compute_total_hours(self):
@@ -263,6 +277,54 @@ class PayrollPayslip(models.Model):
 
             record.outdated_working_hours = outdated_working_hours
             record.outdated_leaves = outdated_leaves
+
+    @api.depends('payment_account_text', 'split_paychecks_type')
+    def _compute_payment_account_html(self):
+        account_env = self.env['account.payment.direct']
+
+        for record in self:
+            payment_account_text = json.loads(record.payment_account_text or '[]')
+            if not payment_account_text:
+                record.payment_account_html = False
+            else:
+                rows = ''
+                for line in payment_account_text:
+                    amount = record._format_currency_amount(line['amount_fixed']) if line['split_paychecks_type'] == 'amount' else line['amount_percentage']
+                    rows += """
+                        <tr>
+                            <td class="pl-5">{account_name}</td>
+                            <td>{routing_number}</td>
+                            <td>{account_number}</td>
+                            <td>{account_type}</td>
+                            <td class="text-right pr-5">{amount}</td>
+                        </tr>
+                    """.format(
+                        account_name=line['account_name'],
+                        routing_number=line['routing_number'],
+                        account_number=line['account_number'],
+                        account_type=dict(account_env._fields['account_type'].selection).get(line['account_type']),
+                        amount=amount
+                    )
+
+                record.payment_account_html = """
+                    <table class="o_list_table table table-sm table-hover table-striped" style="table-layout:fixed">
+                        <thead>
+                            <tr>
+                                <th class="pl-5">Account Name</th>
+                                <th>Routing Number</th>
+                                <th>Account Number</th>
+                                <th>Account Type</th>
+                                <th class="pr-5">{split_type}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {rows}
+                        </tbody>
+                    </table>
+                """.format(
+                    split_type='Fixed Amount' if record.split_paychecks_type == 'amount' else 'Percentage',
+                    rows=rows
+                )
 
     # Historical Data --------------------------------------------------------------------------------------------------
     def _compute_wizard_compensation_ids(self):
@@ -749,25 +811,29 @@ class PayrollPayslip(models.Model):
         self._reset_working_hours()
         self._reset_holiday_hours()
 
+    @api.model
+    def create_compensation(self, com_id, label, employee_id, amount, rate, hours, sequence, is_salary=True, is_regular=True):
+        """
+        Get the values dict to create new payslip compensation
+        """
+        return {
+            'compensation_id': com_id,
+            'label': label,
+            'employee_id': employee_id,
+            'amount': float_round(amount, precision_digits=2),
+            'rate': float_round(rate, precision_digits=2),
+            'hours': hours,
+            'is_salary': is_salary,
+            'is_regular': is_regular,
+            'sequence': sequence
+        }
+
     def _update_compensation_list(self):
         """
         This function is used to update compensation list before running payroll.
         Add Salary line (for salary/hourly employee)
         Add Vacation/Sick Pay
         """
-        def create_compensation(com_id, label, employee_id, amount, rate, hours, sequence, is_salary=True, is_regular=True):
-            return {
-                'compensation_id': com_id,
-                'label': label,
-                'employee_id': employee_id,
-                'amount': float_round(amount, precision_digits=2),
-                'rate': float_round(rate, precision_digits=2),
-                'hours': hours,
-                'is_salary': is_salary,
-                'is_regular': is_regular,
-                'sequence': sequence
-            }
-
         overtime_rate = self.env.company.overtime_rate
         double_rate = self.env.company.double_overtime_rate
 
@@ -793,8 +859,8 @@ class PayrollPayslip(models.Model):
                         com_id = leave.payroll_compensation_id.id
                         label = leave.payroll_compensation_id.name
                         amount = hourly_rate * leave.number_of_hours
-                        comp = create_compensation(com_id, label, record.employee_id.id, amount, hourly_rate,
-                                                   leave.number_of_hours, SEQUENCE_PRIORITY['pto'])
+                        comp = self.create_compensation(com_id, label, record.employee_id.id, amount, hourly_rate,
+                                                        leave.number_of_hours, SEQUENCE_PRIORITY['pto'])
                         compensations.append(comp)
                         total_pto += amount
 
@@ -804,7 +870,7 @@ class PayrollPayslip(models.Model):
             if employee_type == 'hourly':
                 label = 'Regular Pay'
                 amount = hourly_rate * regular_hours
-                comp = create_compensation(com_id, label, record.employee_id.id, amount, hourly_rate, regular_hours, SEQUENCE_PRIORITY['regular'])
+                comp = self.create_compensation(com_id, label, record.employee_id.id, amount, hourly_rate, regular_hours, SEQUENCE_PRIORITY['regular'])
                 compensations.append(comp)
             else:
                 label = 'Salary'
@@ -814,7 +880,7 @@ class PayrollPayslip(models.Model):
                     regular_hours = record._calculate_standard_working_hours() - record.holiday
                 # Error will be raised if user add paid leaves manually with pto amount greater than salary amount
                 if amount > 0:
-                    comp = create_compensation(com_id, label, record.employee_id.id, amount, hourly_rate, regular_hours, SEQUENCE_PRIORITY['salary'])
+                    comp = self.create_compensation(com_id, label, record.employee_id.id, amount, hourly_rate, regular_hours, SEQUENCE_PRIORITY['salary'])
                     compensations.append(comp)
 
             # Overtime and Double Overtime Pay (for `Salary/Eligible for Overtime` and `Hourly` Employees)
@@ -824,15 +890,15 @@ class PayrollPayslip(models.Model):
                     label = 'Overtime Pay'
                     rate = overtime_rate * hourly_rate
                     amount = rate * record.overtime
-                    comp = create_compensation(com_id, label, record.employee_id.id, amount, rate, record.overtime, SEQUENCE_PRIORITY['overtime'])
+                    comp = self.create_compensation(com_id, label, record.employee_id.id, amount, rate, record.overtime, SEQUENCE_PRIORITY['overtime'])
                     compensations.append(comp)
                 if record.double_overtime:
                     com_id = record.env.ref(SALARY_TYPE['double']).id
                     label = 'Double Overtime Pay'
                     rate = double_rate * hourly_rate
                     amount = rate * record.double_overtime
-                    comp = create_compensation(com_id, label, record.employee_id.id, amount, rate,
-                                               record.double_overtime, SEQUENCE_PRIORITY['double'])
+                    comp = self.create_compensation(com_id, label, record.employee_id.id, amount, rate,
+                                                    record.double_overtime, SEQUENCE_PRIORITY['double'])
                     compensations.append(comp)
 
             record.write({'compensation_ids': [(0, 0, x) for x in compensations]})
@@ -908,7 +974,7 @@ class PayrollPayslip(models.Model):
         def generate_entry_detail(payment_account, amount, type=22):
             """
             Create entry object to use in ach.builder
-            :param payment_account: record from 'account.payment.direct'
+            :param payment_account: dict of values got from account.payment.direct.read()
             :param amount: net_pay for this payment_account
             :param type: ACH Transaction Codes
             :return: entry object
@@ -918,10 +984,10 @@ class PayrollPayslip(models.Model):
             # else 27 if payment_type = 'inbound' else 22
             return {
                 'type': type,
-                'routing_number': payment_account.routing_number,
-                'account_number': payment_account.account_number,
+                'routing_number': payment_account['routing_number'],
+                'account_number': payment_account['account_number'],
                 'amount': amount,
-                'name': payment_account.account_name
+                'name': payment_account['account_name']
             }
 
         period_entries = list()
@@ -929,24 +995,29 @@ class PayrollPayslip(models.Model):
 
         for record in payslip_ids:
             payslip_entries = list()
-            employee_id, net_pay = record.employee_id, record.net_pay
-            payment_account_ids = employee_id.payment_account_ids
-            split_paychecks_type = employee_id.split_paychecks_type
-            n_accounts = len(payment_account_ids) - 1   # Except the last one
+            net_pay = record.net_pay
+            payment_accounts = json.loads(record.payment_account_text or '[]')
+            if not payment_accounts:
+                continue
 
-            if split_paychecks_type == 'percentage':
-                for i in range(n_accounts):
-                    amount = float_round(net_pay * payment_account_ids[i].amount_percentage/100, precision_digits=2)
-                    payslip_entries.append(generate_entry_detail(payment_account_ids[i], amount))
+            if record.split_paychecks_type == 'percentage':
+                for account in payment_accounts[:-1]:
+                    amount = float_round(net_pay * account['amount_percentage'] / 100, precision_digits=2)
+                    payslip_entries.append(generate_entry_detail(account, amount))
                 last_amount = net_pay - sum(account.get('amount') for account in payslip_entries)
             else:
-                amount_fixed = payment_account_ids.mapped('amount_fixed')
-                for i in range(n_accounts):
-                    amount = min(net_pay, amount_fixed[i])
-                    payslip_entries.append(generate_entry_detail(payment_account_ids[i], amount))
+                for account in payment_accounts[:-1]:
+                    # Ignore other accounts if current net pay <= 0
+                    if float_compare(net_pay, 0, precision_digits=2) != 1:
+                        break
+                    amount = min(net_pay, account['amount_fixed'])
+                    payslip_entries.append(generate_entry_detail(account, amount))
                     net_pay -= amount
                 last_amount = net_pay
-            payslip_entries.append(generate_entry_detail(payment_account_ids[n_accounts], last_amount))
+
+            # Add last account if remaining net pay > 0
+            if float_compare(last_amount, 0, precision_digits=2) == 1:
+                payslip_entries.append(generate_entry_detail(payment_accounts[-1], last_amount))
 
             period_entries += payslip_entries
 

@@ -5,8 +5,8 @@
         <field name="model">payroll.payslip</field>
         <field name="inherit_id" ref="l10n_us_hr_payroll.view_payroll_payslip_form"/>
         <field name="arch" type="xml">
-            <field name="currency_id" position="before">
-                <field name="check_number" readonly="1"/>
+            <field name="net_pay" position="after">
+                <field name="check_number" readonly="1" attrs="{'invisible': [('payment_method', '!=', 'check')]}"/>
             </field>
             <header position="inside">
                 <button name="print_separated_stubs" type="object" string="Print Paystub" states="done"/>

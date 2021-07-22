@@ -10,6 +10,9 @@
                 <field name="sale_delay" position="attributes">
                     <attribute name="widget">integer</attribute>
                 </field>
+                <field name="company_id" position="before">
+                    <field name="dealer_cost" widget="monetary"/>
+                </field>
             </field>
         </record>
     </data>

@@ -35,7 +35,4 @@
         <field name="res_model">filing.status</field>
         <field name="view_mode">tree,form</field>
     </record>
-
-    <menuitem id="menu_action_payroll_filing_status" action="action_payroll_filing_status"
-              parent="menu_us_payroll_configuration" sequence="50" groups="base.group_no_one"/>
 </odoo>

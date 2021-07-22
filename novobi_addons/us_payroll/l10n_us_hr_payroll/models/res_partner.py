@@ -8,7 +8,7 @@ class Partner(models.Model):
     _inherit = 'res.partner'
 
     county = fields.Char('County')
-    employee_id = fields.Many2one('hr.employee', string='Employee')
+    employee_id = fields.Many2one('hr.employee', string='Employee', ondelete='cascade')
     # Change label because it has same label with "employee_id" field
     employee = fields.Boolean(string='Is an Employee')
 
@@ -16,14 +16,20 @@ class Partner(models.Model):
         """
         Sync the employee which has id = res_partner.employee_id
         """
-        for record in self:
+        if self._context.get('sync_from_employee', False):
+            return
+
+        sync_employee_contact = self.env.company.sync_employee_contact
+        sync_fields = set(values.keys()) & set(sync_employee_contact and EE_PARTNER_SYNC_FIELDS or ['name'])
+        if not sync_fields:
+            return
+
+        for record in self.with_context(sync_from_partner=True):
             if record.employee_id:
-                values = sync_record(record.employee_id, values, EE_PARTNER_SYNC_FIELDS)
-                if values:
-                    record.employee_id.write(values)
+                values = sync_record(record, sync_fields)
+                record.employee_id.write(values)
 
     def write(self, vals):
         res = super(Partner, self).write(vals)
-        if self._context.get('from_employee', False) != '1':
-            self.with_context(from_partner='1').sync_related_employee(vals)
+        self.sync_related_employee(vals)
         return res

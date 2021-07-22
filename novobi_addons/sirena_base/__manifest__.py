@@ -8,7 +8,7 @@
     'version': '14.1.0.0',
     'category': 'Other',
     'author': 'Novobi LLC',
-    "license": "OPL-1",
+    'license': 'OPL-1',
     'website': 'https://www.novobi.com',
     'depends': ['contacts'],
     'data': [

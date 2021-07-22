@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_pending_compensation_user,access_pending_compensation user,model_pending_compensation,l10n_us_hr_payroll.l10n_us_hr_payroll_group_officer,1,1,0,0
+access_pending_compensation_manager,access_pending_compensation manager,model_pending_compensation,l10n_us_hr_payroll.l10n_us_hr_payroll_group_manager,1,1,1,1
+access_add_missing_comp_wizard,add_missing_comp_wizard user,model_add_missing_comp_wizard,base.group_user,1,1,1,1

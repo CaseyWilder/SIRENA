@@ -28,7 +28,7 @@
                         <button name="button_open_move_id" type="object" class="oe_stat_button" states="done"
                                 icon="fa-bars" string="Journal Entry" groups="account.group_account_user"/>
                     </div>
-                     <div class="oe_title">
+                    <div class="oe_title">
                         <h1><field name="name" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/></h1>
                      </div>
                     <group name="top">
@@ -52,7 +52,7 @@
                     <notebook>
                         <page name="payslip_tab" string="Payslips">
                             <field name="payslip_ids" nolabel="1" attrs="{'readonly': [('state', '!=', 'draft')]}">
-                                <tree decoration-danger="is_negative_net_pay">
+                                <tree decoration-danger="is_negative_net_pay or pay_frequency_id != period_pay_frequency_id">
                                     <field name="currency_id" invisible="1"/>
                                     <field name="employee_code"/>
                                     <field name="employee_id"/>
@@ -71,6 +71,9 @@
                                            attrs="{'column_invisible': [('parent.state', '=', 'draft')]}"/>
                                     <field name="state" invisible="1"/>
                                     <field name="is_negative_net_pay" invisible="1"/>
+                                    <field name="period_pay_frequency_id" invisible="1"/>
+                                    <field name="pay_frequency_id" invisible="1"/>
+                                    <field name="company_id" invisible="1"/>
                                 </tree>
                             </field>
                         </page>
@@ -519,19 +522,4 @@
             (0, 0, {'view_mode': 'form', 'view_id': ref('view_pay_period_form_termination')})]"
         />
     </record>
-
-    <!--================================================================================================================
-        MENU
-    =================================================================================================================-->
-    <menuitem id="menu_action_pay_period_frequency" name="Scheduled"
-              action="action_pay_period_form_frequency" parent="menu_us_payroll_pay_period" sequence="5"/>
-
-    <menuitem id="menu_action_pay_period_off_cycle" name="Off-cycle"
-              action="action_pay_period_form_off_cycle" parent="menu_us_payroll_pay_period" sequence="10"/>
-
-    <menuitem id="menu_action_pay_period_bonus" name="Bonus"
-              action="action_pay_period_form_bonus" parent="menu_us_payroll_pay_period" sequence="15"/>
-
-    <menuitem id="menu_action_pay_period_termination" name="Termination"
-              action="action_pay_period_form_termination" parent="menu_us_payroll_pay_period" sequence="20"/>
 </odoo>

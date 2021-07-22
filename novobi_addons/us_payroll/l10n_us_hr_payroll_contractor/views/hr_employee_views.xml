@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="hr_employee_view_form_inherit_payroll_contractor" model="ir.ui.view">
+        <field name="name">hr_employee_view_form_inherit_payroll_contractor</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="l10n_us_hr_payroll.hr_employee_view_form"/>
+        <field name="arch" type="xml">
+            <span name="hour" position="attributes">
+                <attribute name="attrs">{'invisible': [('employee_type', '!=', 'hourly'), ('employee_type', '!=', 'contractor')]}</attribute>
+            </span>
+            <field name="salary_period" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('employee_type', '=', 'hourly'), ('employee_type', '=', 'contractor')]}</attribute>
+            </field>
+            <span name="per_paycheck" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', '|', ('employee_type', '=', 'hourly'), ('employee_type', '=', 'contractor'), ('calculate_salary_by', '=', 'hour')]}</attribute>
+            </span>
+            <label for="salary_annual" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('employee_type', '=', 'hourly'), ('employee_type', '=', 'contractor')]}</attribute>
+            </label>
+            <div name="salary_annual" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('employee_type', '=', 'hourly'), ('employee_type', '=', 'contractor')]}</attribute>
+            </div>
+            <field name="pay_rate" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('employee_type', '=', 'hourly'), ('employee_type', '=', 'contractor')]}</attribute>
+            </field>
+            <field name="time_tracking_id" position="attributes">
+                <attribute name="attrs">{'required': [('employee_type', '!=', 'salary'), ('employee_type', '!=', 'contractor')]}</attribute>
+            </field>
+        </field>
+    </record>
+</odoo>

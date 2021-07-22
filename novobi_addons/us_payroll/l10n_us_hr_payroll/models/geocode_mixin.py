@@ -34,19 +34,19 @@ class GeocodeMixin(models.AbstractModel):
         work_employee_id = self.env.context.get('work_employee_id', False)
         return [('work_employee_id', '=', work_employee_id)] if work_employee_id else []
 
-    geocode = fields.Char('GeoCode')
+    geocode = fields.Char('GeoCode', groups="hr.group_hr_user")
     geocode_status = fields.Selection(
         [('draft', 'Draft'), ('empty', 'Not set'), ('value', 'Had value'), ('choice', 'Need to choose')],
-        string='GeoCode Status', help='Store status of geocode', default='draft')
+        string='GeoCode Status', help='Store status of geocode', default='draft', groups="hr.group_hr_user")
     geocode_option_id = fields.Many2one('geocode.option', string='GeoCode Options', store=False,
-                                        domain=_get_geocode_option_domain)
+                                        domain=_get_geocode_option_domain, groups="hr.group_hr_user")
 
-    work_geocode = fields.Char('Work GeoCode')
+    work_geocode = fields.Char('Work GeoCode', groups="hr.group_hr_user")
     work_geocode_status = fields.Selection(
         [('draft', 'Draft'), ('empty', 'Not set'), ('value', 'Had value'), ('choice', 'Need to choose')],
-        string='Work GeoCode Status', help='Store status of geocode', default='draft')
+        string='Work GeoCode Status', help='Store status of geocode', default='draft', groups="hr.group_hr_user")
     work_geocode_option_id = fields.Many2one('geocode.option', string='Work GeoCode Options', store=False,
-                                             domain=_get_work_geocode_option_domain)
+                                             domain=_get_work_geocode_option_domain, groups="hr.group_hr_user")
 
     def _update_geocode(self, values, option_field, address_list=None, value_dict=None):
         """

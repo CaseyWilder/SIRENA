@@ -21,15 +21,11 @@
     </record>
 
     <record id="action_payslip_garnishment" model="ir.actions.act_window">
-        <field name="name">Installment Deduction</field>
+        <field name="name">Installment Deductions</field>
         <field name="res_model">payslip.deduction</field>
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="view_payslip_garnishment_tree_report"/>
         <field name="context">{'search_default_group_by_employee': 1}</field>
         <field name="domain">[('ee_max_amount_type', '=', 'owed'), ('state', '=', 'done')]</field>
-<!--        <field name="domain">[('ee_max_amount_type', '=', 'owed'), '|', ('state', '=', 'confirmed'), ('state', '=', 'done')]</field>-->
     </record>
-
-    <menuitem action="action_payslip_garnishment" id="menu_payslip_garnishment"
-              parent="menu_us_payroll_report" sequence="40"/>
 </odoo>

@@ -6,7 +6,7 @@ class PayrollSummaryReport(models.AbstractModel):
     _description = "Payroll Summary Report"
     _inherit = 'account.report'
 
-    filter_date = {'date_from': '', 'date_to': '', 'filter': 'this_year'}
+    filter_date = {'mode': 'range', 'date_from': '', 'date_to': '', 'filter': 'this_year'}
 
     STRUCTURE_LINES = [{'name': 'Compensations',
                         'slip_model': 'payslip_compensation',
@@ -53,6 +53,15 @@ class PayrollSummaryReport(models.AbstractModel):
             {'name': _('Amount'), 'class': 'number'},
         ]
 
+    def build_where_clause(self, extra_where):
+        where_clause = """
+            WHERE state in ('done') 
+            AND (SLIP.pay_date >= %s) AND (SLIP.pay_date <= %s)
+            AND SLIP.company_id IN %s
+            {}
+        """.format(extra_where)
+        return where_clause
+
     def _get_data_lines(self, options, structure):
         cr = self.env.cr
 
@@ -70,12 +79,7 @@ class PayrollSummaryReport(models.AbstractModel):
 
         select_clause = "SELECT SLIP.name as column_name, SUM(SLIP.{}) as amount".format(amount_field)
         from_clause = "FROM {} as SLIP".format(slip_model)
-        where_clause = """
-            WHERE state in ('done') 
-            AND (SLIP.pay_date >= %s) AND (SLIP.pay_date <= %s)
-            AND SLIP.company_id IN %s
-            {}
-        """.format(extra_where)
+        where_clause = self.build_where_clause(extra_where)
 
         # Special treatment for NET PAY
         if structure.get('name', False) == 'Net Pay':
