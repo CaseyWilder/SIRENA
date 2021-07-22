@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_address_validation_wizard_form" model="ir.ui.view">
+        <field name="name">address.validation.wizard.form</field>
+        <field name="model">address.validation.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group name="current_address">
+                    <field name="address_id" string="Delivery Address" readonly="1"/>
+                </group>
+                <group name="address_info">
+                    <group name="old_address">
+                        <label for="street" string="Current Address"/>
+                        <div class="o_address_format">
+                            <field name="street" class="o_address_street" readonly="1"/>
+                            <field name="street2" class="o_address_street" readonly="1"/>
+                            <field name="city" class="o_address_city" readonly="1"/>
+                            <field name="state_id" class="o_address_state" readonly="1"/>
+                            <field name="zip" class="o_address_zip" readonly="1"/>
+                            <field name="country_id" class="o_address_country" readonly="1"/>
+                        </div>
+                    </group>
+                    <group name="new_address">
+                        <label for="new_street" string="Validated Address"/>
+                        <div class="o_address_format">
+                            <field name="new_street" class="o_address_street" readonly="1"/>
+                            <field name="new_street2" class="o_address_street" readonly="1"/>
+                            <field name="new_city" class="o_address_city" readonly="1"/>
+                            <field name="new_state_id" class="o_address_state" readonly="1"/>
+                            <field name="new_zip" class="o_address_zip" readonly="1"/>
+                            <field name="new_country_id" class="o_address_country" readonly="1"/>
+                        </div>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_update_new_address" class="btn-primary" string="Use verified address" type="object"/>
+                    <button special="cancel" string="Keep current address"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
