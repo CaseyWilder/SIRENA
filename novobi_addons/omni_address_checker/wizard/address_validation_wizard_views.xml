@@ -32,6 +32,9 @@
                         </div>
                     </group>
                 </group>
+                <group name="address_classification">
+                    <field name="new_address_classification" string="Address' Classification: " readonly="1"/>
+                </group>
                 <footer>
                     <button name="action_update_new_address" class="btn-primary" string="Use verified address" type="object"/>
                     <button special="cancel" string="Keep current address"/>

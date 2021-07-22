@@ -1,14 +1,21 @@
 from odoo import models, fields
 
+ADDRESS_CLASSIFICATION = [
+    ('RESIDENTIAL', 'Residential Address'),
+    ('BUSINESS', 'Business Address'),
+    ('MIXED', 'Mixed Address')
+]
+
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
-    is_address_validated = fields.Boolean(default=False)
+    address_classification = fields.Selection(ADDRESS_CLASSIFICATION)
 
     def get_validated_address(self, result):
         validated_address = result and result['validated_address']
-        if not validated_address:
+        validated_address_classification = result and result['address_classification']
+        if not validated_address or not validated_address_classification:
             return
 
         country = self.env['res.country'].search([('code', '=', validated_address.CountryCode)], limit=1)
@@ -21,11 +28,12 @@ class ResPartner(models.Model):
             'new_zip': validated_address.PostalCode,
             'new_state_id': state.id,
             'new_country_id': country.id,
+            'new_address_classification': validated_address_classification
         }
 
     def write(self, vals):
-        if not vals.get('is_address_validated', False):
+        if not vals.get('address_classification', False):
             if any(field in vals for field in ['street', 'street2', 'city', 'zip', 'state_id', 'country_id']):
-                vals['is_address_validated'] = False
+                vals['address_classification'] = False
 
         return super().write(vals)

@@ -1,4 +1,4 @@
-from odoo import models, fields, _
+from odoo import api, models, fields, _
 from odoo.exceptions import UserError
 
 from ..utils.fedex_request import FedexRequest
@@ -7,7 +7,7 @@ from ..utils.fedex_request import FedexRequest
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
-    is_address_validated = fields.Boolean(related='partner_id.is_address_validated')
+    address_classification = fields.Selection(related='partner_id.address_classification')
 
     def action_validate_address(self):
         fedex = self.env['shipping.account'].search([('provider', '=', 'fedex')], limit=1)
@@ -24,6 +24,9 @@ class StockPicking(models.Model):
 
         if result.get('errors_message', False):
             raise UserError(result['errors_message'])
+
+        if result['matching_state'] != 'STANDARDIZED':
+            raise UserError('Could not match your address against database reference data!')
 
         validated_address = delivery_address.get_validated_address(result)
 

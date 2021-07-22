@@ -8,15 +8,23 @@
             <field name="partner_id" position="replace">
                 <div name="address_checker">
                     <field name="partner_id" nolable="1"/>
-                    <field name="is_address_validated" invisible="1"/>
+                    <field name="address_classification" invisible="1"/>
                     <button name="action_validate_address" title="This address is not validated. Click to check"
                             type="object" class="btn-link text-warning m-0 ml-3" icon="fa-question-circle"
                             style="vertical-align: baseline; padding: 0 !important"
-                            attrs="{'invisible': ['|', ('is_address_validated', '=', True), ('picking_type_code', '!=', 'outgoing')]}"/>
-                    <button name="action_validate_address" title="This address has been validated." disabled="1"
-                            type="object" class="btn-link text-primary m-0 ml-3" icon="fa-check-circle"
+                            attrs="{'invisible': ['|', ('address_classification', '!=', False), ('picking_type_code', '!=', 'outgoing')]}"/>
+                    <button name="action_validate_address" title="This is a residential address." disabled="1"
+                            type="object" class="btn-link text-primary m-0 ml-3" icon="fa-home"
                             style="vertical-align: baseline; padding: 0 !important"
-                            attrs="{'invisible': ['|', ('is_address_validated', '=', False), ('picking_type_code', '!=', 'outgoing')]}"/>
+                            attrs="{'invisible': ['|', ('address_classification', '!=', 'RESIDENTIAL'), ('picking_type_code', '!=', 'outgoing')]}"/>
+                    <button name="action_validate_address" title="This is a business address." disabled="1"
+                            type="object" class="btn-link text-primary m-0 ml-3" icon="fa-building-o"
+                            style="vertical-align: baseline; padding: 0 !important"
+                            attrs="{'invisible': ['|', ('address_classification', '!=', 'BUSINESS'), ('picking_type_code', '!=', 'outgoing')]}"/>
+                    <button name="action_validate_address" title="This address is undetermined." disabled="1"
+                            type="object" class="btn-link text-primary m-0 ml-3" icon="fa-map-marker"
+                            style="vertical-align: baseline; padding: 0 !important"
+                            attrs="{'invisible': ['|', ('address_classification', '!=', 'MIXED'), ('picking_type_code', '!=', 'outgoing')]}"/>
                 </div>
             </field>
         </field>

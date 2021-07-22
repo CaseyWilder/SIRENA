@@ -153,6 +153,11 @@ class ShippingMethodMixin(models.AbstractModel):
             'default_packaging_id': False,
             'usps_first_class_mail_type': False,
             'usps_container': False,
-            # Set/unset residential for some specific FedEx shipping services.
-            'is_residential_address': self.delivery_carrier_id.fedex_service_type == 'GROUND_HOME_DELIVERY',
         })
+
+    @api.onchange('fedex_service_type')
+    def onchange_fedex_service_type(self):
+        if self.fedex_service_type == 'GROUND_HOME_DELIVERY':
+            self.is_residential_address = True
+        elif self.fedex_service_type == 'FEDEX_GROUND':
+            self.is_residential_address = False

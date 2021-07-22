@@ -74,14 +74,23 @@ class FedexRequest(FedexRequestBase):
 
         # Handle and parse AddressValidationReply
         formatted_response['status'] = self.response.HighestSeverity
+
         if self.response.HighestSeverity == 'ERROR' or self.response.HighestSeverity == 'FAILURE':
             errors_message = '\n'.join([("%s: %s" % (n.Code, n.Message)) for n in self.response.Notifications if
                                         (n.Severity == 'ERROR' or n.Severity == 'FAILURE')])
             formatted_response['errors_message'] = errors_message
+            return formatted_response
+
+        if self.response.AddressResults[0] is None:
+            formatted_response['errors_message'] = 'Something went wrong, please try again!'
+            return formatted_response
+
         if any([n.Severity == 'WARNING' for n in self.response.Notifications]):
             warnings_message = '\n'.join(
                 [("%s: %s" % (n.Code, n.Message)) for n in self.response.Notifications if n.Severity == 'WARNING'])
             formatted_response['warnings_message'] = warnings_message
+
+        formatted_response['matching_state'] = self.response.AddressResults[0].State
         formatted_response['validated_address'] = self.response.AddressResults[0].EffectiveAddress
         formatted_response['address_classification'] = self.response.AddressResults[0].Classification
         formatted_response['current_address'] = {'StreetLines': [delivery_address.street, delivery_address.street2 or ''],
