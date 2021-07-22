@@ -15,7 +15,7 @@ class ResPartner(models.Model):
     def get_validated_address(self, result):
         validated_address = result and result['validated_address']
         validated_address_classification = result and result['address_classification']
-        if not validated_address or not validated_address_classification or validated_address_classification == 'UNKNOWN':
+        if not validated_address or not validated_address_classification:
             return
 
         country = self.env['res.country'].search([('code', '=', validated_address.CountryCode)], limit=1)
