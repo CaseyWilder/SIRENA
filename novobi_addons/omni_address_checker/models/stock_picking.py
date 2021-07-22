@@ -41,3 +41,21 @@ class StockPicking(models.Model):
             },
             'target': 'new'
         }
+
+    @api.onchange('fedex_service_type')
+    def onchange_fedex_service_type(self):
+        super().onchange_fedex_service_type()
+        if self.fedex_service_type not in ['FEDEX_GROUND', 'GROUND_HOME_DELIVERY']:
+            self.is_residential_address = self.address_classification == 'RESIDENTIAL'
+
+    def open_create_label_form(self):
+        # Set the default value for is_residential_address when opening the Create Label form:
+        # + GROUND_HOME_DELIVERY -> True
+        # + FEDEX_GROUND -> False
+        # + Else, set based on address_classification of delivery address.
+        self.ensure_one()
+        if self.fedex_service_type in ['FEDEX_GROUND', 'GROUND_HOME_DELIVERY']:
+            self.is_residential_address = self.fedex_service_type == 'GROUND_HOME_DELIVERY'
+        else:
+            self.is_residential_address = self.address_classification == 'RESIDENTIAL'
+        return super().open_create_label_form()

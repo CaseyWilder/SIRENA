@@ -11,19 +11,19 @@
                     <field name="address_classification" invisible="1"/>
                     <button name="action_validate_address" title="This address is not validated. Click to check"
                             type="object" class="btn-link text-warning m-0 ml-3" icon="fa-question-circle"
-                            style="vertical-align: baseline; padding: 0 !important"
+                            style="font-size: 1.3rem; vertical-align: baseline; padding: 0 !important"
                             attrs="{'invisible': ['|', ('address_classification', '!=', False), ('picking_type_code', '!=', 'outgoing')]}"/>
-                    <button name="action_validate_address" title="This is a residential address." disabled="1"
-                            type="object" class="btn-link text-primary m-0 ml-3" icon="fa-home"
-                            style="vertical-align: baseline; padding: 0 !important"
+                    <i name="action_validate_address" title="This is a residential address." disabled="1"
+                            type="object" class="text-primary m-0 ml-3 fa fa-home"
+                            style="font-size: 1.5rem; vertical-align: baseline; padding: 0 !important"
                             attrs="{'invisible': ['|', ('address_classification', '!=', 'RESIDENTIAL'), ('picking_type_code', '!=', 'outgoing')]}"/>
-                    <button name="action_validate_address" title="This is a business address." disabled="1"
-                            type="object" class="btn-link text-primary m-0 ml-3" icon="fa-building-o"
-                            style="vertical-align: baseline; padding: 0 !important"
+                    <i name="action_validate_address" title="This is a business address." disabled="1"
+                            type="object" class="text-primary m-0 ml-3 fa fa-building-o"
+                            style="font-size: 1.5rem; vertical-align: baseline; padding: 0 !important"
                             attrs="{'invisible': ['|', ('address_classification', '!=', 'BUSINESS'), ('picking_type_code', '!=', 'outgoing')]}"/>
-                    <button name="action_validate_address" title="This address is undetermined." disabled="1"
-                            type="object" class="btn-link text-primary m-0 ml-3" icon="fa-map-marker"
-                            style="vertical-align: baseline; padding: 0 !important"
+                    <i name="action_validate_address" title="This address is undetermined." disabled="1"
+                            type="object" class="text-primary m-0 ml-3 fa fa-map-marker"
+                            style="font-size: 1.5rem; vertical-align: baseline; padding: 0 !important"
                             attrs="{'invisible': ['|', ('address_classification', '!=', 'MIXED'), ('picking_type_code', '!=', 'outgoing')]}"/>
                 </div>
             </field>

@@ -157,7 +157,4 @@ class ShippingMethodMixin(models.AbstractModel):
 
     @api.onchange('fedex_service_type')
     def onchange_fedex_service_type(self):
-        if self.fedex_service_type == 'GROUND_HOME_DELIVERY':
-            self.is_residential_address = True
-        elif self.fedex_service_type == 'FEDEX_GROUND':
-            self.is_residential_address = False
+        self.is_residential_address = self.fedex_service_type == 'GROUND_HOME_DELIVERY'

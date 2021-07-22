@@ -438,16 +438,6 @@ class Picking(models.Model):
             total_product_weight = product_weight_in_lbs * ml.quantity_done
             total_move_weight += total_product_weight
 
-        # If there is address_classification column from omni_address_checker module,
-        # set the default value for is_residential_address:
-        # + GROUND_HOME_DELIVERY -> True
-        # + FEDEX_GROUND -> False
-        # + Else, set based on address_classification of delivery address.
-        if hasattr(self, 'address_classification'):
-            vals['is_residential_address'] = self.fedex_service_type == 'GROUND_HOME_DELIVERY'\
-                if self.fedex_service_type == 'GROUND_HOME_DELIVERY' or self.fedex_service_type == 'FEDEX_GROUND'\
-                else self.address_classification == 'RESIDENTIAL'
-
         vals.update({
             'package_shipping_weight': round(total_move_weight, 3),
             'shipping_date': fields.Datetime.to_string(max(self.scheduled_date, fields.Datetime.now())),
