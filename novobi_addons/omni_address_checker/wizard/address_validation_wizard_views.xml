@@ -29,14 +29,16 @@
                             <field name="new_state_id" class="o_address_state" readonly="1"/>
                             <field name="new_zip" class="o_address_zip" readonly="1"/>
                             <field name="new_country_id" class="o_address_country" readonly="1"/>
+                            <br/>
+                        </div>
+                        <label for="new_address_classification" string="Address' Classification"/>
+                        <div>
+                            <field name="new_address_classification" readonly="1"/>
                         </div>
                     </group>
                 </group>
-                <group name="address_classification">
-                    <field name="new_address_classification" string="Address' Classification: " readonly="1"/>
-                </group>
                 <footer>
-                    <button name="action_update_new_address" class="btn-primary" string="Use verified address" type="object"/>
+                    <button name="action_update_new_address" class="btn-primary" string="Use validated address" type="object"/>
                     <button special="cancel" string="Keep current address"/>
                 </footer>
             </form>
