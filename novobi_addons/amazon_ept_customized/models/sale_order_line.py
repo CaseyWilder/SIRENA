@@ -19,7 +19,7 @@ class SaleOrderLine(models.Model):
     def _compute_is_amazon_order_item(self):
         products = self.env['amazon.product.ept'].search([('product_id', 'in', self.mapped('product_id').ids)]).mapped('product_id')
         for rec in self:
-            rec.is_amazon_order_item = bool(rec.order_id.state != 'cancel' and rec.order_id.amz_instance_id and rec.product_id.type != 'service' and rec.product_id in products)
+            rec.is_amazon_order_item = bool(rec.order_id.state != 'cancel' and rec.order_id.amz_instance_id and rec.product_id in products)
 
     @api.depends('order_partner_id')
     def _compute_is_florida_tax(self):
@@ -45,9 +45,9 @@ class SaleOrderLine(models.Model):
 
     @api.depends('order_id.picking_ids.shipping_cost')
     def _compute_shipping_cost(self):
-        for rec in self:
+        for rec in self.filtered(lambda x: x.is_amazon_order_item and x.product_id.type != 'service'):
             order = rec.order_id
-            amz_order_lines = order.order_line.filtered('is_amazon_order_item')
+            amz_order_lines = order.order_line.filtered(lambda x: x.is_amazon_order_item and x.product_id.type != 'service')
             if amz_order_lines:
                 shipping_cost = sum(order.picking_ids.filtered(
                     lambda x: x.picking_type_code == 'outgoing' and x.state != 'cancel').mapped('shipping_cost'))
