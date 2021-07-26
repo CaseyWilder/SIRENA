@@ -9,17 +9,17 @@ class SaleOrderLine(models.Model):
     retail_price = fields.Monetary("Retail Price", compute='_compute_gross_pay', store=True)
     amazon_fee = fields.Monetary("Amazon Fee", compute='_compute_gross_pay', store=True)
     gross_pay = fields.Monetary("Gross Pay", compute='_compute_gross_pay', store=True)
-    shipping_cost = fields.Monetary("Shipping Cost", store=True)
+    shipping_cost = fields.Monetary("Shipping Cost",compute='_compute_shipping_cost', store=True)
     gross_profit = fields.Monetary("Gross profit", compute='_compute_net_profit', store=True)
     dealer_cost = fields.Float("Dealer Cost", related='product_id.dealer_cost', store=True)
     net_profit = fields.Monetary("Net Profit", compute='_compute_net_profit', store=True)
     is_florida_tax = fields.Boolean("Is Florida tax?", compute='_compute_is_florida_tax', store=True)
 
-    @api.depends('product_id')
+    @api.depends('product_id', 'order_id.state')
     def _compute_is_amazon_order_item(self):
         products = self.env['amazon.product.ept'].search([('product_id', 'in', self.mapped('product_id').ids)]).mapped('product_id')
         for rec in self:
-            rec.is_amazon_order_item = bool(rec.product_id in products)
+            rec.is_amazon_order_item = bool(rec.order_id.state != 'cancel' and rec.order_id.amz_instance_id and rec.product_id in products)
 
     @api.depends('order_partner_id')
     def _compute_is_florida_tax(self):
@@ -42,6 +42,16 @@ class SaleOrderLine(models.Model):
         for rec in self.filtered('is_amazon_order_item'):
             rec.gross_profit = rec.gross_pay - rec.shipping_cost
             rec.net_profit = rec.gross_profit - rec.product_id.dealer_cost
+
+    @api.depends('order_id.picking_ids.shipping_cost')
+    def _compute_shipping_cost(self):
+        for rec in self.filtered(lambda x: x.is_amazon_order_item and x.product_id.type != 'service'):
+            order = rec.order_id
+            amz_order_lines = order.order_line.filtered(lambda x: x.is_amazon_order_item and x.product_id.type != 'service')
+            if amz_order_lines:
+                shipping_cost = sum(order.picking_ids.filtered(
+                    lambda x: x.picking_type_code == 'outgoing' and x.state != 'cancel').mapped('shipping_cost'))
+                rec.shipping_cost = shipping_cost/len(amz_order_lines)
 
 
 
