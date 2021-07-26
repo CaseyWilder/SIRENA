@@ -15,11 +15,11 @@ class SaleOrderLine(models.Model):
     net_profit = fields.Monetary("Net Profit", compute='_compute_net_profit', store=True)
     is_florida_tax = fields.Boolean("Is Florida tax?", compute='_compute_is_florida_tax', store=True)
 
-    @api.depends('product_id')
+    @api.depends('product_id', 'order_id.state')
     def _compute_is_amazon_order_item(self):
         products = self.env['amazon.product.ept'].search([('product_id', 'in', self.mapped('product_id').ids)]).mapped('product_id')
         for rec in self:
-            rec.is_amazon_order_item = bool(rec.order_id.amz_instance_id and rec.rec.product_id in products)
+            rec.is_amazon_order_item = bool(rec.order_id.state != 'cancel' and rec.order_id.amz_instance_id and rec.product_id.type != 'service' and rec.product_id in products)
 
     @api.depends('order_partner_id')
     def _compute_is_florida_tax(self):
