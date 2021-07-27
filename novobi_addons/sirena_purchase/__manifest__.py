@@ -2,25 +2,24 @@
 # See LICENSE file for full copyright and licensing details.
 
 {
-    'name': 'Sirena Product Template',
-    'summary': 'Modifies/Adds new fields to the Product Template model',
-    'description': 'Adds some customized fields for the product.template model',
+    'name': 'Sirena Purchase Customization',
+    'summary': 'Modifies/Adds customization to purchase models for Sirena',
     'version': '14.1.0.0',
     'category': 'Other',
     'author': 'Novobi LLC',
     "license": "OPL-1",
     'website': 'https://www.novobi.com',
-    'depends': ['product', 'novobi_shipping_account'],
+    'depends': ['purchase', 'sirena_product'],
     'data': [
         # ============================== DATA =================================
+        'data/install_cn_font.xml',
 
         # ============================== SECURITY =============================
 
         # ============================== VIEWS ================================
-        'views/product_template_views.xml',
-        'views/product_packaging_views.xml',
 
         # ============================== REPORT ===============================
+        'report/purchase_order_customization.xml',
 
         # ============================== WIZARD ===============================
 

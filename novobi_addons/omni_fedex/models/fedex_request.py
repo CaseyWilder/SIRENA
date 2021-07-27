@@ -5,6 +5,7 @@ from odoo.addons.delivery_fedex.models.fedex_request import FedexRequest as Fede
 from datetime import datetime, date
 import os
 import logging
+from zeep import Client
 from zeep.exceptions import Fault
 
 _logger = logging.getLogger(__name__)

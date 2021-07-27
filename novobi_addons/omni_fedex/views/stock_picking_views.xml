@@ -24,7 +24,7 @@
                         <div>
                             <div>
                                 <field name="is_residential_address" attrs="{'readonly': [('fedex_service_type','in',['FEDEX_GROUND','GROUND_HOME_DELIVERY'])], 'invisible': [('provider', '!=', 'fedex')]}" force_save="1"/>
-                                <label for="is_residential_address" string="Residential"/>
+                                <label for="is_residential_address" string="Residential (recipient)"/>
                             </div>
                             <div>
                                 <field name="shipping_change_billing"/>
@@ -92,12 +92,22 @@
                        attrs="{'invisible': [('provider', '!=', 'fedex')]}"
                        string="Confirmation" />
             </field>
+            <field name="delivery_carrier_id" position="after">
+                <field name="fedex_service_type" invisible="1"/>
+                <field name="smartpost_indicia" attrs="{'invisible': [('fedex_service_type','!=','SMART_POST')]}" readonly="1"/>
+                <field name="smartpost_ancillary" attrs="{'invisible': [('fedex_service_type','!=','SMART_POST')]}" readonly="1"/>
+                <field name="smartpost_hubId" attrs="{'invisible': [('fedex_service_type','!=','SMART_POST')]}" readonly="1"/>
+            </field>
             <xpath expr="//page[@name='shipping_info_no_label']//div[@name='other_shipping_information']" position="inside">
                 <div class="row other_shipping_information_section"
                      attrs="{'invisible': [('provider', '!=', 'fedex')]}">
                     <div class="col-6 col-lg-6">
                         <div class="o_horizontal_separator">Shipment Options</div>
                         <div>
+                            <div>
+                                <field name="is_residential_address" readonly="1"/>
+                                <label for="is_residential_address" string="Residential (recipient)"/>
+                            </div>
                             <div>
                                 <field name="shipping_change_billing" readonly="1"/>
                                 <label for="shipping_change_billing" string="Change Billing (*)"/>

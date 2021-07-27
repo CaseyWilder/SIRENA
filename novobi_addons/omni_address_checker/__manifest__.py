@@ -2,27 +2,28 @@
 # See LICENSE file for full copyright and licensing details.
 
 {
-    'name': 'Sirena Product Template',
-    'summary': 'Modifies/Adds new fields to the Product Template model',
-    'description': 'Adds some customized fields for the product.template model',
+    'name': 'Shipping Integration: Address Checker',
+    'summary': 'Validate and auto correct delivery address using FedEx',
+    'description': 'Validate and auto correct delivery address using FedEx',
     'version': '14.1.0.0',
     'category': 'Other',
     'author': 'Novobi LLC',
-    "license": "OPL-1",
+    'license': 'OPL-1',
     'website': 'https://www.novobi.com',
-    'depends': ['product', 'novobi_shipping_account'],
+    'depends': ['omni_fedex'],
     'data': [
         # ============================== DATA =================================
 
         # ============================== SECURITY =============================
+        'security/ir.model.access.csv',
 
         # ============================== VIEWS ================================
-        'views/product_template_views.xml',
-        'views/product_packaging_views.xml',
+        'views/stock_picking_views.xml',
 
         # ============================== REPORT ===============================
 
         # ============================== WIZARD ===============================
+        'wizard/address_validation_wizard_views.xml',
 
         # ============================== MENU =================================
 
@@ -32,3 +33,4 @@
     'auto_install': False,
     'application': False,
 }
+
