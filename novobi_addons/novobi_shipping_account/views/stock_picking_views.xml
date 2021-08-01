@@ -217,7 +217,6 @@
                             <field name="shipping_account_delivery_carrier_ids" invisible="1"/>
                             <field name="provider" string="Provider" invisible="1" />
                             <field name="delivery_carrier_id" string="Shipping Service"
-                                   widget="selection_group"
                                    domain="[('shipping_account_id.id','=',shipping_account_id), ('id', 'in', shipping_account_delivery_carrier_ids)]"
                                    options="{'no_create': True, 'no_open': True}" required="1"
                                    attrs="{'invisible': [('provider', '=', False)], 'required': [('provider', '!=', False)]}"
