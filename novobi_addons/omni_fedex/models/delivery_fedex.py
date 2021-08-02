@@ -554,7 +554,11 @@ class ProviderFedex(models.Model):
         if delivery_time is None:
             delivery_time = self.fedex_get_rate_and_delivery_time(picking=picking, product_packaging=product_packaging,
                                                                   package_length=package_length, package_width=package_width, package_height= package_height,
-                                                                  weight=weight, shipping_options={}, pickup_date=pickup_date, insurance_amount=0.0)['estimated_date'] + ' (subject to change)'
+                                                                  weight=weight, shipping_options={}, pickup_date=pickup_date, insurance_amount=0.0)['estimated_date']
+            if delivery_time is not None:
+                delivery_time += ' (subject to change)'
+            else:
+                delivery_time = 'N/A'
 
         return {
             'success': True,
