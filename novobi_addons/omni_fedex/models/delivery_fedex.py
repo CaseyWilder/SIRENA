@@ -4,6 +4,7 @@
 from odoo.tools import pdf, DEFAULT_SERVER_DATE_FORMAT
 from odoo import api, models, fields, _, tools
 from odoo.addons.delivery_fedex.models.delivery_fedex import _convert_curr_iso_fdx
+from odoo.exceptions import UserError
 
 from .fedex_request import FedexRequest
 from decimal import Decimal
@@ -152,7 +153,7 @@ class ProviderFedex(models.Model):
 
         request.set_shipper(shipper, warehouse)
         request.set_recipient(recipient)
-        request.set_residential(residential)
+        request.set_residential_recipient(residential)
 
         if not picking.is_mul_packages:
             weight_value = self._fedex_convert_weight_in_ob(weight, unit=self.fedex_weight_unit)
@@ -323,7 +324,7 @@ class ProviderFedex(models.Model):
 
             request.set_shipper(shipper, warehouse)
             request.set_recipient(recipient)
-            request.set_residential(residential)
+            request.set_residential_recipient(residential)
 
             request._shipping_charges_payment(shipping_charge_payment_account, shipping_charge_payment_type)
 
@@ -532,13 +533,28 @@ class ProviderFedex(models.Model):
         # Create return label if user chose "include return label option"
         if advanced_options.get('shipping_include_return_label'):
             tracking_number = carrier_tracking_ref.split(',')[0]
-            self.omni_fedex_get_return_label(picking=picking, product_packaging=product_packaging,
-                                             package_dimension=package_dimension, weight=return_weight,
-                                             pickup_datetime=pickup_datetime, advanced_options=advanced_options,
-                                             tracking_number=tracking_number, origin_date=delivery_time)
+            return_result = self.omni_fedex_get_return_label(picking=picking, product_packaging=product_packaging,
+                                                             package_dimension=package_dimension, weight=return_weight,
+                                                             pickup_datetime=pickup_datetime, advanced_options=advanced_options,
+                                                             tracking_number=tracking_number, origin_date=delivery_time)
+            if return_result['errors_message']:
+                return {
+                    'success': False,
+                    'price': 0.0,
+                    'price_without_discounts': 0.0,
+                    'estimated_date': 'N/A',
+                    'tracking_number': False,
+                    'error_message': _('RETURN LABEL: %s\n') % return_result['errors_message'],
+                    'warning_message': False
+                }
 
         if isinstance(delivery_time, datetime.date):
             delivery_time = str(delivery_time.strftime(DEFAULT_SERVER_DATE_FORMAT))
+
+        if delivery_time is None:
+            delivery_time = self.fedex_get_rate_and_delivery_time(picking=picking, product_packaging=product_packaging,
+                                                                  package_length=package_length, package_width=package_width, package_height= package_height,
+                                                                  weight=weight, shipping_options={}, pickup_date=pickup_date, insurance_amount=0.0)['estimated_date'] + ' (subject to change)'
 
         return {
             'success': True,
@@ -559,6 +575,7 @@ class ProviderFedex(models.Model):
         warehouse = picking.picking_type_id.warehouse_id.partner_id
         recipient = picking.company_id.partner_id
         shipper = picking.partner_id
+        residential_shipper = picking.is_residential_address
 
         order_currency = picking.sale_id.currency_id or picking.company_id.currency_id
 
@@ -579,8 +596,10 @@ class ProviderFedex(models.Model):
 
         request.set_currency(_convert_curr_iso_fdx(order_currency.name))
 
-        request.set_shipper(shipper, warehouse)
+        request.set_shipper(shipper, shipper)
         request.set_recipient(recipient)
+        request.set_residential_recipient(False)
+        request.set_residential_shipper(residential_shipper)
 
         shipping_charge_payment_account = shipping_account.fedex_account_number
         shipping_charge_payment_type = 'SENDER'
@@ -646,6 +665,12 @@ class ProviderFedex(models.Model):
 
             request.duties_payment(warehouse, shipping_account.fedex_account_number, 'SENDER')
 
+        if advanced_options.get('shipping_include_return_label'):
+            request.shipment_request_special_services(advanced_options={}, advanced_option_values={})
+
+        if self.fedex_service_type == 'SMART_POST':
+            request.set_smartpost_detail(picking.smartpost_indicia, picking.smartpost_ancillary, picking.smartpost_hubId)
+
         request.return_label(tracking_number, origin_date)
 
         response = request.process_shipment()
@@ -661,6 +686,7 @@ class ProviderFedex(models.Model):
                             for index, label in enumerate(request._get_labels(self.fedex_label_file_type))]
 
             picking.message_post(body=_('Return Label'), attachments=fedex_labels)
+            return {'errors_message': False}
 
             # return {'success': True,
             #         'return_price': price,
@@ -669,7 +695,9 @@ class ProviderFedex(models.Model):
             title = 'Cannot create return label !'
             exceptions = [{'title': 'Message from fedEx',
                            'reason': response['errors_message']}]
-            picking._log_exceptions_on_picking(title, exceptions)
+            #picking._log_exceptions_on_picking(title, exceptions)
+            _logger.error(response['errors_message'])
+            return {'errors_message': response['errors_message']}
 
     @api.model
     def fedex_void_label(self, picking, master_tracking_id=False):
