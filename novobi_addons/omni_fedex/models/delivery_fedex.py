@@ -673,7 +673,7 @@ class ProviderFedex(models.Model):
             request.shipment_request_special_services(advanced_options={}, advanced_option_values={})
 
         if self.fedex_service_type == 'SMART_POST':
-            request.set_smartpost_detail(picking.smartpost_indicia, picking.smartpost_ancillary, picking.smartpost_hubId)
+            request.set_smartpost_detail('PARCEL_RETURN', 'NONE', picking.smartpost_hubId)
 
         request.return_label(tracking_number, origin_date)
 
