@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="custom_create_label_form_fedex" model="ir.ui.view">
+        <field name="name">custom.create.label.form.fedex</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="novobi_shipping_account.view_picking_create_label_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='shipping_include_return_label']/../label" position="attributes">
+                <attribute name="string">Include a return label with the outgoing shipping label (**)</attribute>
+            </xpath>
+            <xpath expr="//div[@name='notes_section']" position="inside">
+                <div class="mt10" attrs="{'invisible': [('provider', '!=', 'fedex')]}">
+                    <em>(**) Return Label will use FedEx Ground shipping service.</em>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="custom_view_picking_form" model="ir.ui.view">
+        <field name="name">custom.view.picking.form</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="novobi_shipping_account.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='shipping_include_return_label']/../label" position="attributes">
+                <attribute name="string">Include a return label with the outgoing shipping label (**)</attribute>
+            </xpath>
+            <xpath expr="//page[@name='shipping_info_no_label']//div[@name='notes_section']" position="inside">
+                <div class="mt10" attrs="{'invisible': [('provider', '!=', 'fedex')]}">
+                    <em>(**) Return Label will use FedEx Ground shipping service.</em>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
