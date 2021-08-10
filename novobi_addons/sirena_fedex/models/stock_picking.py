@@ -35,5 +35,7 @@ class StockPicking(models.Model):
         # result['context'] = context
         if delivery_carrier_id:
             self.onchange_delivery_carrier_id()
+            if self.default_packaging_id:
+                self._onchange_default_packaging_id()
 
         return result
