@@ -11,6 +11,9 @@ class StockPicking(models.Model):
 
     def action_validate_address(self):
         fedex = self.env['shipping.account'].search([('provider', '=', 'fedex')], limit=1)
+        if not fedex.fedex_account_number or not fedex.fedex_meter_number or not fedex.fedex_developer_key or not fedex.fedex_developer_password:
+            raise UserError('Please add a FedEx shipping account or complete all FedEx credential fields if you haven\'t done so!')
+
         delivery_address = self.partner_id
 
         request = FedexRequest(self.delivery_carrier_id.get_debug_logger_xml(self),

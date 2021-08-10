@@ -73,8 +73,11 @@ class FedexRequest(FedexRequestBase):
         Money.Amount = amount
         self.RequestedShipment.TotalInsuredValue = Money
 
-    def set_residential(self, residential):
+    def set_residential_recipient(self, residential):
         self.RequestedShipment.Recipient.Address.Residential = residential
+
+    def set_residential_shipper(self, residential):
+        self.RequestedShipment.Shipper.Address.Residential = residential
 
     def set_smartpost_detail(self, indicia, ancillary, hubId):
         smart_post_detail = self.factory.SmartPostShipmentDetail()
@@ -402,7 +405,7 @@ class FedexRequest(FedexRequestBase):
                     raise Exception("No rating found")
                 reply = self.response.RateReplyDetails[0]
                 try:
-                    if reply['ServiceType'] == 'FEDEX_GROUND':
+                    if reply['ServiceType'] in ['FEDEX_GROUND', 'GROUND_HOME_DELIVERY']:
                         formatted_response['estimated_delivery_time'] = reply['TransitTime'].replace('_', ' Business ').title()
                     else:
                         formatted_response['estimated_delivery_time'] = reply['DeliveryTimestamp']
