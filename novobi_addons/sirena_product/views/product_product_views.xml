@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_product_form_inherited" model="ir.ui.view">
+        <field name="name">product.product.form.inherited</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <group name="invoicing" position="after">
+                <group name="delivery" string="Delivery">
+                    <field name="packaging_id"/>
+                </group>
+            </group>
+        </field>
+    </record>
+</odoo>
