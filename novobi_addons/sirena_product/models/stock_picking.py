@@ -12,3 +12,8 @@ class StockPicking(models.Model):
         product_ids = self.move_line_ids.mapped('product_id')
         if len(product_ids) == 1:
             self.default_packaging_id = product_ids.packaging_id
+            return
+
+        bom_ids = self.move_ids_without_package.mapped('bom_line_id').mapped('bom_id')
+        if len(bom_ids) == 1:
+            self.default_packaging_id = bom_ids.product_tmpl_id.packaging_id

@@ -26,11 +26,12 @@
                                     <div class="row">
                                         <label for="pay_frequency_id" class="col-lg-3 o_light_label"/>
                                         <field name="pay_frequency_id" class="oe_inline" domain="[('state', '=', 'confirm')]"
-                                               required="1" options="{'no_create': True}"/>
+                                               attrs="{'required': [('allow_payroll', '=', True)]}" options="{'no_create': True}"/>
+                                        <field name="allow_payroll" invisible="1"/>
                                     </div>
                                     <div class="row mt16">
                                         <label for="calculate_salary_by" class="col-lg-3 o_light_label"/>
-                                        <field name="calculate_salary_by" class="oe_inline" required="1"/>
+                                        <field name="calculate_salary_by" class="oe_inline" attrs="{'required': [('allow_payroll', '=', True)]}"/>
                                     </div>
                                 </div>
                             </div>
@@ -48,7 +49,8 @@
                                 <div class="content-group mt16">
                                     <div class="row">
                                         <label for="resource_calendar_id" class="col-lg-3 o_light_label"/>
-                                        <field name="resource_calendar_id" class="oe_inline" options="{'no_create': True}" required="1"/>
+                                        <field name="resource_calendar_id" class="oe_inline" options="{'no_create': True}"
+                                               required="1"/>
                                     </div>
                                 </div>
                             </div>
@@ -66,7 +68,8 @@
                                 <div class="content-group mt16">
                                     <div class="row">
                                         <label for="time_tracking_id" class="col-lg-3 o_light_label"/>
-                                        <field name="time_tracking_id" class="oe_inline" options="{'no_create': True}" required="1"/>
+                                        <field name="time_tracking_id" class="oe_inline" options="{'no_create': True}"
+                                               attrs="{'required': [('allow_payroll', '=', True)]}"/>
                                     </div>
                                 </div>
                             </div>
@@ -90,7 +93,8 @@
                                 <div class="content-group mt16">
                                     <div class="row mt16">
                                         <label for="checkin_method" class="col-lg-3 o_light_label" />
-                                        <field name="checkin_method" widget="radio" class="oe_inline" required="1"/>
+                                        <field name="checkin_method" widget="radio" class="oe_inline"
+                                               attrs="{'required': [('allow_payroll', '=', True)]}"/>
                                     </div>
                                 </div>
                             </div>
@@ -108,11 +112,11 @@
                                 <div class="content-group mt16">
                                     <div class="row">
                                         <label for="overtime_rate" class="col-lg-3 o_light_label"/>
-                                        <field name="overtime_rate" class="oe_inline" required="1"/>
+                                        <field name="overtime_rate" class="oe_inline" attrs="{'required': [('allow_payroll', '=', True)]}"/>
                                     </div>
                                     <div class="row mt16">
                                         <label for="double_overtime_rate" class="col-lg-3 o_light_label"/>
-                                        <field name="double_overtime_rate" class="oe_inline" required="1"/>
+                                        <field name="double_overtime_rate" class="oe_inline" attrs="{'required': [('allow_payroll', '=', True)]}"/>
                                     </div>
                                 </div>
                             </div>
@@ -172,10 +176,10 @@
                                         <div class="col-lg-3">FUTA Tax</div>
                                         <div class="col-lg-9">
                                             <div class="row">
-                                                <field name="override_futa_rate" class="oe_inline" required="1"/>
+                                                <field name="override_futa_rate" class="oe_inline" attrs="{'required': [('allow_payroll', '=', True)]}"/>
                                                 <label for="override_futa_rate" class="o_light_label"/>
                                                 <span attrs="{'invisible': [('override_futa_rate', '=', False)]}">
-                                                    <field name="futa_tax_rate" class="oe_inline text-right" required="1"/>%
+                                                    <field name="futa_tax_rate" class="oe_inline text-right" attrs="{'required': [('allow_payroll', '=', True)]}"/>%
                                                 </span>
                                             </div>
                                         </div>
@@ -199,15 +203,18 @@
                                 <div class="content-group mt16">
                                     <div class="row">
                                         <label for="payroll_expense_account_id" class="col-lg-3 o_light_label"/>
-                                        <field name="payroll_expense_account_id" class="oe_inline" required="1" options="{'no_create': True}"/>
+                                        <field name="payroll_expense_account_id" class="oe_inline"
+                                               attrs="{'required': [('allow_payroll', '=', True)]}" options="{'no_create': True}"/>
                                     </div>
                                     <div class="row mt16">
                                         <label for="bank_account_id" class="col-lg-3 o_light_label"/>
-                                        <field name="bank_account_id" class="oe_inline" required="1" options="{'no_create': True}" context="{'is_payroll_bank_account': 1}"/>
+                                        <field name="bank_account_id" class="oe_inline" attrs="{'required': [('allow_payroll', '=', True)]}"
+                                               options="{'no_create': True}" context="{'is_payroll_bank_account': 1}"/>
                                     </div>
                                     <div class="row mt16">
                                         <label for="payroll_journal_id" class="col-lg-3 o_light_label"/>
-                                        <field name="payroll_journal_id" class="oe_inline" required="1" options="{'no_create': True}"/>
+                                        <field name="payroll_journal_id" class="oe_inline"
+                                               attrs="{'required': [('allow_payroll', '=', True)]}" options="{'no_create': True}"/>
                                     </div>
                                 </div>
                             </div>

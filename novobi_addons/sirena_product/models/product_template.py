@@ -16,4 +16,4 @@ class ProductTemplate(models.Model):
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
-    packaging_id = fields.Many2one(related='product_tmpl_id.packaging_id')
+    packaging_id = fields.Many2one(related='product_tmpl_id.packaging_id', store=True, readonly=False)
