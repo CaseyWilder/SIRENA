@@ -4,6 +4,8 @@ from odoo import fields, models, api, _
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
+    allow_payroll = fields.Boolean(related='company_id.allow_payroll', readonly=False)
+
     # Pay Frequency
     pay_frequency_id = fields.Many2one(related='company_id.pay_frequency_id', readonly=False)
     calculate_salary_by = fields.Selection(related='company_id.calculate_salary_by', readonly=False)

@@ -21,7 +21,8 @@
                             <div class="content-group mt16">
                                 <div class="row">
                                     <label for="paystub_layout_id" class="col-lg-3 o_light_label"/>
-                                    <field name="paystub_layout_id" class="oe_inline" required="1" options="{'no_create': True}"/>
+                                    <field name="paystub_layout_id" class="oe_inline"
+                                           attrs="{'required': [('allow_payroll', '=', True)]}" options="{'no_create': True}"/>
                                 </div>
                             </div>
                         </div>
