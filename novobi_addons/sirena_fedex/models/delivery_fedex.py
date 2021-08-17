@@ -1,26 +1,26 @@
 # Copyright © 2020 Novobi, LLC
 # See LICENSE file for full copyright and licensing details.
 
-from odoo.tools import pdf, DEFAULT_SERVER_DATE_FORMAT
 from odoo import api, models, fields, _, tools
 from odoo.addons.delivery_fedex.models.delivery_fedex import _convert_curr_iso_fdx
-from odoo.exceptions import UserError
 
-from odoo.addons.omni_address_checker.utils.fedex_request import FedexRequest
-from decimal import Decimal
+from odoo.addons.omni_fedex.models.fedex_request import FedexRequest
 
-import datetime
 import logging
 
 _logger = logging.getLogger(__name__)
+
 
 class ProviderFedex(models.Model):
     _inherit = 'delivery.carrier'
 
     def omni_fedex_get_return_label(self, picking, product_packaging, package_dimension, weight, pickup_datetime,
                                     advanced_options={}, tracking_number=None, origin_date=None):
+        # [SRN-94] FedEx Ground for all return labels
         original_shipping_service = self.fedex_service_type
         self.fedex_service_type = 'FEDEX_GROUND'
+        # [SRN-94]
+
         shipping_account = self.shipping_account_id
         package_type = product_packaging.shipper_package_code or 'YOUR_PACKAGING'
 
@@ -125,7 +125,9 @@ class ProviderFedex(models.Model):
 
         request.return_label(tracking_number, origin_date)
 
+        # [SRN-94] FedEx Ground for all return labels
         self.fedex_service_type = original_shipping_service
+        # [SRN-94]
 
         response = request.process_shipment()
 
