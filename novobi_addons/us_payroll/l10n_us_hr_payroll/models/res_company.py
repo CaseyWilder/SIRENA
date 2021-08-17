@@ -8,6 +8,8 @@ _logger = logging.getLogger(__name__)
 class ResCompany(models.Model):
     _inherit = 'res.company'
 
+    allow_payroll = fields.Boolean(default=True)
+
     # Pay Frequency
     pay_frequency_id = fields.Many2one('pay.frequency', 'Pay Frequency')
     calculate_salary_by = fields.Selection([

@@ -19,7 +19,7 @@
                         <div class="content-group mt16">
                             <div class="row">
                                 <div class="col-12">
-                                    <field name="chart_deduction_ids" class="oe_inline" required="1"
+                                    <field name="chart_deduction_ids" class="oe_inline" attrs="{'required': [('allow_payroll', '=', True)]}"
                                            options="{'no_create': True}" widget="many2many_tags"/>
                                 </div>
                             </div>
