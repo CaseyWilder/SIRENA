@@ -32,7 +32,7 @@ class StockPicking(models.Model):
             if not ups:
                 return result
 
-            delivery_carrier_id = ups.delivery_carrier_ids.filtered(lambda r: r.ups_default_service_type == '03')
+            delivery_carrier_id = ups.delivery_carrier_ids.filtered(lambda r: r.ups_default_service_type == '11')
             self.update({
                 'shipping_account_id': ups.id,
                 'delivery_carrier_id': delivery_carrier_id,
