@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_amazon_sku_mapping_lead_manager,sku.amazon.lead.manager,model_amazon_product_mapping,sales_team.group_sale_manager,1,1,1,1
