@@ -41,13 +41,11 @@ class WooProductTemplateEpt(models.Model):
             return False
 
         # changed part: search in product mapping
-        odoo_product = woo_product = False
         woo_product_obj = self.env['woo.product.product.ept']
         product_mapping_obj = self.env['woo.product.mapping']
         product_mapping = product_mapping_obj.search([('woo_sku', '=', product_sku), ('instance_id', '=', woo_instance.id)], limit=1)
-        if product_mapping:
-            odoo_product = product_mapping.odoo_product_id
-            woo_product = product_mapping.woo_product_id
+        odoo_product = product_mapping.odoo_product_id
+        woo_product = product_mapping.woo_product_id
         # end of changed part
 
         if woo_product and not odoo_product:
@@ -75,7 +73,7 @@ class WooProductTemplateEpt(models.Model):
         if not woo_product:
             if not woo_template:
                 # changed part: if product_mapping doesn't exist, check if odoo product exists before creating new one
-                if not odoo_product:
+                if not product_mapping and woo_instance.auto_import_product:
                     odoo_product = self.env['product.product'].search([('default_code', '=', product_sku)], limit=1)
                     odoo_template = odoo_product.product_tmpl_id
                 # end of changed part
@@ -123,16 +121,17 @@ class WooProductTemplateEpt(models.Model):
                 woo_template.write(woo_template_vals)
             woo_product.write(variant_info)
         # changed part: update/create product mapping
-        if not woo_product:
-            woo_product = woo_product_obj.search(
+        woo_product_id = product_mapping.woo_product_id
+        if not woo_product_id:
+            new_woo_product_id = woo_product_obj.search(
                 [('default_code', '=', product_sku), ('woo_instance_id', '=', woo_instance.id)], limit=1)
-        if product_mapping:
-            product_mapping.woo_product_id = woo_product
-        elif woo_product:
+        if product_mapping and not woo_product_id:
+            product_mapping.woo_product_id = new_woo_product_id
+        if not product_mapping and new_woo_product_id:
             product_mapping_obj.create({
-                'odoo_product_id': woo_product.product_id.id,
-                'woo_product_id': woo_product.id,
-                'instance_id': woo_product.woo_instance_id.id
+                'odoo_product_id': new_woo_product_id.product_id.id,
+                'woo_product_id': new_woo_product_id.id,
+                'instance_id': new_woo_product_id.woo_instance_id.id
             })
         # end of changed part
         if update_price:

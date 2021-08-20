@@ -74,12 +74,10 @@ class ActiveProductListingReportEpt(models.Model):
 
             seller_sku = row.get('seller-sku', '').strip()
             # changed part: search in product mapping
-            odoo_product_id = amazon_product_id = False
             product_mapping_obj = self.env['amazon.product.mapping']
             product_mapping = product_mapping_obj.search([('amz_sku', '=', seller_sku), ('instance_id', '=', self.instance_id.id)], limit=1)
-            if product_mapping:
-                odoo_product_id = product_mapping.odoo_product_id
-                amazon_product_id = product_mapping.amazon_product_id
+            odoo_product_id = product_mapping.odoo_product_id
+            amazon_product_id = product_mapping.amazon_product_id
             # end of changed part
 
             if amazon_product_id:
@@ -91,20 +89,20 @@ class ActiveProductListingReportEpt(models.Model):
                                                         float(row.get('price')))
             else:
                 # changed part: if product_mapping doesn't exist, check if odoo product exists before creating new one
-                if not odoo_product_id:
+                if not product_mapping and self.auto_create_product:
                     odoo_product_id = self.env['product.product'].search([('default_code', '=', seller_sku)], limit=1)
                 # end of changed part
                 self.create_odoo_or_amazon_product_ept(odoo_product_id, fulfillment_type, row, log_rec)
             # changed part: update/create product mapping
             if not amazon_product_id:
-                amazon_product_id = amazon_product_ept_obj.search([('seller_sku', '=', seller_sku), ('instance_id', '=', self.instance_id.id)], limit=1)
-            if product_mapping:
-                product_mapping.amazon_product_id = amazon_product_id
-            elif amazon_product_id:
+                new_amazon_product_id = amazon_product_ept_obj.search([('seller_sku', '=', seller_sku), ('instance_id', '=', self.instance_id.id)], limit=1)
+            if product_mapping and not amazon_product_id:
+                product_mapping.amazon_product_id = new_amazon_product_id
+            if not product_mapping and new_amazon_product_id:
                 product_mapping_obj.create({
-                    'odoo_product_id': amazon_product_id.product_id.id,
-                    'amazon_product_id': amazon_product_id.id,
-                    'instance_id': amazon_product_id.instance_id.id
+                    'odoo_product_id': new_amazon_product_id.product_id.id,
+                    'amazon_product_id': new_amazon_product_id.id,
+                    'instance_id': new_amazon_product_id.instance_id.id
                 })
             # end of changed part
 
