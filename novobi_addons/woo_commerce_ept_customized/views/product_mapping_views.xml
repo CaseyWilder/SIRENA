@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_woo_product_mapping_tree" model="ir.ui.view">
+        <field name="name">product.mapping.tree</field>
+        <field name="model">woo.product.mapping</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom" create="1" edit="1">
+                <field name="odoo_product_id" required="1"/>
+                <field name="woo_sku"/>
+                <field name="instance_id" attrs="{'readonly': [('woo_product_id', '!=', False)]}"/>
+                <field name="woo_product_id" readonly="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="woo_product_sku_mapping_search" model="ir.ui.view">
+        <field name="name">woo.product.mapping.search</field>
+        <field name="model">woo.product.mapping</field>
+        <field name="arch" type="xml">
+            <search string="Search">
+                <field name="woo_sku" string="Woo SKU" filter_domain="[('woo_sku', 'ilike', self)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_woo_product_sku_mapping" model="ir.actions.act_window" >
+        <field name="name">Woo Product SKU Mapping</field>
+        <field name="res_model">woo.product.mapping</field>
+        <field name="view_id" ref="view_woo_product_mapping_tree"/>
+        <field name="search_view_id" ref="woo_product_sku_mapping_search"/>
+    </record>
+
+    <menuitem id="menu_action_woo_product_sku_mapping_sales" name="Woo Product SKU Mapping" action="action_woo_product_sku_mapping"
+              parent="sale.prod_config_main"/>
+    <menuitem id="menu_action_woo_product_sku_mapping_inventory" name="Woo Product SKU Mapping" action="action_woo_product_sku_mapping"
+              parent="stock.menu_product_in_config_stock"/>
+    <menuitem id="menu_action_woo_product_sku_mapping_amazon_ept" name="Woo Product SKU Mapping" action="action_woo_product_sku_mapping"
+              parent="woo_commerce_ept.woo_configuration_menu_items"/>
+
+</odoo>
