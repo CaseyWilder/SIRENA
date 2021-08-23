@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="amazon_view_order_line_tree" model="ir.ui.view">
+            <field name="name">amazon.view.order.line.tree</field>
+            <field name="model">sale.order.line</field>
+            <field name="mode">primary</field>
+            <field name="priority">20</field>
+            <field name="arch" type="xml">
+                <tree string="Sales Margin" create="false">
+                    <field name="date_order"/>
+                    <field name="product_id"/>
+                    <field name="order_id"/>
+                    <field name="order_partner_id"/>
+                    <field name="product_uom_qty"/>
+                    <field name="retail_price" sum="Total"/>
+                    <field name="amazon_fee" sum="Total"/>
+                    <field name="gross_pay" sum="Total"/>
+                    <field name="shipping_cost" sum="Total"/>
+                    <field name="gross_profit" sum="Total"/>
+                    <field name="dealer_cost" sum="Total"/>
+                    <field name="net_profit" sum="Total"/>
+                    <field name="line_tax_amount" sum="Total" optional="hide" string="Tax"/>
+                    <field name="is_florida_tax" optional="hide"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_amazon_margin_report" model="ir.actions.act_window" >
+            <field name="name">Amazon Margin Report</field>
+            <field name="res_model">sale.order.line</field>
+            <field name="domain">[('is_amazon_order_item', '=', True)]</field>
+            <field name="view_id" ref="amazon_view_order_line_tree"/>
+        </record>
+
+        <menuitem id="menu_action_amazon_margin_report" name="Amazon Margin Report"
+            parent="amazon_ept.menu_amazon_main_statements"
+            groups="account.group_account_user,amazon_ept.group_amazon_manager_ept"
+            action="action_amazon_margin_report" sequence="19"/>
+    </data>
+</odoo>

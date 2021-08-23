@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_time_tracking_rule_form" model="ir.ui.view">
+        <field name="name">time.tracking.rule.form</field>
+        <field name="model">time.tracking.rule</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group name="top">
+                        <group name="left">
+                            <field name="name"/>
+                            <field name="workweek_start"/>
+                        </group>
+                        <div class="text-muted" colspan="2">
+                            We suggest you make your workweek start on the same day as your pay period.<br/>
+                            If you pay your employees semi-monthly, we recommend you start your pay period on Sunday.
+                        </div>
+                    </group>
+                    <group name="bottom" string="Overtime Rules">
+                        <label for="weekly_ovt"/>
+                        <div name="weekly_ovt">
+                            <field name="weekly_ovt_apply" nolabel="1" class="oe_inline"/>
+                            <span attrs="{'invisible': [('weekly_ovt_apply', '=', False)]}">
+                                <field name="weekly_ovt" nolabel="1" class="oe_inline"/>
+                                <span> Hours</span>
+                            </span>
+                        </div>
+                        <label for="daily_ovt"/>
+                        <div name="daily_ovt">
+                            <field name="daily_ovt_apply" nolabel="1" class="oe_inline"/>
+                            <span attrs="{'invisible': [('daily_ovt_apply', '=', False)]}">
+                                <field name="daily_ovt" nolabel="1" class="oe_inline" attrs="{'required': [('daily_ovt_apply', '=', True)]}"/>
+                                <span> Hours</span>
+                            </span>
+                        </div>
+                        <label for="daily_double_ovt"/>
+                        <div name="daily_double_ovt">
+                            <field name="daily_double_ovt_apply" nolabel="1" class="oe_inline"/>
+                            <span attrs="{'invisible': [('daily_double_ovt_apply', '=', False)]}">
+                                <field name="daily_double_ovt" nolabel="1" class="oe_inline" attrs="{'required': [('daily_double_ovt_apply', '=', True)]}"/>
+                                <span> Hours</span>
+                            </span>
+                        </div>
+                        <label for="consecutive_7_days"/>
+                        <div name="consecutive_7_days">
+                            <field name="consecutive_7_days" nolabel="1" class="oe_inline"/>
+                            <span attrs="{'invisible': [('consecutive_7_days', '=', True)]}">
+                                (No, my state doesn't require overtime on the 7th consecutive day of work)
+                            </span>
+                            <span attrs="{'invisible': [('consecutive_7_days', '=', False)]}">
+                                (Yes, my state requires overtime on the 7th consecutive day of work)
+                            </span>
+                        </div>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_time_tracking_rule_wizard_form" model="ir.ui.view">
+        <field name="name">time.tracking.rule.wizard</field>
+        <field name="model">time.tracking.rule</field>
+        <field name="inherit_id" ref="view_time_tracking_rule_form"/>
+        <field name="mode">primary</field>
+        <field name="priority" eval="50"/>
+        <field name="arch" type="xml">
+            <sheet position="after">
+                <footer>
+                    <button name="button_onboarding_confirm" type="object" class="btn-primary" string="Set as company default" />
+                    <button string="Cancel" class="btn-secondary" special="cancel" />
+                </footer>
+            </sheet>
+        </field>
+    </record>
+
+    <record id="view_time_tracking_rule_tree" model="ir.ui.view">
+        <field name="name">time.tracking.rule.tree</field>
+        <field name="model">time.tracking.rule</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="workweek_start"/>
+                <field name="weekly_ovt" attrs="{'invisible': [('weekly_ovt_apply', '=', False)]}"/>
+                <field name="weekly_ovt_apply" invisible="1"/>
+                <field name="daily_ovt" attrs="{'invisible': [('daily_ovt_apply', '=', False)]}"/>
+                <field name="daily_ovt_apply" invisible="1"/>
+                <field name="daily_double_ovt" attrs="{'invisible': [('daily_double_ovt_apply', '=', False)]}"/>
+                <field name="daily_double_ovt_apply" invisible="1"/>
+                <field name="consecutive_7_days"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_view_time_tracking_rule" model="ir.actions.act_window">
+        <field name="name">Overtime Rules</field>
+        <field name="res_model">time.tracking.rule</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

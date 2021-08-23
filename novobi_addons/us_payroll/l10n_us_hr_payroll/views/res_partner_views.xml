@@ -1,0 +1,16 @@
+<odoo>
+    <record id="res_partner_view_form_inherit_payroll" model="ir.ui.view">
+        <field name="name">res.partner.form.payroll</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <label for="street" position="before">
+                <field name="employee_id"/>
+            </label>
+            <field name="city" position="after">
+                <field name="county" placeholder="County" class="o_address_city"
+                       attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+            </field>
+        </field>
+    </record>
+</odoo>

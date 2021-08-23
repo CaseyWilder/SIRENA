@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!-- Update default companies for some default users. Only run when install new sirena_base -->
+    <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'base'), ('name', 'in', ['user_root', 'user_admin'])]"/>
+        </function>
+        <value eval="{'noupdate': False}"/>
+    </function>
+
+    <record id="base.user_root" model="res.users">
+        <field name="company_ids" eval="[(4, ref('sirena_base.sirena_inc_ottawa')), (4, ref('sirena_base.paradise'))]"/>
+    </record>
+
+    <record id="base.user_admin" model="res.users">
+        <field name="company_ids" eval="[(4, ref('sirena_base.sirena_inc_ottawa')), (4, ref('sirena_base.paradise'))]"/>
+    </record>
+
+    <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'base'), ('name', 'in', ['user_root', 'user_admin'])]"/>
+        </function>
+        <value eval="{'noupdate': True}"/>
+    </function>
+</odoo>

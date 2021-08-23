@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="GetRateButton">
+        <div>
+            <span class="estimated_shipping_rate_value"></span>
+            <button class="btn oe_inline btn-link"
+               style="color:#008784; margin-left:10px"
+               data-original-title="" title="">
+                <i class="fa fa-arrow-right"></i> Get rate</button>
+            <div class="loader" style="display:none;margin-left:10px"/>
+        </div>
+    </t>
+    <t t-name="CustomFieldMany2ManyCheckBoxes">
+        <div aria-atomic="true">
+            <div t-if="widget.mode !== 'readonly'">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" id="select_all" class="custom-control-input"/>
+                    <label class="custom-control-label o_form_label" for="select_all">Select All</label>
+                </div>
+            </div>
+            <div t-foreach="widget.m2mValues" t-as="m2m_value">
+                <t t-set="id_for_label" t-value="'o_many2many_checkbox_' + _.uniqueId()"/>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" t-att-id="id_for_label"
+                           class="custom-control-input"
+                           t-att-data-record-id="JSON.stringify(m2m_value[0])"/>
+                    <label t-att-for="id_for_label"
+                           style="font-weight:normal !important;"
+                           class="custom-control-label o_form_label"><t t-esc="m2m_value[1]"/></label>
+                </div>
+            </div>
+        </div>
+    </t>
+    <t t-name="CustomGroupByMany2ManyCheckBoxes">
+        <div aria-atomic="true" class="custom-groupby-many2many">
+            <div t-foreach="widget.groups" t-as="group">
+                <div>
+                    <div class="custom-control custom-checkbox group-name" t-if="widget.mode !== 'readonly'">
+                        <input type="checkbox"
+                               t-att-data-group-name="group" t-attf-id="input_#{group_index}" class="select_all custom-control-input"/>
+                        <label class="custom-control-label o_form_label" t-attf-for="input_#{group_index}">
+                            <t t-esc="group"/>
+                        </label>
+                    </div>
+                    <div class="group-name" t-else="">
+                        <label class="o_form_label"><t t-esc="group"/></label>
+                    </div>
+                    <div class="group-elements">
+                        <div class="group-element"
+                             t-foreach="widget.groupValues[group]" t-as="m2m_value">
+                            <t t-set="id_for_label" t-value="'o_many2many_checkbox_' + _.uniqueId()"/>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" t-att-id="id_for_label"
+                                       class="custom-control-input record-id"
+                                       t-att-data-group-name="group"
+                                       t-att-data-record-id="JSON.stringify(m2m_value[0])"/>
+                                <label t-att-for="id_for_label"
+                                       style="font-weight:normal !important;"
+                                       class="custom-control-label o_form_label"><t t-esc="m2m_value[1]"/></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+    <t t-name="NovobiShippingAccount.CancelCreateLabelButton">
+        <button type="button" class="btn btn-secondary">Cancel</button>
+    </t>
+
+    <t t-name="novobi_shipping_account.FieldBooleanButton" owl="1">
+        <div class="o_stat_info">
+            <span t-attf-class="o_stat_text o_not_hover {{props.text_color}}">
+                <t t-esc="props.text"/>
+            </span>
+            <span t-attf-class="o_stat_text o_hover {{props.hover_color}}">
+                <t t-esc="props.hover"/>
+            </span>
+        </div>
+    </t>
+
+</templates>

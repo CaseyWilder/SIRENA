@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_employee_form_inherit_timesheet" model="ir.ui.view">
+        <field name="name">hr.employee.form.timesheet.payroll</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr_timesheet.hr_employee_view_form_inherit_timesheet"/>
+        <field name="arch" type="xml">
+            <button name="%(hr_timesheet.timesheet_action_from_employee)d" position="replace"/>
+            <xpath expr="//div[hasclass('oe_button_box')]/button[1]" position="before">
+                <button name="%(hr_timesheet.timesheet_action_from_employee)d" icon="fa-calendar" class="oe_stat_button" type="action">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Timesheets</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

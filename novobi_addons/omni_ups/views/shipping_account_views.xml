@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_shipping_account_form_settings_ups" model="ir.ui.view">
+            <field name="name">shipping.account.form.settings.ups</field>
+            <field name="model">shipping.account</field>
+            <field name="inherit_id" ref="novobi_shipping_account.view_shipping_account_form_settings" />
+            <field name="arch" type="xml">
+                <field name="provider" position="after">
+                    <field name="ups_username"
+                           attrs="{'required':[('provider', '=', 'ups')], 'invisible':[('provider', '!=', 'ups')]}"/>
+                    <field name="ups_passwd"
+                           password="True"
+                           attrs="{'required':[('provider', '=', 'ups')], 'invisible':[('provider', '!=', 'ups')]}"/>
+                    <field name="ups_shipper_number"
+                           attrs="{'required':[('provider', '=', 'ups')], 'invisible':[('provider', '!=', 'ups')]}"/>
+                    <field name="ups_access_number"
+                           attrs="{'required':[('provider', '=', 'ups')], 'invisible':[('provider', '!=', 'ups')]}"/>
+                    <field name="handling_fee"
+                           attrs="{'required':[('provider', '=', 'ups')], 'invisible':[('provider', '!=', 'ups')]}"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>

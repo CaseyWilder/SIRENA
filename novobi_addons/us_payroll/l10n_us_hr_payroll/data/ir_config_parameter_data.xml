@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="x-api-key" model="ir.config_parameter">
+        <field name="key">x-api-key</field>
+        <field name="value">x-api-key</field>
+    </record>
+
+    <record id="vertex-url" model="ir.config_parameter">
+        <field name="key">vertex-url</field>
+        <field name="value">https://api-gateway.novobi.com/payroll</field>
+    </record>
+</odoo>

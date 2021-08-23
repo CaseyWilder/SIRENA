@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_picking_create_label_form_fedex" model="ir.ui.view">
+        <field name="name">stock.picking.create.label.form.fedex</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="novobi_shipping_account.view_picking_create_label_form"/>
+        <field name="arch" type="xml">
+            <field name="custom_packaging_name" position="after">
+                <field name="fedex_service_type" invisible="1"/>
+                <field name="smartpost_indicia" attrs="{'invisible': [('fedex_service_type','!=','SMART_POST')]}"/>
+                <field name="smartpost_ancillary" attrs="{'invisible': [('fedex_service_type','!=','SMART_POST')]}"/>
+                <field name="smartpost_hubId" attrs="{'invisible': [('fedex_service_type','!=','SMART_POST')]}"/>
+            </field>
+            <field name="shipping_date" position="after">
+                <field name="fedex_shipping_confirmation"
+                       attrs="{'invisible': [('provider', '!=', 'fedex')]}"
+                       string="Confirmation" />
+            </field>
+            <xpath expr="//div[@name='other_shipping_information']" position="inside">
+                <div class="row other_shipping_information_section"
+                     attrs="{'invisible': [('provider', '!=', 'fedex')]}">
+                    <div class="col-6 col-lg-6">
+                        <div class="o_horizontal_separator">Shipment Options</div>
+                        <div>
+                            <div>
+                                <field name="is_residential_address" attrs="{'readonly': [('fedex_service_type','in',['FEDEX_GROUND','GROUND_HOME_DELIVERY'])], 'invisible': [('provider', '!=', 'fedex')]}" force_save="1"/>
+                                <label for="is_residential_address" string="Residential (recipient)"/>
+                            </div>
+                            <div>
+                                <field name="shipping_change_billing"/>
+                                <label for="shipping_change_billing" string="Change Billing (*)"/>
+                            </div>
+                            <div attrs="{'invisible': [('shipping_change_billing', '!=', True)]}" class="inner_input_section">
+                                <div class="shipping_customer_account">
+                                    <label for="shipping_customer_account" string="Customer Account"/>
+                                    <field name="shipping_customer_account" string="Customer Account"
+                                           attrs="{'required': [('provider', '=', 'fedex'), ('shipping_change_billing', '=', True)]}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-6">
+                        <div class="o_horizontal_separator">Label Options</div>
+                        <div>
+                            <field name="shipping_include_return_label"/>
+                            <label for="shipping_include_return_label" string="Include a return label with the outgoing shipping label"/>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-6">
+                        <div class="o_horizontal_separator">Delivery Options</div>
+                        <div>
+                            <div>
+                                <field name="shipping_cod"/>
+                                <label for="shipping_cod" string="Collect payment on delivery (C.O.D.)"/>
+                            </div>
+                            <div attrs="{'invisible': [('shipping_cod', '!=', True)]}" class="inner_input_section">
+                                <div class="shipping_cod_payment_type">
+                                    <label for="shipping_cod_payment_type" string="Payment Type"/>
+                                    <field name="shipping_cod_payment_type"
+                                           attrs="{'required': [('shipping_cod', '=', True)]}"/>
+                                </div>
+                                <div class="shipping_cod_amount">
+                                    <label for="shipping_cod_amount" string="Amount"/>
+                                    <field name="shipping_cod_amount"
+                                           attrs="{'required': [('shipping_cod', '=', True)]}"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <field name="shipping_saturday_delivery"/>
+                            <label for="shipping_saturday_delivery" string="Saturday Delivery"/>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+            <xpath expr="//div[@name='notes_section']" position="inside">
+                <div class="mt16" attrs="{'invisible': [('provider', '!=', 'fedex')]}">
+                    <em>(*) Use Change Billing to charge the label fee to customer account.
+                        Must be a valid account for the selected carrier.</em>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_picking_form" model="ir.ui.view">
+        <field name="name">stock.picking.form.fedex</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="novobi_shipping_account.view_picking_form"/>
+        <field name="arch" type="xml">
+            <field name="shipping_date" position="after">
+                <field name="fedex_shipping_confirmation" readonly="1"
+                       attrs="{'invisible': [('provider', '!=', 'fedex')]}"
+                       string="Confirmation" />
+            </field>
+            <field name="delivery_carrier_id" position="after">
+                <field name="fedex_service_type" invisible="1"/>
+                <field name="smartpost_indicia" attrs="{'invisible': [('fedex_service_type','!=','SMART_POST')]}" readonly="1"/>
+                <field name="smartpost_ancillary" attrs="{'invisible': [('fedex_service_type','!=','SMART_POST')]}" readonly="1"/>
+                <field name="smartpost_hubId" attrs="{'invisible': [('fedex_service_type','!=','SMART_POST')]}" readonly="1"/>
+            </field>
+            <xpath expr="//page[@name='shipping_info_no_label']//div[@name='other_shipping_information']" position="inside">
+                <div class="row other_shipping_information_section"
+                     attrs="{'invisible': [('provider', '!=', 'fedex')]}">
+                    <div class="col-6 col-lg-6">
+                        <div class="o_horizontal_separator">Shipment Options</div>
+                        <div>
+                            <div>
+                                <field name="is_residential_address" readonly="1"/>
+                                <label for="is_residential_address" string="Residential (recipient)"/>
+                            </div>
+                            <div>
+                                <field name="shipping_change_billing" readonly="1"/>
+                                <label for="shipping_change_billing" string="Change Billing (*)"/>
+                            </div>
+                            <div attrs="{'invisible': [('shipping_change_billing', '!=', True)]}" class="inner_input_section">
+                                <div class="shipping_customer_account">
+                                    <label for="shipping_customer_account" string="Customer Account"/>
+                                    <field name="shipping_customer_account" string="Customer Account"
+                                           attrs="{'required': [('provider', '=', 'fedex'), ('shipping_change_billing', '=', True)]}" readonly="1"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-6">
+                        <div class="o_horizontal_separator">Label Options</div>
+                        <div>
+                            <field name="shipping_include_return_label" readonly="1"/>
+                            <label for="shipping_include_return_label" string="Include a return label with the outgoing shipping label"/>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-6">
+                        <div class="o_horizontal_separator">Delivery Options</div>
+                        <div>
+                            <div>
+                                <field name="shipping_cod" readonly="1"/>
+                                <label for="shipping_cod" string="Collect payment on delivery (C.O.D.)"/>
+                            </div>
+                            <div attrs="{'invisible': [('shipping_cod', '!=', True)]}" class="inner_input_section">
+                                <div class="shipping_cod_payment_type">
+                                    <label for="shipping_cod_payment_type" string="Payment Type"/>
+                                    <field name="shipping_cod_payment_type"
+                                           attrs="{'required': [('shipping_cod', '=', True)]}" readonly="1"/>
+                                </div>
+                                <div class="shipping_cod_amount">
+                                    <label for="shipping_cod_amount" string="Amount"/>
+                                    <field name="shipping_cod_amount"
+                                           attrs="{'required': [('shipping_cod', '=', True)]}" readonly="1"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <field name="shipping_saturday_delivery" readonly="1"/>
+                            <label for="shipping_saturday_delivery" string="Saturday Delivery"/>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+            <xpath expr="//page[@name='shipping_info_no_label']//div[@name='notes_section']" position="inside">
+                <div class="mt16" attrs="{'invisible': [('provider', '!=', 'fedex')]}">
+                    <em>(*) Use Change Billing to charge the label fee to customer account.
+                        Must be a valid account for the selected carrier.</em>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

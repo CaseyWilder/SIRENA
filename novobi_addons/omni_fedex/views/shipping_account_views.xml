@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_shipping_account_form_settings_fedex" model="ir.ui.view">
+            <field name="name">shipping.account.form.settings.fedex</field>
+            <field name="model">shipping.account</field>
+            <field name="inherit_id" ref="novobi_shipping_account.view_shipping_account_form_settings" />
+            <field name="arch" type="xml">
+                <field name="provider" position="after">
+                    <field name="fedex_developer_key"
+                           attrs="{'required':[('provider', '=', 'fedex')], 'invisible':[('provider', '!=', 'fedex')]}"/>
+                    <field name="fedex_developer_password"
+                           password="True"
+                           attrs="{'required':[('provider', '=', 'fedex')], 'invisible':[('provider', '!=', 'fedex')]}"/>
+                    <field name="fedex_account_number"
+                           attrs="{'required':[('provider', '=', 'fedex')], 'invisible':[('provider', '!=', 'fedex')]}"/>
+                    <field name="fedex_meter_number"
+                           attrs="{'required':[('provider', '=', 'fedex')], 'invisible':[('provider', '!=', 'fedex')]}"/>
+                    <field name="handling_fee"
+                           attrs="{'required':[('provider', '=', 'fedex')], 'invisible':[('provider', '!=', 'fedex')]}"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>

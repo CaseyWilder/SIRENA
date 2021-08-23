@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_paycheck_report_filter" model="ir.ui.view">
+        <field name="name">payroll.payslip.search.paycheck</field>
+        <field name="model">payroll.payslip</field>
+        <field name="mode">primary</field>
+        <field name="priority">50</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="employee_id"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_period" string="Pay Period" context="{'group_by': 'pay_period_id'}"/>
+                    <separator/>
+                    <filter name="group_by_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                    <separator/>
+                    <filter name="group_by_pay_date" string="Pay Date" context="{'group_by': 'pay_date'}"/>
+                    <separator/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_paycheck_report" model="ir.actions.act_window">
+        <field name="name">Paycheck Detail Reports</field>
+        <field name="res_model">payroll.payslip</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_paycheck_report_filter"/>
+        <field name="context">{
+            'search_default_group_by_period': 1,
+            'custom_export': 1,
+            'remove_external_id': 1,
+            'tree_view_ref': 'l10n_us_hr_payroll_reports.view_payslip_tree_paycheck'}
+        </field>
+        <field name="domain">[('state', '=', 'done')]</field>
+    </record>
+</odoo>

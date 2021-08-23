@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_amazon_product_mapping_tree" model="ir.ui.view">
+        <field name="name">product.mapping.tree</field>
+        <field name="model">amazon.product.mapping</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom" create="1" edit="1">
+                <field name="odoo_product_id" required="1"/>
+                <field name="amz_sku"/>
+                <field name="instance_id" attrs="{'readonly': [('amazon_product_id', '!=', False)]}"/>
+                <field name="amazon_product_id" readonly="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="amazon_product_sku_mapping_search" model="ir.ui.view">
+        <field name="name">amazon.product.mapping.search</field>
+        <field name="model">amazon.product.mapping</field>
+        <field name="arch" type="xml">
+            <search string="Search">
+                <field name="amz_sku" string="Amazon SKU" filter_domain="[('amz_sku', 'ilike', self)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_amazon_product_sku_mapping" model="ir.actions.act_window" >
+        <field name="name">Amazon Product SKU Mapping</field>
+        <field name="res_model">amazon.product.mapping</field>
+        <field name="view_id" ref="view_amazon_product_mapping_tree"/>
+        <field name="search_view_id" ref="amazon_product_sku_mapping_search"/>
+    </record>
+
+    <menuitem id="menu_action_amazon_product_sku_mapping_sales" name="Amazon Product SKU Mapping" action="action_amazon_product_sku_mapping"
+              parent="sale.prod_config_main"/>
+    <menuitem id="menu_action_amazon_product_sku_mapping_inventory" name="Amazon Product SKU Mapping" action="action_amazon_product_sku_mapping"
+              parent="stock.menu_product_in_config_stock"/>
+    <menuitem id="menu_action_amazon_product_sku_mapping_amazon_ept" name="Amazon Product SKU Mapping" action="action_amazon_product_sku_mapping"
+              parent="amazon_ept.menu_configuration_ept"/>
+
+</odoo>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <menuitem id="menu_hr_public_holidays"
+              name="Public Holidays"
+              parent="hr_holidays.menu_hr_holidays_configuration"
+              sequence="20"/>
+
+    <menuitem id="menu_holidays_public_view"
+              action="action_hr_public_holiday"
+              parent="menu_hr_public_holidays"
+              sequence="10"/>
+              
+    <menuitem id="menu_generate_holidays"
+              action="action_generate_holidays"
+              parent="menu_hr_public_holidays"
+              groups="hr_holidays.group_hr_holidays_manager"
+              sequence="20"/>
+</odoo>

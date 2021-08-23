@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="ir_cron_auto_generate_public_holiday" model="ir.cron">
+        <field name="name">Public Holidays: Auto generate public holiday and leaves</field>
+        <field name="active" eval="True"/>
+        <field name="model_id" ref="model_hr_public_holidays"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_generate_public_holiday()</field>
+        <field name="interval_number">12</field>
+        <field name="interval_type">months</field>
+        <field name="nextcall" eval="(DateTime.now().date().replace(year=DateTime.now().year + 1,month=12, day=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="numbercall">-1</field>
+    </record>
+
+</odoo>

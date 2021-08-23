@@ -1,0 +1,1 @@
+{"VoidShipmentResponse":{"Response":{"ResponseStatus":{"Code":"1", "Description":"Success"}, "TransactionReference":{"CustomerContext":"Novobi", "TransactionIdentifier":"ciewgss11d81bzHqMYT73R"}}, "SummaryResult":{"Status":{"Code":"1", "Description":"Voided"}}}}

@@ -1,0 +1,57 @@
+<odoo>
+    <!-- Parent menus-->
+    <menuitem id="menu_generate_reports"
+              name="Generate reports"
+              parent="l10n_us_hr_payroll.menu_us_payroll_report"
+              sequence="50"/>
+
+    <menuitem id="menu_reports_list"
+              name="Reports"
+              parent="l10n_us_hr_payroll.menu_us_payroll_report"
+              sequence="60"/>
+
+    <!--941-->
+    <menuitem action="action_quarter_tax_report"
+              id="menu_941_list"
+              parent="menu_reports_list"
+              sequence="5"/>
+
+    <menuitem action="action_quarter_tax_report_wizard"
+              id="menu_941_create"
+              parent="menu_generate_reports"
+              sequence="5"/>
+
+    <!--W2-->
+    <menuitem action="action_wage_tax_report"
+              id="menu_w2_list"
+              parent="menu_reports_list"
+              sequence="10"/>
+
+    <menuitem action="action_wage_tax_report_wizard"
+              id="menu_w2_create"
+              parent="menu_generate_reports"
+              sequence="10"/>
+
+    <!--941 Form B-->
+    <menuitem action="action_semiweekly_tax_report"
+              id="menu_941_formb_list"
+              parent="menu_reports_list"
+              sequence="15"/>
+
+    <menuitem action="action_semiweekly_tax_report_wizard"
+              id="menu_941_formb_create"
+              parent="menu_generate_reports"
+              sequence="15"/>
+
+    <!-- Paycheck Detail -->
+    <menuitem id="paycheck_report_view"
+              action="action_paycheck_report"
+              parent="menu_reports_list"
+              sequence="20"/>
+
+    <!--Payroll Summary-->
+    <menuitem id="menu_action_report_payroll_summary"
+              name="Payroll Summary" action="action_report_payroll_summary"
+              parent="l10n_us_hr_payroll_reports.menu_reports_list"
+              sequence="25"/>
+</odoo>

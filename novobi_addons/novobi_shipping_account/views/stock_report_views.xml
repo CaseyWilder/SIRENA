@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <function name="unlink_action" model="ir.actions.report">
+        <value eval="[ref('stock.action_report_delivery')]"/>
+    </function>
+    <record id="action_report_packing_slip" model="ir.actions.report">
+        <field name="name">Packing Slip</field>
+        <field name="model">stock.picking</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">novobi_shipping_account.report_packing_slip</field>
+        <field name="report_file">novobi_shipping_account.report_packing_slip</field>
+        <field name="print_report_name">'Packing Slip - %s - %s' % (object.partner_id.name or '', object.name)</field>
+        <field name="binding_model_id" ref="model_stock_picking"/>
+        <field name="binding_type">report</field>
+    </record>
+    <record id="action_report_shipping_label" model="ir.actions.report">
+        <field name="name">Shipping Label</field>
+        <field name="model">stock.picking</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">novobi_shipping_account.report_packing_slip</field>
+        <field name="report_file">novobi_shipping_account.report_packing_slip</field>
+        <field name="print_report_name">'Shipping Label - %s - %s' % (object.partner_id.name or '', object.name)</field>
+        <field name="binding_model_id" ref="model_stock_picking"/>
+        <field name="binding_type">report</field>
+    </record>
+    <record id="action_report_shipping_label_packing_slip" model="ir.actions.report">
+        <field name="name">Shipping Label and Packing Slip</field>
+        <field name="model">stock.picking</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">novobi_shipping_account.report_shipping_label_packing_slip</field>
+        <field name="report_file">novobi_shipping_account.report_shipping_label_packing_slip</field>
+        <field name="print_report_name">'Shipping Label - %s - %s' % (object.partner_id.name or '', object.name)</field>
+        <field name="binding_model_id" ref="model_stock_picking"/>
+        <field name="binding_type">report</field>
+    </record>
+    <function name="unlink_action" model="ir.actions.report">
+        <value eval="[ref('novobi_shipping_account.action_report_shipping_label_packing_slip')]"/>
+    </function>
+</odoo>

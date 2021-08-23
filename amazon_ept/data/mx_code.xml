@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<odoo noupdate="1">
+    <record id="MEX1" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MEX1</field>
+        <field name="country_id" ref="base.mx"/>
+    </record>
+    <record id="MEX2" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MEX2</field>
+        <field name="country_id" ref="base.mx"/>
+    </record>
+    <record id="MEX3" model="amazon.fulfillment.country.rel">
+        <field name="fulfillment_code">MEX3</field>
+        <field name="country_id" ref="base.mx"/>
+    </record>
+</odoo>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_hr_expense_sheet_form_inherit_us_payroll" model="ir.ui.view">
+        <field name="name">view_hr_expense_sheet_form_inherit_us_payroll</field>
+        <field name="model">hr.expense.sheet</field>
+        <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_form"/>
+        <field name="arch" type="xml">
+            <button name="action_register_payment" position="after">
+                <field name="is_registered_payment" invisible="1"/>
+                <field name="pending_compensation_id" invisible="1"/>
+                <button name="action_report_in_next_payslip"
+                        type="object"
+                        attrs="{'invisible': ['|', '|', ('state', '!=', 'post'), ('pending_compensation_id', '!=', False), ('is_registered_payment', '=', True)]}"
+                        string="Report In Next Payslip"
+                        groups="l10n_us_hr_payroll.l10n_us_hr_payroll_group_officer"/>
+            </button>
+            <button name="action_register_payment" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('state', '!=', 'post'), ('pending_compensation_id', '!=', False)]}</attribute>
+            </button>
+            <div name="button_box" position="inside">
+                <field name="linked_payslip_id" invisible="1"/>
+                <button name="action_open_linked_payslip" type="object" class="oe_stat_button"
+                        attrs="{'invisible': [('linked_payslip_id', '=', False)]}"
+                        icon="fa-file-text-o" string="Payslip"/>
+            </div>
+            <sheet position="before">
+                <div class="alert alert-info" role="alert" attrs="{'invisible': ['|', ('pending_compensation_id', '=', False), ('state', '!=', 'post')]}">
+                    Waiting to be paid in payslip
+                </div>
+            </sheet>
+        </field>
+    </record>
+
+    <record id="view_hr_expense_sheet_tree_inherit_payroll_expense" model="ir.ui.view">
+        <field name="name">view_hr_expense_sheet_tree_inherit_payroll_expense</field>
+        <field name="model">hr.expense.sheet</field>
+        <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_tree"/>
+        <field name="arch" type="xml">
+            <field name="state" position="after">
+                <field name="pay_with_payslip" widget="boolean_toggle"/>
+            </field>
+        </field>
+    </record>
+</odoo>

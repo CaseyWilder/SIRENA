@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="separated_paystub">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="l10n_us_payroll_check_printing.external_layout_payroll">
+                    <t t-set="o" t-value="o.with_context(lang=lang, paystub=1)"/>
+                    <t t-set="stub_info" t-value="o.get_stub_info()"/>
+                    <t t-set="employee_address">
+                        <div>
+                            <div data-oe-type="contact">
+                                <address class="mb0" itemscope="itemscope" itemtype="http://schema.org/Organization">
+                                    <div>
+                                        <span itemprop="name" t-esc="stub_info['employee_name']"/>
+                                    </div>
+                                    <div itemprop="address" itemscope="itemscope" itemtype="http://schema.org/PostalAddress">
+                                        <div>
+                                            <span itemprop="streetAddress">
+                                                <t t-esc="o.street"/>
+                                                <br/>
+                                                <span t-esc="o.city"/> <span t-esc="o.state_id.code"/> <span t-esc="o.zip"/>
+                                                <br/>
+                                                <t t-if="o.country_id.code != 'US'">
+                                                    <span t-esc="o.country_id.name" />
+                                                </t>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </address>
+                            </div>
+                        </div>
+                    </t>
+                    <div class="page" style="font-size: 0.6rem;">
+                        <div class="oe_structure"/>
+                        <!-- General information -->
+                        <h3 t-esc="stub_info['name']"/>
+                        <div id="informations" class="row mt32 mb32">
+                            <div class="col-auto mw-100 mb-2" name="start_date">
+                                <strong>Start Date</strong>
+                                <p class="m-0" t-esc="stub_info['start_date']"/>
+                            </div>
+                            <div class="col-auto mw-100 mb-2" name="end_date">
+                                <strong>End Date</strong>
+                                <p class="m-0" t-esc="stub_info['end_date']"/>
+                            </div>
+                            <div class="col-auto mw-100 mb-2" name="pay_date">
+                                <strong>Pay Date</strong>
+                                <p class="m-0" t-esc="stub_info['pay_date']"/>
+                            </div>
+                            <div class="col-auto mw-100 mb-2" name="pay_rate">
+                                <strong>Pay Rate</strong>
+                                <p class="m-0" t-esc="stub_info['pay_rate']"/>
+                            </div>
+                            <div class="col-auto mw-100 mb-2" name="check_number" t-if="stub_info['payment_method'] == 'check'">
+                                <strong>Check No.</strong>
+                                <p class="m-0" t-esc="stub_info['check_number']"/>
+                            </div>
+                            <div class="col-auto mw-100 mb-2" name="check_date" t-if="stub_info['payment_method'] == 'check'">
+                                <strong>Check Date</strong>
+                                <p class="m-0" t-esc="stub_info['check_date']"/>
+                            </div>
+                        </div>
+                        <!-- Compensations and Deductions -->
+                        <table class="mt-3" name="compensation_deduction" style="width: 100%;">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <table class="table table-sm table-bordered o_main_table" name="table_compensation_line">
+                                            <thead>
+                                                <tr>
+                                                    <th>Earnings</th>
+                                                    <th class="text-right">Hours/Units</th>
+                                                    <th class="text-right">Rate</th>
+                                                    <th class="text-right">Amount</th>
+                                                    <th class="text-right">YTD</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="compensation_tbody">
+                                                <t t-foreach="stub_info['compensation_lines']" t-as="group">
+                                                    <t t-set="first_line" t-value="1"/>
+                                                    <t t-foreach="group['lines']" t-as="line">
+                                                        <tr>
+                                                            <td><t t-esc="line[0]" /></td>
+                                                            <td class="text-right"><t t-esc="line[1]"/></td>
+                                                            <td class="text-right"><t t-esc="line[2]"/></td>
+                                                            <td class="text-right"><t t-esc="line[3]"/></td>
+                                                            <t t-if="first_line == 1">
+                                                                <t t-set="first_line" t-value="0"/>
+                                                                <td class="text-right" t-att-rowspan="len(group['lines'])"><t t-esc="group['ytd']"/></td>
+                                                            </t>
+                                                        </tr>
+                                                    </t>
+                                                </t>
+                                                <tr>
+                                                    <td colspan="3"> <strong>Total Earnings</strong> </td>
+                                                    <td class="text-right"> <strong t-esc="stub_info['gross_pay']" /></td>
+                                                    <td class="text-right"> <strong t-esc="stub_info['ytd_compensations']" /> </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <table class="table table-sm table-bordered o_main_table"
+                                               name="table_company_contribution_line"
+                                               t-if="stub_info['include_company_contribution'] and stub_info['contribution_lines']">
+                                            <thead>
+                                                <tr>
+                                                    <th>Company Contributions</th>
+                                                    <th class="text-right">Amount</th>
+                                                    <th class="text-right">YTD</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="compensation_tbody">
+                                                <t t-foreach="stub_info['contribution_lines']" t-as="group">
+                                                    <t t-set="first_line" t-value="1"/>
+                                                    <t t-foreach="group['lines']" t-as="line">
+                                                        <tr>
+                                                            <td><t t-esc="line[0]" /></td>
+                                                            <td class="text-right"><t t-esc="line[1]"/></td>
+                                                            <t t-if="first_line == 1">
+                                                                <t t-set="first_line" t-value="0"/>
+                                                                <td class="text-right" t-att-rowspan="len(group['lines'])"><t t-esc="group['ytd']"/></td>
+                                                            </t>
+                                                        </tr>
+                                                    </t>
+                                                </t>
+                                                <tr>
+                                                    <td> <strong>Total Company Contributions</strong> </td>
+                                                    <td class="text-right"> <strong t-esc="stub_info['total_er_deduction']" /></td>
+                                                    <td class="text-right"> <strong t-esc="stub_info['er_ytd_deduction']" /> </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+
+                                    <td style="border-style: none; margin-left: 7px; margin-right: 7px;"> &amp;nbsp; &amp;nbsp; </td>
+                                    <td>
+                                        <table class="table table-sm table-bordered o_main_table" name="table_deduction_line">
+                                            <thead>
+                                                <tr>
+                                                    <th>Deductions</th>
+                                                    <th class="text-right">Amount</th>
+                                                    <th class="text-right">YTD</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="deduction_tbody">
+                                                <t t-foreach="stub_info['deduction_lines']" t-as="group">
+                                                    <t t-set="first_line" t-value="1"/>
+                                                    <t t-foreach="group['lines']" t-as="line">
+                                                        <tr>
+                                                            <td><t t-esc="line[0]" /></td>
+                                                            <td class="text-right"><t t-esc="line[1]"/></td>
+                                                            <t t-if="first_line == 1">
+                                                                <t t-set="first_line" t-value="0"/>
+                                                                <td class="text-right" t-att-rowspan="len(group['lines'])"><t t-esc="group['ytd']"/></td>
+                                                            </t>
+                                                        </tr>
+                                                    </t>
+                                                </t>
+                                                <tr>
+                                                    <td> <strong>Total Deductions</strong> </td>
+                                                    <td class="text-right"> <strong t-esc="stub_info['total_ee_deduction']" /> </td>
+                                                    <td class="text-right"> <strong t-esc="stub_info['ytd_deduction']" /> </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- Summary -->
+                        <table name="summary" style="width: 100%;">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <table class="table table-sm table-bordered o_main_table" name="pto_table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Summary</th>
+                                                    <th class="text-right">Amount</th>
+                                                    <th class="text-right">YTD</th>
+                                                </tr>
+                                            </thead>
+                                            <tfoot>
+                                                <tr>
+                                                    <td>Net Pay</td>
+                                                    <td class="text-right"> <t t-esc="stub_info['net_pay']"/> </td>
+                                                    <td class="text-right"> <t t-esc="stub_info['ytd_net_pay']"/> </td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- PTO -->
+                        <table name="pto" style="width: 100%;">
+                            <tbody>
+                                <tr>
+                                    <t t-set="last_td" t-value="0"/>
+                                    <t t-set="leave_lines" t-value="stub_info['leave_lines']"/>
+                                    <t t-foreach="leave_lines" t-as="leave_line">
+                                        <t t-set="last_td" t-value="last_td + 1"/>
+                                        <td>
+                                            <table class="table table-sm table-bordered o_main_table" name="pto_table">
+                                                <thead>
+                                                    <tr>
+                                                        <th><t t-esc="leave_line.leave_type_id.name"/></th>
+                                                        <th class="text-right">Hours</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="leave_tbody">
+                                                    <tr>
+                                                        <td class="pl-4">Used in this period</td>
+                                                        <td class="text-right"><t t-esc="leave_line.number_of_hours"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="pl-4">Remaining balance</td>
+                                                        <td class="text-right"><t t-esc="leave_line.remaining_leave_hours"/></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                        <t t-if="last_td != len(leave_lines)">
+                                            <td style="border-style: none; margin-left: 7px; margin-right: 7px;"> &amp;nbsp; &amp;nbsp; </td>
+                                        </t>
+                                    </t>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

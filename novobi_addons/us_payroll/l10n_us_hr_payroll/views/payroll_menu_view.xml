@@ -1,0 +1,198 @@
+<odoo>
+    <!-- Level 0: Payroll app -->
+    <menuitem id="menu_us_payroll_root"
+              name="Payroll"
+              groups="l10n_us_hr_payroll.l10n_us_hr_payroll_group_officer"
+              web_icon="l10n_us_hr_payroll,static/description/icon.png"
+              sequence="70"/>
+
+    <!-- Level 1: EMPLOYEES ======================================================================================== -->
+    <menuitem id="menu_us_payroll_employee_main"
+              name="Employees"
+              parent="menu_us_payroll_root"
+              groups="hr.group_hr_user"
+              sequence="20"/>
+
+        <!-- Level 2: Employees -->
+        <menuitem id="menu_us_payroll_employee_sub"
+                  action="hr_employee_action_payroll"
+                  parent="menu_us_payroll_employee_main"
+                  sequence="5"/>
+
+        <!-- Level 2: Departments -->
+        <menuitem id="menu_us_payroll_department"
+                  action="hr_department_action_payroll"
+                  parent="menu_us_payroll_employee_main"
+                  sequence="10"/>
+
+    <!-- Level 1: Payroll -->
+    <menuitem id="menu_us_payroll_payroll"
+              name="Payroll"
+              parent="menu_us_payroll_root"
+              groups="hr.group_hr_user"
+              sequence="50"/>
+
+        <!-- Level 2: Periods -->
+        <menuitem id="menu_us_payroll_pay_period"
+                  name="Periods"
+                  parent="menu_us_payroll_payroll"
+                  sequence="10"/>
+
+            <!-- Level 3 -->
+            <menuitem id="menu_action_pay_period_frequency"
+                      name="Scheduled"
+                      action="action_pay_period_form_frequency"
+                      parent="menu_us_payroll_pay_period"
+                      sequence="5"/>
+            <menuitem id="menu_action_pay_period_off_cycle"
+                      name="Off-cycle"
+                      action="action_pay_period_form_off_cycle"
+                      parent="menu_us_payroll_pay_period"
+                      sequence="10"/>
+            <menuitem id="menu_action_pay_period_bonus"
+                      name="Bonus"
+                      action="action_pay_period_form_bonus"
+                      parent="menu_us_payroll_pay_period"
+                      sequence="15"/>
+            <menuitem id="menu_action_pay_period_termination"
+                      name="Termination"
+                      action="action_pay_period_form_termination"
+                      parent="menu_us_payroll_pay_period"
+                      sequence="20"/>
+
+        <!-- Level 2: Payslips -->
+        <menuitem id="menu_action_payroll_payslip_form"
+                  action="action_payroll_payslip_form"
+                  parent="menu_us_payroll_payroll"
+                  sequence="20"/>
+
+        <!-- Level 2: Ad hoc (Compensations, Deductions) -->
+        <menuitem id="menu_us_payroll_adhoc"
+                  name="Ad hoc"
+                  parent="menu_us_payroll_payroll"
+                  groups="hr.group_hr_user"
+                  sequence="30"/>
+
+            <!-- Level 3 -->
+            <menuitem id="menu_adhoc_payslip_compensation"
+                      action="action_adhoc_payslip_compensation"
+                      parent="menu_us_payroll_adhoc"
+                      sequence="10"/>
+            <menuitem id="menu_adhoc_payslip_deduction"
+                      action="action_adhoc_payslip_deduction"
+                      parent="menu_us_payroll_adhoc"
+                      sequence="20"/>
+
+    <!-- Level 1: REPORTING ======================================================================================== -->
+    <menuitem id="menu_us_payroll_report"
+              name="Reporting"
+              parent="menu_us_payroll_root"
+              groups="l10n_us_hr_payroll.l10n_us_hr_payroll_group_manager"
+              sequence="80"/>
+
+        <!-- Level 2: Compensations -->
+        <menuitem id="menu_payslip_compensation"
+                  action="action_payslip_compensation"
+                  parent="menu_us_payroll_report"
+                  sequence="10"/>
+
+        <!-- Level 2: Deductions -->
+        <menuitem id="menu_payslip_deduction"
+                  action="action_payslip_deduction"
+                  parent="menu_us_payroll_report"
+                  sequence="20"/>
+
+        <!-- Level 2: Taxes -->
+        <menuitem id="menu_payslip_tax"
+                  action="action_payslip_tax"
+                  parent="menu_us_payroll_report"
+                  sequence="30"/>
+
+        <!-- Level 2: Installment Deductions -->
+        <menuitem id="menu_payslip_garnishment"
+                  action="action_payslip_garnishment"
+                  parent="menu_us_payroll_report"
+                  sequence="40"/>
+
+    <!-- Level 1 Configuration ===================================================================================== -->
+    <menuitem id="menu_us_payroll_configuration"
+              name="Configuration"
+              parent="menu_us_payroll_root"
+              groups="l10n_us_hr_payroll.l10n_us_hr_payroll_group_manager"
+              sequence="100"/>
+
+        <!-- Level 2: Settings -->
+        <menuitem id="menu_us_payroll_global_settings"
+                  action="action_us_payroll_configuration"
+                  parent="menu_us_payroll_configuration"
+                  groups="base.group_system"
+                  sequence="0"/>
+
+        <!-- Level 2: Pay Frequencies -->
+        <menuitem id="menu_pay_frequency"
+                  action="action_pay_frequency"
+                  parent="menu_us_payroll_configuration"
+                  sequence="10"/>
+
+        <!-- Level 2: Overtime Rules -->
+        <menuitem id="menu_view_time_tracking_rule"
+                  action="action_view_time_tracking_rule"
+                  parent="menu_us_payroll_configuration"
+                  sequence="20"/>
+
+        <!-- Level 2: Employee (Tags, Working Schedules) -->
+        <menuitem id="menu_employee_config"
+                  name="Employee"
+                  parent="menu_us_payroll_configuration"
+                  sequence="30"/>
+
+            <!-- Level 3 -->
+            <menuitem id="menu_view_employee_category_form_payroll"
+                      action="hr.open_view_categ_form"
+                      parent="menu_employee_config"
+                      sequence="10"/>
+            <menuitem id="menu_action_payroll_resource_calendar"
+                      name="Working Schedules"
+                      action="resource.action_resource_calendar_form"
+                      parent="menu_employee_config"
+                      sequence="20"/>
+
+        <!-- Level 2: Compensations -->
+        <menuitem id="menu_action_payroll_compensation_form"
+                  action="action_payroll_compensation_form"
+                  parent="menu_us_payroll_configuration"
+                  sequence="40"/>
+
+        <!-- Level 2: Deductions -->
+        <menuitem id="menu_deduction_config"
+                  name="Deductions"
+                  parent="menu_us_payroll_configuration"
+                  sequence="50"/>
+
+            <!-- Level 3 -->
+            <menuitem id="menu_action_payroll_deduction_form"
+                      action="action_payroll_deduction_form"
+                      parent="menu_deduction_config"
+                      sequence="10"/>
+            <menuitem id="menu_action_deduction_policy_template_form"
+                      action="action_deduction_policy_template_form"
+                      parent="menu_deduction_config"
+                      sequence="20"/>
+            <menuitem id="menu_action_deduction_enrollment_policy_form"
+                      action="action_deduction_enrollment_policy_form"
+                      parent="menu_deduction_config"
+                      sequence="30"/>
+
+        <!-- Level 2: Taxes -->
+        <menuitem id="menu_action_payroll_tax_form"
+                  action="action_payroll_tax_form"
+                  parent="menu_us_payroll_configuration"
+                  sequence="60"/>
+
+        <!-- Level 2: Filing Status -->
+        <menuitem id="menu_action_payroll_filing_status"
+                  action="action_payroll_filing_status"
+                  parent="menu_us_payroll_configuration"
+                  groups="base.group_no_one"
+                  sequence="50"/>
+</odoo>
