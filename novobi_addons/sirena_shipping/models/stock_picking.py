@@ -7,6 +7,22 @@ class StockPicking(models.Model):
     def open_create_label_form(self):
         result = super().open_create_label_form()
 
+        # Change to demand quantity instead of done.
+        total_move_weight = 0
+        for ml in self.move_lines:
+            # 1 ounce = 0.0625 pound
+            if hasattr(ml.product_id, 'weight_in_oz') and ml.product_id.weight_in_oz != 0:
+                product_weight_in_lbs = ml.product_id.weight_in_oz * 0.0625
+            else:
+                weight_uom_lbs_id = self.env.ref('uom.product_uom_lb')
+                weight_uom_system_id = self.env['product.template']._get_weight_uom_id_from_ir_config_parameter()
+
+                product_weight_in_lbs = weight_uom_system_id._compute_quantity(ml.product_id.weight,
+                                                                               weight_uom_lbs_id, round=False)
+            total_product_weight = product_weight_in_lbs * ml.product_uom_qty
+            total_move_weight += total_product_weight
+        self.package_shipping_weight = round(total_move_weight, 3)
+
         if self.company_id.country_id.code == 'US' and isinstance(result, dict) and result.get('res_model') == 'stock.picking':
             fedex = self.env['shipping.account'].search([('provider', '=', 'fedex')], limit=1)
             if not fedex:
