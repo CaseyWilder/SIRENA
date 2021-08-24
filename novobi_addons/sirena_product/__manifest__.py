@@ -13,10 +13,12 @@
     'depends': ['product', 'novobi_shipping_account'],
     'data': [
         # ============================== DATA =================================
+        'data/res_company_data.xml',
 
         # ============================== SECURITY =============================
 
         # ============================== VIEWS ================================
+        'views/res_company_views.xml',
         'views/product_template_views.xml',
         'views/product_product_views.xml',
         'views/product_packaging_views.xml',
