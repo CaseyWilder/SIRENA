@@ -89,7 +89,7 @@ class ActiveProductListingReportEpt(models.Model):
                                                         float(row.get('price')))
             else:
                 # changed part: if product_mapping doesn't exist, check if odoo product exists before creating new one
-                if not product_mapping and self.auto_create_product:
+                if not product_mapping:
                     odoo_product_id = self.env['product.product'].search([('default_code', '=', seller_sku)], limit=1)
                 # end of changed part
                 self.create_odoo_or_amazon_product_ept(odoo_product_id, fulfillment_type, row, log_rec)

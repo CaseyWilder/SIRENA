@@ -73,7 +73,7 @@ class WooProductTemplateEpt(models.Model):
         if not woo_product:
             if not woo_template:
                 # changed part: if product_mapping doesn't exist, check if odoo product exists before creating new one
-                if not product_mapping and woo_instance.auto_import_product:
+                if not product_mapping:
                     odoo_product = self.env['product.product'].search([('default_code', '=', product_sku)], limit=1)
                     odoo_template = odoo_product.product_tmpl_id
                 # end of changed part
