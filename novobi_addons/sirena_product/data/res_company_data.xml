@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<odoo>
+<odoo noupdate="1">
     <function name="init_hide_shared_products" model="res.company"/>
 </odoo>
