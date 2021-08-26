@@ -2,6 +2,7 @@
 # See LICENSE file for full copyright and licensing details.
 
 from odoo.addons.delivery_fedex.models.fedex_request import FedexRequest as FedexRequestBase, LogPlugin
+from odoo.exceptions import UserError
 from datetime import datetime, date
 import os
 import logging
@@ -172,8 +173,13 @@ class FedexRequest(FedexRequestBase):
             package.SpecialServicesRequested.SpecialServiceTypes = special_services_type
 
         package.PhysicalPackaging = 'BOX'
-        if package_code == 'YOUR_PACKAGING' and package_dimension['height'] != 0\
-                and package_dimension['width'] != 0 and package_dimension['length'] != 0:
+        if (
+                package_code == 'YOUR_PACKAGING'
+                and isinstance(package_dimension, dict)
+                and package_dimension.get('height', 0)
+                and package_dimension.get('width', 0)
+                and package_dimension.get('length', 0)
+        ):
             package.Dimensions = self.factory.Dimensions()
             package.Dimensions.Height = int(package_dimension['height'])
             package.Dimensions.Width = int(package_dimension['width'])
@@ -448,3 +454,54 @@ class FedexRequest(FedexRequestBase):
             formatted_response['errors_message'] = e.args[0]
 
         return formatted_response
+
+    def set_doc_tab(self, information, handling_fee=0):
+        if not isinstance(information, dict):
+            raise UserError('Internal code error: information is not a dictionary')
+
+        customer_specified_detail = self.factory.CustomerSpecifiedLabelDetail()
+        doc_tab_content = self.factory.DocTabContent()
+        doc_tab_content.DocTabContentType = 'ZONE001'
+        zone001 = self.factory.DocTabContentZone001()
+
+        zone_number = 1
+        for header, value in information.items():
+            zone = self.factory.DocTabZoneSpecification()
+            zone.ZoneNumber = zone_number
+            zone.Header = header if value else ' '
+            zone.LiteralValue = str(value)
+            zone.Justification = 'LEFT'
+            zone001.DocTabZoneSpecifications.append(zone)
+            zone_number += 1
+
+        zone5 = self.factory.DocTabZoneSpecification()
+        zone5.ZoneNumber = 9
+        zone5.Header = 'Shipping'
+        zone5.DataField = 'REPLY/SHIPMENT/ShipmentRating/ShipmentRateDetails[1]/TotalBaseCharge/Amount'
+        zone5.Justification = 'RIGHT'
+        zone001.DocTabZoneSpecifications.append(zone5)
+
+        zone6 = self.factory.DocTabZoneSpecification()
+        zone6.ZoneNumber = 10
+        zone6.Header = 'Special'
+        zone6.DataField = 'REPLY/SHIPMENT/ShipmentRating/ShipmentRateDetails[1]/TotalSurcharges/Amount'
+        zone6.Justification = 'RIGHT'
+        zone001.DocTabZoneSpecifications.append(zone6)
+
+        zone7 = self.factory.DocTabZoneSpecification()
+        zone7.ZoneNumber = 11
+        zone7.Header = 'Handling'
+        zone7.LiteralValue = '%.2f' % handling_fee
+        zone7.Justification = 'RIGHT'
+        zone001.DocTabZoneSpecifications.append(zone7)
+
+        zone8 = self.factory.DocTabZoneSpecification()
+        zone8.ZoneNumber = 12
+        zone8.Header = 'Total'
+        zone8.DataField = 'REPLY/SHIPMENT/ShipmentRating/ShipmentRateDetails[1]/TotalNetCharge/Amount'
+        zone8.Justification = 'RIGHT'
+        zone001.DocTabZoneSpecifications.append(zone8)
+
+        doc_tab_content.Zone001 = zone001
+        customer_specified_detail.DocTabContent = doc_tab_content
+        self.RequestedShipment.LabelSpecification.CustomerSpecifiedDetail = customer_specified_detail

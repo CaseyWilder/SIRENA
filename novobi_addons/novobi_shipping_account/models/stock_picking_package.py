@@ -29,6 +29,15 @@ class PickingPackage(models.Model):
     handling_fee = fields.Monetary(string='Handling Charges', help='Handling Charges for each package')
     currency_id = fields.Many2one('res.currency', string='Currency', related='picking_id.currency_id')
 
+    @api.onchange('packaging_id')
+    def _onchange_packaging_id(self):
+        if self.packaging_id:
+            self.update({
+                'length': self.packaging_id.length,
+                'width': self.packaging_id.width,
+                'height': self.packaging_id.height
+            })
+
     @api.constrains('weight')
     def _check_weight(self):
         if any(r.weight <= 0 and r.weight_oz <=0 for r in self):
