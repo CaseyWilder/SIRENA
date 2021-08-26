@@ -2,6 +2,7 @@
 # See LICENSE file for full copyright and licensing details.
 
 from odoo.addons.delivery_fedex.models.fedex_request import FedexRequest as FedexRequestBase, LogPlugin
+from odoo.exceptions import UserError
 from datetime import datetime, date
 import os
 import logging
@@ -172,8 +173,13 @@ class FedexRequest(FedexRequestBase):
             package.SpecialServicesRequested.SpecialServiceTypes = special_services_type
 
         package.PhysicalPackaging = 'BOX'
-        if (package_code == 'YOUR_PACKAGING' or package_dimension) and package_dimension['height'] != 0\
-                and package_dimension['width'] != 0 and package_dimension['length'] != 0:
+        if (
+                package_code == 'YOUR_PACKAGING'
+                and isinstance(package_dimension, dict)
+                and package_dimension.get('height', 0)
+                and package_dimension.get('width', 0)
+                and package_dimension.get('length', 0)
+        ):
             package.Dimensions = self.factory.Dimensions()
             package.Dimensions.Height = int(package_dimension['height'])
             package.Dimensions.Width = int(package_dimension['width'])
@@ -449,7 +455,10 @@ class FedexRequest(FedexRequestBase):
 
         return formatted_response
 
-    def set_doc_tab(self, information, handling_fee):
+    def set_doc_tab(self, information, handling_fee=0):
+        if not isinstance(information, dict):
+            raise UserError('Internal code error: information is not a dictionary')
+
         customer_specified_detail = self.factory.CustomerSpecifiedLabelDetail()
         doc_tab_content = self.factory.DocTabContent()
         doc_tab_content.DocTabContentType = 'ZONE001'

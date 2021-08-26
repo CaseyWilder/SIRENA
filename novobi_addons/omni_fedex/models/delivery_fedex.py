@@ -175,7 +175,7 @@ class ProviderFedex(models.Model):
                 weight_value = self._fedex_convert_weight_in_ob(pkg.weight, unit=self.fedex_weight_unit)
                 request._add_package(
                     weight_value=weight_value,
-                    package_code=pkg.packaging_id.shipper_package_code,
+                    package_code=pkg.packaging_id.shipper_package_code or 'YOUR_PACKAGING',
                     package_dimension=dict(width=pkg.width, height=pkg.height, length=pkg.length),
                     confirmation=picking.fedex_shipping_confirmation,
                     mode='rating',
@@ -292,7 +292,7 @@ class ProviderFedex(models.Model):
             self.fedex_label_stock_type = 'PAPER_7X4.75'
             self.fedex_label_file_type = 'PDF'
         else:
-            self.fedex_label_stock_type = 'STOCK_4X6.75_LEADING_DOC_TAB'
+            self.fedex_label_stock_type = 'STOCK_4X6.75_LEADING_DOC_TAB'  # Change the label stock type. TODO: add setting on Shipping Account for this field
             self.fedex_label_file_type = 'ZPLII'
 
         request = FedexRequest(self.get_debug_logger_xml(picking), request_type="shipping",
@@ -304,7 +304,7 @@ class ProviderFedex(models.Model):
 
         request.transaction_detail(picking.name)
 
-        def _generate_shipment_request(package_type, package_details):
+        def _generate_shipment_request(package_type, package_details):  # Add package details dictionary to match with package type of the current package
             request.shipment_request(dropoff_type=self.fedex_droppoff_type,
                                      service_type=self.fedex_service_type,
                                      packaging_type=package_type,
@@ -342,18 +342,20 @@ class ProviderFedex(models.Model):
             # |2  |6  |10
             # |3  |7  |11
             # 8, 9, 10, 11 are reserved for shipping price details and could be changed in ./fedex_request/set_doc_tab()
+            if not isinstance(package_details, dict):
+                raise UserError(_('Internal code error: package_details is not a dictionary'))
             information = {
-                'DIMS': '%.0fX%.0fX%.0f' % (package_details["length"], package_details["width"], package_details["height"]),
+                'DIMS': '%.0fX%.0fX%.0f' % (package_details.get('length', 0), package_details.get('width', 0), package_details.get('height', 0)),
                 'Customer': picking.sale_id.display_name,
                 'Phone': recipient.phone or '',
                 'Dept': '',
                 'Date': pickup_date.strftime('%d%b%y'),
-                'Weight': '%.2f LBS' % package_details['weight'],
+                'Weight': '%.2f LBS' % package_details.get('weight', 0),
                 'COD': '',
                 'DV': ''
             }
             if self.fedex_label_stock_type != 'PDF' and 'DOC_TAB' in self.fedex_label_stock_type:
-                request.set_doc_tab(information, package_details["handling_fee"])
+                request.set_doc_tab(information, package_details.get('handling_fee', 0))
 
             # Commodities for customs declaration (international shipping)
             if self.fedex_service_type in ['INTERNATIONAL_ECONOMY', 'INTERNATIONAL_PRIORITY'] or (
@@ -648,8 +650,10 @@ class ProviderFedex(models.Model):
         # |2  |6  |10
         # |3  |7  |11
         # 8, 9, 10, 11 are reserved for shipping price details and could be changed in ./fedex_request/set_doc_tab()
+        if not isinstance(package_dimension, dict):
+            raise UserError(_('Internal code error: package_dimension is not a dictionary'))
         information = {
-            'DIMS': '%.0fX%.0fX%.0f' % (package_dimension["length"], package_dimension["width"], package_dimension["height"]),
+            'DIMS': '%.0fX%.0fX%.0f' % (package_dimension.get('length', 0), package_dimension.get('width', 0), package_dimension.get('height', 0)),
             'Customer': picking.sale_id.display_name,
             'Phone': recipient.phone or '',
             'Dept': '',

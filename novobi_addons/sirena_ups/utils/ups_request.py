@@ -2,6 +2,9 @@
 # See LICENSE file for full copyright and licensing details.
 # This file contains new customized function for omni_ups/models/ups_request/create_shipment_label()
 # - [SRN-127] Change stock label size to 4" x 8"
+import json
+import requests
+
 from odoo.addons.omni_ups.models.ups_request import UPSRequest
 
 
