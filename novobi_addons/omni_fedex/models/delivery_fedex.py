@@ -292,7 +292,7 @@ class ProviderFedex(models.Model):
             self.fedex_label_stock_type = 'PAPER_7X4.75'
             self.fedex_label_file_type = 'PDF'
         else:
-            self.fedex_label_stock_type = 'STOCK_4X9_LEADING_DOC_TAB'
+            self.fedex_label_stock_type = 'STOCK_4X6.75_LEADING_DOC_TAB'
             self.fedex_label_file_type = 'ZPLII'
 
         request = FedexRequest(self.get_debug_logger_xml(picking), request_type="shipping",
@@ -304,7 +304,7 @@ class ProviderFedex(models.Model):
 
         request.transaction_detail(picking.name)
 
-        def _generate_shipment_request(package_type):
+        def _generate_shipment_request(package_type, package_details):
             request.shipment_request(dropoff_type=self.fedex_droppoff_type,
                                      service_type=self.fedex_service_type,
                                      packaging_type=package_type,
@@ -334,6 +334,26 @@ class ProviderFedex(models.Model):
                                    label_printing_orientation='TOP_EDGE_OF_TEXT_FIRST',
                                    label_order='SHIPPING_LABEL_FIRST'
                                    )
+
+            # Setup Doc Tab for label if the label's type is ZPL with DOC_TAB
+            # information: a dict() of 8 elements to be put on Doc Tab in the following format (leave blank '' if no intention to use that element):
+            # |0  |4  |8
+            # |1  |5  |9
+            # |2  |6  |10
+            # |3  |7  |11
+            # 8, 9, 10, 11 are reserved for shipping price details and could be changed in ./fedex_request/set_doc_tab()
+            information = {
+                'DIMS': '%.0fX%.0fX%.0f' % (package_details["length"], package_details["width"], package_details["height"]),
+                'Customer': picking.sale_id.display_name,
+                'Phone': recipient.phone or '',
+                'Dept': '',
+                'Date': pickup_date.strftime('%d%b%y'),
+                'Weight': '%.2f LBS' % package_details['weight'],
+                'COD': '',
+                'DV': ''
+            }
+            if self.fedex_label_stock_type != 'PDF' and 'DOC_TAB' in self.fedex_label_stock_type:
+                request.set_doc_tab(information, package_details["handling_fee"])
 
             # Commodities for customs declaration (international shipping)
             if self.fedex_service_type in ['INTERNATIONAL_ECONOMY', 'INTERNATIONAL_PRIORITY'] or (
@@ -376,12 +396,12 @@ class ProviderFedex(models.Model):
             dept_number = 'BILL D/T: SENDER'
 
         if not picking.is_mul_packages:
-            _generate_shipment_request(package_type)
             # Only one package
             weight_value = self._fedex_convert_weight_in_ob(weight, unit=self.fedex_weight_unit)
             # Set value for return weight
             return_weight = weight_value
             package_dimension = dict(height=package_height, width=package_width, length=package_length)
+            _generate_shipment_request(package_type, dict(height=package_height, width=package_width, length=package_length, weight=weight_value, handling_fee=picking.handling_fee))
             request._add_package(
                 weight_value=weight_value,
                 package_code=package_type,
@@ -446,7 +466,7 @@ class ProviderFedex(models.Model):
             for sequence, pkg in enumerate(picking.picking_package_ids, start=1):
                 weight_value = self._fedex_convert_weight_in_ob(pkg.weight, unit=self.fedex_weight_unit)
                 package_type = pkg.packaging_id.shipper_package_code or 'YOUR_PACKAGING'
-                _generate_shipment_request(package_type)
+                _generate_shipment_request(package_type, dict(width=pkg.width, height=pkg.height, length=pkg.length, weight=weight_value, handling_fee=pkg.handling_fee))
                 request._add_package(
                     weight_value=weight_value,
                     package_code=package_type,
@@ -620,6 +640,26 @@ class ProviderFedex(models.Model):
                                label_printing_orientation='TOP_EDGE_OF_TEXT_FIRST',
                                label_order='SHIPPING_LABEL_FIRST',
                                )
+
+        # Setup Doc Tab for label if the label's type is ZPL with DOC_TAB
+        # information: a dict() of 8 elements to be put on Doc Tab in the following format (leave blank '' if no intention to use that element):
+        # |0  |4  |8
+        # |1  |5  |9
+        # |2  |6  |10
+        # |3  |7  |11
+        # 8, 9, 10, 11 are reserved for shipping price details and could be changed in ./fedex_request/set_doc_tab()
+        information = {
+            'DIMS': '%.0fX%.0fX%.0f' % (package_dimension["length"], package_dimension["width"], package_dimension["height"]),
+            'Customer': picking.sale_id.display_name,
+            'Phone': recipient.phone or '',
+            'Dept': '',
+            'Date': pickup_datetime.date().strftime('%d%b%y'),
+            'Weight': '%.2f LBS' % weight,
+            'COD': '',
+            'DV': ''
+        }
+        if self.fedex_label_stock_type != 'PDF' and 'DOC_TAB' in self.fedex_label_stock_type:
+            request.set_doc_tab(information, 0.0)
 
         net_weight = self._fedex_convert_weight_in_ob(weight, unit=self.fedex_weight_unit)
         po_number = picking.sale_id.display_name or False
