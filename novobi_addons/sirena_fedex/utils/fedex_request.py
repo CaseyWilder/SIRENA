@@ -53,8 +53,13 @@ def new_add_package(self, weight_value, package_dimension={}, package_code=False
         package.SpecialServicesRequested.SpecialServiceTypes = special_services_type
 
     package.PhysicalPackaging = 'BOX'
-    if package_code == 'YOUR_PACKAGING' and package_dimension['height'] != 0 \
-            and package_dimension['width'] != 0 and package_dimension['length'] != 0:
+    if (
+            package_code == 'YOUR_PACKAGING'
+            and isinstance(package_dimension, dict)
+            and package_dimension.get('height', 0)
+            and package_dimension.get('width', 0)
+            and package_dimension.get('length', 0)
+    ):
         package.Dimensions = self.factory.Dimensions()
         package.Dimensions.Height = int(package_dimension['height'])
         package.Dimensions.Width = int(package_dimension['width'])

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="custom_create_label_form" model="ir.ui.view">
+        <field name="name">custom.create.label.form</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="novobi_shipping_account.view_picking_create_label_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='picking_package_ids']/tree/field[@name='packaging_id']" position="attributes">
+                <attribute name="domain">[('is_custom', '=', True)]</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
