@@ -11,7 +11,7 @@ class ProductTemplate(models.Model):
     parts_spec_color = fields.Char(string="Parts Spec / Color")
     part_code = fields.Char(string="Part Code")
 
-    packaging_id = fields.Many2one('product.packaging', string='Custom Package')
+    packaging_id = fields.Many2one('product.packaging', string='Custom Package', domain=[('is_custom', '=', True)])
 
     @api.model
     def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):

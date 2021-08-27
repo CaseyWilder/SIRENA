@@ -4,6 +4,8 @@ from odoo import models, fields, api
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
+    default_packaging_id = fields.Many2one(domain=[('is_custom', '=', True)])
+
     def open_create_label_form(self):
         result = super().open_create_label_form()
 
