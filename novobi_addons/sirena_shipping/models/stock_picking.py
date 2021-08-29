@@ -6,6 +6,17 @@ class StockPicking(models.Model):
 
     default_packaging_id = fields.Many2one(domain=[('is_custom', '=', True)])
 
+    def check_for_one_product_or_bundle(self):
+        product_ids = self.move_line_ids.mapped('product_id')
+        if len(product_ids) == 1:
+            return product_ids
+
+        bom_ids = self.move_ids_without_package.mapped('bom_line_id').mapped('bom_id')
+        if len(bom_ids) == 1:
+            return bom_ids.product_tmpl_id
+
+        return False
+
     def open_create_label_form(self):
         result = super().open_create_label_form()
 
@@ -31,6 +42,7 @@ class StockPicking(models.Model):
                 return result
 
             carriers = fedex.delivery_carrier_ids
+            one_product_or_bundle = self.check_for_one_product_or_bundle()
 
             if self.partner_id.address_classification == 'RESIDENTIAL':
                 delivery_carrier = carriers.filtered(lambda r: r.fedex_service_type == 'GROUND_HOME_DELIVERY')
@@ -38,6 +50,10 @@ class StockPicking(models.Model):
             else:
                 delivery_carrier = carriers.filtered(lambda r: r.fedex_service_type == 'FEDEX_GROUND')
                 is_residential_address = False if delivery_carrier else self.is_residential_address
+
+            if one_product_or_bundle and one_product_or_bundle.delivery_carrier_id == 'SMART_POST':
+                delivery_carrier = carriers.filtered(lambda r: r.fedex_service_type == 'SMART_POST')
+                is_residential_address = self.is_residential_address
 
             delivery_carrier_id = delivery_carrier and delivery_carrier[0].id
             self.update({
