@@ -9,8 +9,8 @@ from odoo.addons.omni_ups.models.ups_request import UPSRequest
 
 
 def new_create_shipment_label(self, shipper_number, package_detail, shipper, ship_from, ship_to, service_type,
-                          insurance_detail=None, confirmation=None, shipping_info=None,
-                          label_file_type='GIF', is_return=False, is_residential=False, references=[]):
+                              insurance_detail=None, confirmation=None, shipping_info=None,
+                              label_file_type='GIF', is_return=False, is_residential=False, references=[]):
     endpoint = self.restful_url + self.ship_restful
     headers = self._generate_header()
 
@@ -136,7 +136,7 @@ def new_create_shipment_label(self, shipper_number, package_detail, shipper, shi
         request_data["ShipmentRequest"]["LabelSpecification"].update({
             "LabelStockSize": {
                 # [SRN-127] Change to 4" x 8" label stock size for UPS ZPL labels
-                "Height": "8",
+                "Height": "8" if shipping_info.get('label_stock_type', '4X8') == '4X8' else "6",
                 # [SRN-127]
                 "Width": "4",
             }
