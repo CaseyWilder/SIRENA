@@ -22,6 +22,7 @@
         'views/product_views.xml',
         'views/sale_order_line_views.xml',
         'views/product_mapping_views.xml',
+        'views/res_config_views.xml',
         # ============================== SECURITY ===========================
         'security/ir.model.access.csv',
         # ============================== TEMPLATES ==========================
