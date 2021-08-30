@@ -15,7 +15,7 @@ class ProductTemplate(models.Model):
     parts_spec_color = fields.Char(string="Parts Spec / Color")
     part_code = fields.Char(string="Part Code")
 
-    delivery_carrier_id = fields.Selection(SHIPPING_SERVICES, string='Shipping Service')
+    delivery_carrier_id = fields.Selection(SHIPPING_SERVICES, string='Shipping Service (FedEx)')
     packaging_id = fields.Many2one('product.packaging', string='Custom Package', domain=[('is_custom', '=', True)])
 
     @api.model
