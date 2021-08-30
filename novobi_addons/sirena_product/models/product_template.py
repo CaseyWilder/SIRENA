@@ -1,5 +1,9 @@
 from odoo import fields, models, api
-from odoo.osv import expression
+
+SHIPPING_SERVICES = [
+    ('HOME_DELIVERY_OR_GROUND', 'Home Delivery or Ground'),
+    ('SMART_POST', 'Smart Post')
+]
 
 
 class ProductTemplate(models.Model):
@@ -11,6 +15,7 @@ class ProductTemplate(models.Model):
     parts_spec_color = fields.Char(string="Parts Spec / Color")
     part_code = fields.Char(string="Part Code")
 
+    delivery_carrier_id = fields.Selection(SHIPPING_SERVICES, string='Shipping Service')
     packaging_id = fields.Many2one('product.packaging', string='Custom Package', domain=[('is_custom', '=', True)])
 
     @api.model
@@ -29,4 +34,5 @@ class ProductTemplate(models.Model):
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
+    delivery_carrier_id = fields.Selection(related='product_tmpl_id.delivery_carrier_id', store=True, readonly=False)
     packaging_id = fields.Many2one(related='product_tmpl_id.packaging_id', store=True, readonly=False)
