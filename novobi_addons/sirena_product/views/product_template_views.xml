@@ -18,6 +18,7 @@
 
             <group name="invoicing" position="after">
                 <group name="delivery" string="Delivery">
+                    <field name="delivery_carrier_id"/>
                     <field name="packaging_id"/>
                 </group>
             </group>
