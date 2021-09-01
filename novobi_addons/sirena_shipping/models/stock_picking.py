@@ -66,11 +66,13 @@ class StockPicking(models.Model):
                 is_residential_address = self.is_residential_address
 
             delivery_carrier_id = delivery_carrier and delivery_carrier[0].id
-            self.update({
+            vals = {
                 'shipping_account_id': fedex.id,
-                'delivery_carrier_id': delivery_carrier_id,
                 'is_residential_address': is_residential_address
-            })
+            }
+            if delivery_carrier_id:
+                vals.update({'delivery_carrier_id': delivery_carrier_id})
+            self.update(vals)
         elif self.company_id.country_id.code == 'CA' and isinstance(result, dict) and result.get('res_model') == 'stock.picking':
             ups = self.env['shipping.account'].search([('provider', '=', 'ups')], limit=1)
             if not ups:
@@ -79,10 +81,13 @@ class StockPicking(models.Model):
             self.calculate_weight_based_on_quantity_column(shipping_account=ups)
 
             delivery_carrier_id = ups.delivery_carrier_ids.filtered(lambda r: r.ups_default_service_type == '11')
-            self.update({
-                'shipping_account_id': ups.id,
-                'delivery_carrier_id': delivery_carrier_id,
-            })
+            if delivery_carrier_id:
+                self.update({
+                    'shipping_account_id': ups.id,
+                    'delivery_carrier_id': delivery_carrier_id,
+                })
+            else:
+                self.shipping_account_id = ups.id
         else:
             return result
 
