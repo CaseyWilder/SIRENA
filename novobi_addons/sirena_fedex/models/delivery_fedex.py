@@ -213,8 +213,8 @@ class ProviderFedex(models.Model):
             log_message = (_("Shipment created into Fedex <br/> <b>Tracking Number : </b>%s") % (
                 carrier_tracking_ref))
             fedex_labels = [
-                ('LabelFedex-%s-%s.%s' % (carrier_tracking_ref, index, self.fedex_label_file_type), label)
-                for index, label in enumerate(request._get_labels(self.fedex_label_file_type))]
+                ('LabelFedex-%s.%s' % (carrier_tracking_ref, self.fedex_label_file_type), label)
+                for label in request._get_labels(self.fedex_label_file_type)]
 
             picking.message_post(body=log_message, attachments=fedex_labels)
         else:
@@ -327,21 +327,70 @@ class ProviderFedex(models.Model):
         # Create return label if user chose "include return label option"
         if advanced_options.get('shipping_include_return_label'):
             tracking_number = carrier_tracking_ref.split(',')[0]
-            return_result = self.omni_fedex_get_return_label(picking=picking, product_packaging=product_packaging,
-                                                             package_dimension=package_dimension, weight=return_weight,
-                                                             pickup_datetime=pickup_datetime,
-                                                             advanced_options=advanced_options,
-                                                             tracking_number=tracking_number, origin_date=delivery_time)
-            if return_result['errors_message']:
-                return {
-                    'success': False,
-                    'price': 0.0,
-                    'price_without_discounts': 0.0,
-                    'estimated_date': 'N/A',
-                    'tracking_number': False,
-                    'error_message': _('RETURN LABEL: %s\n') % return_result['errors_message'],
-                    'warning_message': False
-                }
+            if picking.is_mul_packages:
+                labels = []
+                tracking_numbers = []
+                for sequence, pkg in enumerate(picking.picking_package_ids, start=1):
+                    return_result = self.omni_fedex_get_return_label(picking=picking,
+                                                                     product_packaging=pkg.packaging_id,
+                                                                     package_dimension=dict(width=pkg.width,
+                                                                                            height=pkg.height,
+                                                                                            length=pkg.length),
+                                                                     weight=pkg.weight,
+                                                                     pickup_datetime=pickup_datetime,
+                                                                     advanced_options=advanced_options,
+                                                                     tracking_number=pkg.carrier_tracking_ref,
+                                                                     origin_date=delivery_time)
+                    if return_result['errors_message']:
+                        return {
+                            'success': False,
+                            'price': 0.0,
+                            'price_without_discounts': 0.0,
+                            'estimated_date': 'N/A',
+                            'tracking_number': False,
+                            'error_message': _('RETURN LABEL %d: %s\n') % (sequence, return_result['errors_message']),
+                            'warning_message': False
+                        }
+
+                    labels.append(return_result['label'][0])
+                    tracking_numbers.append(str(return_result['tracking_reference']))
+
+                log_message = _("FedEx return labels<br/>"
+                                "<b>Tracking Numbers:</b> %s<br/>"
+                                "<b>Packages:</b> %s") % (
+                                  ', '.join(tracking_numbers), ', '.join([str(pl[0]) for pl in package_labels]))
+                if self.fedex_label_file_type != 'PDF':
+                    attachments = [('ReturnLabelFedex-%s.%s' % (index, self.fedex_label_file_type), label) for
+                                   index, label in
+                                   enumerate(labels, start=1)]
+                if self.fedex_label_file_type == 'PDF':
+                    attachments = [('ReturnLabelFedex-%s.pdf' % ' & '.join(tracking_numbers),
+                                    pdf.merge_pdf([label for label in labels]))]
+                picking.message_post(body=log_message, attachments=attachments)
+            else:
+                return_result = self.omni_fedex_get_return_label(picking=picking, product_packaging=product_packaging,
+                                                                 package_dimension=package_dimension,
+                                                                 weight=return_weight,
+                                                                 pickup_datetime=pickup_datetime,
+                                                                 advanced_options=advanced_options,
+                                                                 tracking_number=carrier_tracking_ref,
+                                                                 origin_date=delivery_time)
+
+                if return_result['errors_message']:
+                    return {
+                        'success': False,
+                        'price': 0.0,
+                        'price_without_discounts': 0.0,
+                        'estimated_date': 'N/A',
+                        'tracking_number': False,
+                        'error_message': _('RETURN LABEL %d: %s\n') % (sequence, return_result['errors_message']),
+                        'warning_message': False
+                    }
+
+                log_message = (_("FedEx return label <br/> <b>Tracking Number : </b>%s") % str(
+                    return_result['tracking_reference']))
+                fedex_labels = [('ReturnLabelFedex-%s.%s' % (return_result['tracking_reference'], self.fedex_label_file_type), return_result['label'][0])]
+                picking.message_post(body=log_message, attachments=fedex_labels)
 
         if isinstance(delivery_time, datetime.date):
             delivery_time = str(delivery_time.strftime(DEFAULT_SERVER_DATE_FORMAT))
@@ -513,12 +562,12 @@ class ProviderFedex(models.Model):
             #
             # insurance_cost = self._fedex_convert_cost(picking.sale_id, picking.company_id, response['insurance']) if response.get('insurance') else 0
 
-            fedex_labels = [('%s-%s-%s.%s' % (
-                self.get_return_label_prefix(), response['tracking_number'], index, self.fedex_label_file_type), label)
-                            for index, label in enumerate(request._get_labels(self.fedex_label_file_type))]
+            # fedex_labels = [('%s-%s-%s.%s' % (
+            #    self.get_return_label_prefix(), response['tracking_number'], index, self.fedex_label_file_type), label)
+            #                for index, label in enumerate(request._get_labels(self.fedex_label_file_type))]
 
-            picking.message_post(body=_('Return Label'), attachments=fedex_labels)
-            return {'errors_message': False}
+            # picking.message_post(body=_('Return Label'), attachments=fedex_labels)
+            return {'errors_message': False, 'tracking_reference': response['tracking_number'], 'label': request._get_labels(self.fedex_label_file_type)}
 
             # return {'success': True,
             #         'return_price': price,
@@ -527,6 +576,6 @@ class ProviderFedex(models.Model):
             title = 'Cannot create return label !'
             exceptions = [{'title': 'Message from fedEx',
                            'reason': response['errors_message']}]
-            #picking._log_exceptions_on_picking(title, exceptions)
+            # picking._log_exceptions_on_picking(title, exceptions)
             _logger.error(response['errors_message'])
             return {'errors_message': response['errors_message']}
