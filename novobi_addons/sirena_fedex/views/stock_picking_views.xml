@@ -13,6 +13,18 @@
                     <em>(**) Return Label will use FedEx Ground shipping service.</em>
                 </div>
             </xpath>
+            <field name="smartpost_indicia" position="attributes">
+                <attribute name="attrs">{}</attribute>
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="smartpost_ancillary" position="attributes">
+                <attribute name="attrs">{}</attribute>
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="smartpost_hubId" position="attributes">
+                <attribute name="attrs">{}</attribute>
+                <attribute name="invisible">1</attribute>
+            </field>
         </field>
     </record>
 
