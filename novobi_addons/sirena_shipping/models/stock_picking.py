@@ -97,3 +97,17 @@ class StockPicking(models.Model):
                 self._onchange_default_packaging_id()
 
         return result
+
+    def check_open_update_done_quantities_form(self, callback):
+        """
+        Inherit: add conditions not to show update qty form
+        """
+        if self.company_id.country_id.code == 'US':
+            fedex = self.env['shipping.account'].search([('provider', '=', 'fedex')], limit=1)
+            if fedex and fedex.stock_quantity_column != 'done':
+                return False
+        elif self.company_id.country_id.code == 'CA':
+            ups = self.env['shipping.account'].search([('provider', '=', 'ups')], limit=1)
+            if ups and ups.stock_quantity_column != 'done':
+                return False
+        return super(StockPicking, self).check_open_update_done_quantities_form(callback)

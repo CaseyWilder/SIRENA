@@ -15,7 +15,7 @@
                     <br/>
                     <br/>
                     <div class="o_horizontal_separator" attrs="{'invisible':[('provider', '=', 'none')]}">Logistics</div>
-                    <field name="stock_quantity_column" attrs="{'invisible':[('provider', '=', 'none')]}"/>
+                    <field name="stock_quantity_column" attrs="{'invisible':[('provider', '=', 'none')], 'required': True}"/>
                 </field>
             </field>
         </record>
