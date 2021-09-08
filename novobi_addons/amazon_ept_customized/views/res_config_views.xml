@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_amazon_instance_config_settings_custom" model="ir.ui.view">
+        <field name="name">Amazon Settings Customized</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="amazon_ept.view_amazon_instance_config_settings"/>
+        <field name="arch" type="xml">
+            <div name="amazon_us_tax_config" position="attributes">
+                <attribute name="attrs">{}</attribute>
+            </div>
+        </field>
+    </record>
+</odoo>

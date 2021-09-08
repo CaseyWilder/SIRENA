@@ -175,7 +175,7 @@ class ProviderFedex(models.Model):
                 weight_value = self._fedex_convert_weight_in_ob(pkg.weight, unit=self.fedex_weight_unit)
                 request._add_package(
                     weight_value=weight_value,
-                    package_code=pkg.packaging_id.shipper_package_code,
+                    package_code=pkg.packaging_id.shipper_package_code or 'YOUR_PACKAGING',
                     package_dimension=dict(width=pkg.width, height=pkg.height, length=pkg.length),
                     confirmation=picking.fedex_shipping_confirmation,
                     mode='rating',
@@ -287,13 +287,10 @@ class ProviderFedex(models.Model):
             shipping_charge_payment_type = 'RECIPIENT'
             bill_duties_party = recipient
 
-        # Configure label options
-        if shipping_account.label_file_type == 'PDF':
-            self.fedex_label_stock_type = 'PAPER_7X4.75'
-            self.fedex_label_file_type = 'PDF'
-        else:
-            self.fedex_label_stock_type = 'STOCK_4X9_LEADING_DOC_TAB'
-            self.fedex_label_file_type = 'ZPLII'
+        # [SRN-128] Configure label options
+        self.fedex_label_stock_type = shipping_account.fedex_label_stock_type
+        self.fedex_label_file_type = 'PDF' if shipping_account.label_file_type == 'PDF' else 'ZPLII'
+        # [SRN-128]
 
         request = FedexRequest(self.get_debug_logger_xml(picking), request_type="shipping",
                                prod_environment=shipping_account.prod_environment)
@@ -304,7 +301,7 @@ class ProviderFedex(models.Model):
 
         request.transaction_detail(picking.name)
 
-        def _generate_shipment_request(package_type):
+        def _generate_shipment_request(package_type, package_details):  # Add package details dictionary to match with package type of the current package
             request.shipment_request(dropoff_type=self.fedex_droppoff_type,
                                      service_type=self.fedex_service_type,
                                      packaging_type=package_type,
@@ -334,6 +331,28 @@ class ProviderFedex(models.Model):
                                    label_printing_orientation='TOP_EDGE_OF_TEXT_FIRST',
                                    label_order='SHIPPING_LABEL_FIRST'
                                    )
+
+            # Setup Doc Tab for label if the label's type is ZPL with DOC_TAB
+            # information: a dict() of 8 elements to be put on Doc Tab in the following format (leave blank '' if no intention to use that element):
+            # |0  |4  |8
+            # |1  |5  |9
+            # |2  |6  |10
+            # |3  |7  |11
+            # 8, 9, 10, 11 are reserved for shipping price details and could be changed in ./fedex_request/set_doc_tab()
+            if not isinstance(package_details, dict):
+                raise UserError(_('Internal code error: package_details is not a dictionary'))
+            information = {
+                'DIMS': '%.0fX%.0fX%.0f' % (package_details.get('length', 0), package_details.get('width', 0), package_details.get('height', 0)),
+                'Customer': picking.sale_id.display_name,
+                'Phone': recipient.phone or '',
+                'Dept': '',
+                'Date': pickup_date.strftime('%d%b%y'),
+                'Weight': '%.2f LBS' % package_details.get('weight', 0),
+                'COD': '',
+                'DV': ''
+            }
+            if self.fedex_label_stock_type != 'PDF' and 'DOC_TAB' in self.fedex_label_stock_type:
+                request.set_doc_tab(information, package_details.get('handling_fee', 0))
 
             # Commodities for customs declaration (international shipping)
             if self.fedex_service_type in ['INTERNATIONAL_ECONOMY', 'INTERNATIONAL_PRIORITY'] or (
@@ -376,12 +395,12 @@ class ProviderFedex(models.Model):
             dept_number = 'BILL D/T: SENDER'
 
         if not picking.is_mul_packages:
-            _generate_shipment_request(package_type)
             # Only one package
             weight_value = self._fedex_convert_weight_in_ob(weight, unit=self.fedex_weight_unit)
             # Set value for return weight
             return_weight = weight_value
             package_dimension = dict(height=package_height, width=package_width, length=package_length)
+            _generate_shipment_request(package_type, dict(height=package_height, width=package_width, length=package_length, weight=weight_value, handling_fee=picking.handling_fee))
             request._add_package(
                 weight_value=weight_value,
                 package_code=package_type,
@@ -424,8 +443,8 @@ class ProviderFedex(models.Model):
             log_message = (_("Shipment created into Fedex <br/> <b>Tracking Number : </b>%s") % (
                 carrier_tracking_ref))
             fedex_labels = [
-                ('LabelFedex-%s-%s.%s' % (carrier_tracking_ref, index, self.fedex_label_file_type), label)
-                for index, label in enumerate(request._get_labels(self.fedex_label_file_type))]
+                ('LabelFedex-%s.%s' % (carrier_tracking_ref, self.fedex_label_file_type), label)
+                for label in request._get_labels(self.fedex_label_file_type)]
 
             picking.message_post(body=log_message, attachments=fedex_labels)
         else:
@@ -446,7 +465,7 @@ class ProviderFedex(models.Model):
             for sequence, pkg in enumerate(picking.picking_package_ids, start=1):
                 weight_value = self._fedex_convert_weight_in_ob(pkg.weight, unit=self.fedex_weight_unit)
                 package_type = pkg.packaging_id.shipper_package_code or 'YOUR_PACKAGING'
-                _generate_shipment_request(package_type)
+                _generate_shipment_request(package_type, dict(width=pkg.width, height=pkg.height, length=pkg.length, weight=weight_value, handling_fee=pkg.handling_fee))
                 request._add_package(
                     weight_value=weight_value,
                     package_code=package_type,
@@ -533,20 +552,59 @@ class ProviderFedex(models.Model):
         # Create return label if user chose "include return label option"
         if advanced_options.get('shipping_include_return_label'):
             tracking_number = carrier_tracking_ref.split(',')[0]
-            return_result = self.omni_fedex_get_return_label(picking=picking, product_packaging=product_packaging,
-                                                             package_dimension=package_dimension, weight=return_weight,
-                                                             pickup_datetime=pickup_datetime, advanced_options=advanced_options,
-                                                             tracking_number=tracking_number, origin_date=delivery_time)
-            if return_result['errors_message']:
-                return {
-                    'success': False,
-                    'price': 0.0,
-                    'price_without_discounts': 0.0,
-                    'estimated_date': 'N/A',
-                    'tracking_number': False,
-                    'error_message': _('RETURN LABEL: %s\n') % return_result['errors_message'],
-                    'warning_message': False
-                }
+            if picking.is_mul_packages:
+                labels = []
+                tracking_numbers = []
+                for sequence, pkg in enumerate(picking.picking_package_ids, start=1):
+                    return_result = self.omni_fedex_get_return_label(picking=picking, product_packaging=pkg.packaging_id,
+                                                                     package_dimension=dict(width=pkg.width, height=pkg.height, length=pkg.length), weight=pkg.weight,
+                                                                     pickup_datetime=pickup_datetime, advanced_options=advanced_options,
+                                                                     tracking_number=pkg.carrier_tracking_ref, origin_date=delivery_time)
+                    if return_result['errors_message']:
+                        return {
+                            'success': False,
+                            'price': 0.0,
+                            'price_without_discounts': 0.0,
+                            'estimated_date': 'N/A',
+                            'tracking_number': False,
+                            'error_message': _('RETURN LABEL %d: %s\n') % (sequence, return_result['errors_message']),
+                            'warning_message': False
+                        }
+
+                    labels.append(return_result['label'])
+                    tracking_numbers.append(str(return_result['tracking_reference']))
+
+                log_message = _("FedEx return labels<br/>"
+                                "<b>Tracking Numbers:</b> %s<br/>"
+                                "<b>Packages:</b> %s") % (
+                                  ', '.join(tracking_numbers), ', '.join([str(pl[0]) for pl in package_labels]))
+                if self.fedex_label_file_type != 'PDF':
+                    attachments = [('ReturnLabelFedex-%s.%s' % (index, self.fedex_label_file_type), label) for index, label in
+                                   enumerate(labels, start=1)]
+                if self.fedex_label_file_type == 'PDF':
+                    attachments = [('ReturnLabelFedex-%s.pdf' % ' & '.join(tracking_numbers),
+                                    pdf.merge_pdf([label for label in labels]))]
+                picking.message_post(body=log_message, attachments=attachments)
+            else:
+                return_result = self.omni_fedex_get_return_label(picking=picking, product_packaging=product_packaging,
+                                                                 package_dimension=package_dimension, weight=return_weight,
+                                                                 pickup_datetime=pickup_datetime, advanced_options=advanced_options,
+                                                                 tracking_number=carrier_tracking_ref, origin_date=delivery_time)
+
+                if return_result['errors_message']:
+                    return {
+                        'success': False,
+                        'price': 0.0,
+                        'price_without_discounts': 0.0,
+                        'estimated_date': 'N/A',
+                        'tracking_number': False,
+                        'error_message': _('RETURN LABEL %d: %s\n') % (sequence, return_result['errors_message']),
+                        'warning_message': False
+                    }
+
+                log_message = (_("FedEx return label <br/> <b>Tracking Number : </b>%s") % str(return_result['tracking_reference']))
+                fedex_labels = [('ReturnLabelFedex-%s.%s' % (return_result['tracking_reference'], self.fedex_label_file_type), return_result['label'][0])]
+                picking.message_post(body=log_message, attachments=fedex_labels)
 
         if isinstance(delivery_time, datetime.date):
             delivery_time = str(delivery_time.strftime(DEFAULT_SERVER_DATE_FORMAT))
@@ -621,6 +679,28 @@ class ProviderFedex(models.Model):
                                label_order='SHIPPING_LABEL_FIRST',
                                )
 
+        # Setup Doc Tab for label if the label's type is ZPL with DOC_TAB
+        # information: a dict() of 8 elements to be put on Doc Tab in the following format (leave blank '' if no intention to use that element):
+        # |0  |4  |8
+        # |1  |5  |9
+        # |2  |6  |10
+        # |3  |7  |11
+        # 8, 9, 10, 11 are reserved for shipping price details and could be changed in ./fedex_request/set_doc_tab()
+        if not isinstance(package_dimension, dict):
+            raise UserError(_('Internal code error: package_dimension is not a dictionary'))
+        information = {
+            'DIMS': '%.0fX%.0fX%.0f' % (package_dimension.get('length', 0), package_dimension.get('width', 0), package_dimension.get('height', 0)),
+            'Customer': picking.sale_id.display_name,
+            'Phone': recipient.phone or '',
+            'Dept': '',
+            'Date': pickup_datetime.date().strftime('%d%b%y'),
+            'Weight': '%.2f LBS' % weight,
+            'COD': '',
+            'DV': ''
+        }
+        if self.fedex_label_stock_type != 'PDF' and 'DOC_TAB' in self.fedex_label_stock_type:
+            request.set_doc_tab(information, 0.0)
+
         net_weight = self._fedex_convert_weight_in_ob(weight, unit=self.fedex_weight_unit)
         po_number = picking.sale_id.display_name or False
         picking_number, dept_number = picking.name, False
@@ -685,12 +765,12 @@ class ProviderFedex(models.Model):
             #
             # insurance_cost = self._fedex_convert_cost(picking.sale_id, picking.company_id, response['insurance']) if response.get('insurance') else 0
 
-            fedex_labels = [('%s-%s-%s.%s' % (
-                self.get_return_label_prefix(), response['tracking_number'], index, self.fedex_label_file_type), label)
-                            for index, label in enumerate(request._get_labels(self.fedex_label_file_type))]
+            # fedex_labels = [('%s-%s-%s.%s' % (
+            #    self.get_return_label_prefix(), response['tracking_number'], index, self.fedex_label_file_type), label)
+            #                for index, label in enumerate(request._get_labels(self.fedex_label_file_type))]
 
-            picking.message_post(body=_('Return Label'), attachments=fedex_labels)
-            return {'errors_message': False}
+            # picking.message_post(body=_('Return Label'), attachments=fedex_labels)
+            return {'errors_message': False, 'tracking_reference': response['tracking_number'], 'label': request._get_labels(self.fedex_label_file_type)}
 
             # return {'success': True,
             #         'return_price': price,

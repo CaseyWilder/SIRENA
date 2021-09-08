@@ -2,23 +2,22 @@
 # See LICENSE file for full copyright and licensing details.
 
 {
-    'name': 'Sirena Shipping Account Customization',
-    'version': '14.0.1',
+    'name': 'Sirena Public Holidays',
+    'summary': 'Customize Novobi US Public Holidays',
+    'description': 'Customize Novobi US Public Holidays',
+    'version': '14.1.0.0',
     'category': 'Other',
-    'author': 'Novobi',
+    'author': 'Novobi LLC',
     "license": "OPL-1",
     'website': 'https://www.novobi.com',
-    'depends': [
-        'novobi_shipping_account'
-    ],
+    'depends': ['l10n_us_hr_holidays'],
     'data': [
         # ============================== DATA =================================
+        'data/init_public_holidays.xml',
 
         # ============================== SECURITY =============================
 
         # ============================== VIEWS ================================
-        'views/stock_picking_views.xml',
-        'views/shipping_account_views.xml',
 
         # ============================== REPORT ===============================
 

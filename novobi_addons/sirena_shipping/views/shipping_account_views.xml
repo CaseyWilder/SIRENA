@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="custom_shipping_account_form_settings" model="ir.ui.view">
+            <field name="name">custom.shipping.account.form.settings</field>
+            <field name="model">shipping.account</field>
+            <field name="inherit_id" ref="novobi_shipping_account.view_shipping_account_form_settings" />
+            <field name="arch" type="xml">
+                <field name="provider" position="before">
+                    <div class="o_horizontal_separator">Settings</div>
+                </field>
+                <field name="label_file_type" position="after">
+                    <field name="fedex_label_stock_type" required="1" attrs="{'invisible': [('provider', '!=', 'fedex')]}"/>
+                    <field name="ups_label_stock_type" required="1" attrs="{'invisible': [('provider', '!=', 'ups')]}"/>
+                    <br/>
+                    <br/>
+                    <div class="o_horizontal_separator" attrs="{'invisible':[('provider', '=', 'none')]}">Logistics</div>
+                    <field name="stock_quantity_column" attrs="{'invisible':[('provider', '=', 'none')], 'required': True}"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>
