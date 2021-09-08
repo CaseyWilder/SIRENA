@@ -202,4 +202,20 @@
             </xpath>
         </field>
     </record>
+
+    <record id="view_picking_withcarrier_out_form_omni_fulfillment_mso" model="ir.ui.view">
+        <field name="name">view.picking.with.carrier.out.form.omni.fulfillment.mso</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="delivery.view_picking_withcarrier_out_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='open_website_url']" position="attributes">
+                <attribute name="attrs">{'invisible': [('carrier_tracking_ref','=',False)]}</attribute>
+                <attribute name="string">Tracking 1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='open_website_url']" position="after">
+                <button type="object" name="second_open_website_url" class="oe_stat_button" icon='fa-truck' string="Tracking 2"
+                         attrs="{'invisible': [('second_carrier_tracking_ref','=',False)]}" />
+            </xpath>
+        </field>
+    </record>
 </odoo>

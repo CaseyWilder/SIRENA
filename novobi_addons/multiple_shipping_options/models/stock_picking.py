@@ -23,7 +23,7 @@ class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
     shipping_options = fields.Selection(SHIPPING_OPTIONS, string='Create Shipping Label Options', copy=False, required=True, default=lambda self: self.default_shipping_options())
-    label_status = fields.Selection(LABEL_STATUS, string='Keep track label status of the DO', copy=False, compute=lambda self: self.compute_label_status())
+    label_status = fields.Selection(LABEL_STATUS, string='Keep track label status of the DO', copy=False, compute='_compute_label_status')
     is_void_first_label = fields.Boolean(string='Shipping Option 1', copy=False)
     is_void_second_label = fields.Boolean(string='Shipping Option 2', copy=False)
 
@@ -69,31 +69,36 @@ class StockPicking(models.Model):
 
     @api.onchange('shipping_options')
     def _onchange_shipping_options(self):
+        """
+        Prevents the user from switching to Shipping Option that already has a shipping label created.
+        """
         if self.shipping_options == 'option1' and self.label_status == '1':
             raise UserError('There has already been a shipping label for Shipping Option 1, please choose Shipping Option 2 instead!')
         elif self.shipping_options == 'option2' and self.label_status == '2':
             raise UserError('There has already been a shipping label for Shipping Option 2, please choose Shipping Option 1 instead!')
 
-    @api.model
-    def _reset_label_fields(self):
-        res = super(StockPicking, self)._reset_label_fields()
-        res.update({
-            'shipping_options': False,
-        })
-        return res
-
     @api.depends('is_create_label', 'second_is_create_label')
-    def compute_label_status(self):
-        if self.is_create_label:
-            self.label_status = '1'
-        if self.second_is_create_label:
-            self.label_status = '2'
-        if self.is_create_label and self.second_is_create_label:
-            self.label_status = '3'
-        if not self.is_create_label and not self.second_is_create_label:
-            self.label_status = False
+    def _compute_label_status(self):
+        """
+        Updates stock.picking's label status:
+        - False: no label has been created.
+        - '1': has shipping label for Shipping Option 1.
+        - '2': has shipping label for Shipping Option 2.
+        - '3': has shipping labels for both options.
+        """
+        for record in self:
+            is_create_label = 1 if record.is_create_label else 0
+            second_is_create_label = 2 if record.second_is_create_label else 0
+            label_status = is_create_label + second_is_create_label
+            record.label_status = label_status and str(label_status) or False
 
     def default_shipping_options(self):
+        """
+        Used to compute default shipping option when opening the Create Label form:
+        - If there has been no shipping label created, default shipping option is Shipping Option 1.
+        - If there has been a shipping label for Shipping Option 2, default shipping option is Shipping Option 1.
+        - If there has been a shipping label for Shipping Option 1, default shipping option is Shipping Option 2.
+        """
         if not self.label_status:
             self.shipping_options = 'option1'
             return
@@ -107,6 +112,9 @@ class StockPicking(models.Model):
 
     @api.onchange('second_shipping_date')
     def _onchange_second_shipping_date(self):
+        """
+        Option 1's shipping_date counterpart method.
+        """
         if self.second_shipping_date and self.second_shipping_date < fields.Date.today() and 'no_check' not in self.env.context:
             return dict(warning={
                 'title': _('Invalid Ship date'),
@@ -115,6 +123,9 @@ class StockPicking(models.Model):
 
     @api.onchange('second_default_packaging_id')
     def _onchange_second_default_packaging_id(self):
+        """
+        Option 1's default_packaging_id counterpart method.
+        """
         self.ensure_one()
         if self.second_default_packaging_id.is_custom:
             self.update({
@@ -133,11 +144,14 @@ class StockPicking(models.Model):
     @api.onchange('partner_id', 'location_id', 'move_ids_without_package')
     def _onchange_partner_and_location(self):
         self.ensure_one()
-        if self.label_status:
+        if self.label_status:  # [SRN-99] Switch from checking only is_create_label to check if there is any shipping label using label_status.
             self.is_change_info = True
             self.is_change_info_message_removed = False
 
     def second_open_website_url(self):
+        """
+        Smart button "Tracking 2"
+        """
         self.ensure_one()
         match = guess_carrier(self.second_carrier_tracking_ref)
         if not match:
@@ -151,6 +165,9 @@ class StockPicking(models.Model):
             }
 
     def create_custom_package_type(self):
+        """
+        Only create new custom package type when the selecting shipping option is Shipping Option 1.
+        """
         self.ensure_one()
         if self.shipping_options == 'option1':
             super().create_custom_package_type()
@@ -165,6 +182,9 @@ class StockPicking(models.Model):
 
     @api.model
     def _reset_label_fields(self):
+        """
+        Rewrite method to reset fields based on the selecting shipping option (used when voiding labels).
+        """
         vals = {
             'shipping_cost': 0.0,
             'shipping_cost_without_discounts': 0.0,
@@ -250,7 +270,7 @@ class StockPicking(models.Model):
 
     def reset_label_fields(self):
         self.sudo().write(self._reset_label_fields())
-        if self.is_void_first_label and self.picking_package_ids:
+        if self.is_void_first_label and self.picking_package_ids:  # Only unlink the MPS table if void Shipping Option 1's label
             self.sudo().picking_package_ids.unlink()
 
     def button_validate(self):
@@ -265,7 +285,7 @@ class StockPicking(models.Model):
         if open_update_done_quantities_form:
             return open_update_done_quantities_form
 
-        if not self.label_status and 'is_confirm_wiz' not in self.env.context:
+        if not self.label_status and 'is_confirm_wiz' not in self.env.context:  # Switch to label_status to check if no label has been created
             wiz = self.env['confirm.create.shipping.label'].create({'picking_id': self.id})
             return {
                 'name': _('Confirmation'),
@@ -286,6 +306,8 @@ class StockPicking(models.Model):
         res = super().open_create_label_form()
         self.default_shipping_options()
         self.second_shipping_date = fields.Datetime.to_string(max(self.scheduled_date, fields.Datetime.now()))
+
+        # Recover saved fields for Option 1 (these fields were modified when calling super().open_create_label_form() above)
         if self.shipping_options == 'option2':
             self.update({
                 'delivery_carrier_id': self.first_option_delivery_carrier_id,
@@ -295,6 +317,7 @@ class StockPicking(models.Model):
                 'shipping_date': self.first_option_shipping_date
             })
             self._onchange_default_packaging_id()
+
         return res
 
     def action_create_label(self):
@@ -379,6 +402,7 @@ class StockPicking(models.Model):
             'no_shipping_cost': no_shipping_cost
         }
 
+        # Update fields according to their selected shipping option when creating label.
         if self.shipping_options == 'option1':
             vals.update({
                 'is_create_label': True,
@@ -479,7 +503,7 @@ class StockPicking(models.Model):
     def write(self, vals):
         if 'create_label' in self.env.context:
             return super(StockPicking, self).write(vals)
-        if 'move_lines' in vals and self.label_status:
+        if 'move_lines' in vals and self.label_status:  # Switch label_status to check if there has been any shipping label created
             # Raise Warning when users add or remove move line in Delivery Order
             vals['is_change_info'] = True
             vals['is_change_info_message_removed'] = False
