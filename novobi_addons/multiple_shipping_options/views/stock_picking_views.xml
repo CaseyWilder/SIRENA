@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="custom_create_label_form_fedex_mso" model="ir.ui.view">
+        <field name="name">custom.create.label.form.fedex.mso</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="novobi_shipping_account.view_picking_create_label_form"/>
+        <field name="arch" type="xml">
+            <field name="state" position="after">
+                <group string="Create Shipping Label Options" attrs="{'invisible': [('provider', '!=', 'fedex')]}">
+                    <group>
+                        <field name="label_status" invisible="1"/>
+                        <field name="shipping_options" widget="radio" required="1"/>
+                    </group>
+                </group>
+            </field>
+            <field name="delivery_carrier_id" position="attributes">
+                <attribute name="required">0</attribute>
+                <attribute name="attrs">{'invisible': ['|', ('provider', '=', False), ('shipping_options', '=', 'option2')], 'required': [('provider', '!=', False), ('shipping_options', '=', 'option1')]}</attribute>
+            </field>
+            <field name="delivery_carrier_id" position="after">
+                <field name="second_delivery_carrier_id" string="Shipping Service"
+                                   domain="[('shipping_account_id.id','=',shipping_account_id), ('id', 'in', shipping_account_delivery_carrier_ids)]"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   attrs="{'invisible': ['|', ('provider', '=', False), ('shipping_options', '=', 'option1')], 'required': [('provider', '!=', False), ('shipping_options', '=', 'option2')]}"
+                                   context="{'tree_view_ref': 'novobi_shipping_account.product_packaging_tree'}"/>
+            </field>
+            <field name="is_mul_packages" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('provider', 'not in', ['ups','fedex']), ('shipping_options', '=', 'option2')]}</attribute>
+            </field>
+            <field name="default_packaging_id" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', '|', ('provider', 'not in', ['fedex','shipstation', 'ups']), ('is_mul_packages', '=', True), ('shipping_options', '=', 'option2')], 'required': [('provider', 'in', ['ups','fedex','shipstation']), ('is_mul_packages', '=', False), ('shipping_options', '=', 'option1')]}</attribute>
+            </field>
+            <field name="default_packaging_id" position="after">
+                <field name="second_default_packaging_id" string="Package Type"
+                                   attrs="{'invisible': ['|', ('provider', 'not in', ['fedex','shipstation', 'ups']), ('shipping_options', '=', 'option1')], 'required': [('provider', 'in', ['ups','fedex','shipstation']), ('shipping_options', '=', 'option2')]}"
+                                   options="{'no_create': True, 'no_open': True}"/>
+            </field>
+            <xpath expr="//label[1]" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('is_mul_packages', '=', True), ('shipping_options', '=', 'option2')]}</attribute>
+            </xpath>
+            <xpath expr="//div[1]" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('is_mul_packages', '=', True), ('shipping_options', '=', 'option2')]}</attribute>
+            </xpath>
+            <xpath expr="//div[1]" position="after">
+                <label for="second_package_size_length" string="Package Size"
+                                   attrs="{'invisible': [('shipping_options', '=', 'option1')]}"/>
+                <div class="o_row" name="second_package_size" attrs="{'invisible': [('shipping_options', '=', 'option1')]}">
+                    <span>L</span>
+                    <field name="second_package_size_length"/>
+                    <span>W</span>
+                    <field name="second_package_size_width"/>
+                    <span>H</span>
+                    <field name="second_package_size_height"/>
+                    <span>(in)</span>
+                </div>
+            </xpath>
+            <xpath expr="//label[3]" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('shipping_options', '=', 'option2'), ('is_package_require_dimensions', '=', False)]}</attribute>
+            </xpath>
+            <xpath expr="//div[3]" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('shipping_options', '=', 'option2'), ('is_package_require_dimensions', '=', False)]}</attribute>
+            </xpath>
+            <field name="custom_packaging_name" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('is_save_custom_package', '=', False), ('shipping_options', '=', 'option2')], 'required': [('is_save_custom_package', '=', True), ('shipping_options', '=', 'option1')]}</attribute>
+            </field>
+            <xpath expr="//label[4]" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('shipping_options', '=', 'option2'), ('is_mul_packages', '=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//div[4]" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('shipping_options', '=', 'option2'), ('is_mul_packages', '=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//div[4]" position="after">
+                <label for="second_package_shipping_weight" string="Weight for Shipping"
+                                   attrs="{'invisible': [('shipping_options', '=', 'option1')]}"/>
+                <div class="o_row" name="second_package_shipping_weight_in_pound"
+                     attrs="{'invisible': [('shipping_options', '=', 'option1')]}">
+                    <field name="second_package_shipping_weight" string="Weight for Shipping"/>
+                    <span>(lb)</span>
+                </div>
+            </xpath>
+            <field name="handling_fee" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', '|', ('provider', 'not in', ['fedex', 'ups']), ('is_mul_packages', '=', True), ('shipping_options', '=', 'option2')]}</attribute>
+            </field>
+            <field name="handling_fee" position="after">
+                <field name="second_handling_fee" attrs="{'invisible': ['|', ('provider', 'not in', ['fedex', 'ups']), ('shipping_options', '=', 'option1')]}"/>
+            </field>
+            <field name="shipping_date" position="attributes">
+                <attribute name="required">0</attribute>
+                <attribute name="attrs">{'invisible': [('shipping_options', '=', 'option2')], 'required': [('shipping_options', '=', 'option1')]}</attribute>
+            </field>
+            <field name="shipping_date" position="after">
+                <field name="second_shipping_date" attrs="{'invisible': [('shipping_options', '=', 'option1')], 'required': [('shipping_options', '=', 'option2')]}"/>
+            </field>
+            <field name="fedex_shipping_confirmation" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('provider', '!=', 'fedex'), ('shipping_options', '=', 'option2')]}</attribute>
+            </field>
+            <field name="fedex_shipping_confirmation" position="after">
+                <field name="second_fedex_shipping_confirmation"
+                       attrs="{'invisible': ['|', ('provider', '!=', 'fedex'), ('shipping_options', '=', 'option1')]}"
+                       string="Confirmation" />
+            </field>
+            <xpath expr="//field[@name='picking_package_ids']/.." position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('shipping_options', '=', 'option2'), ('is_mul_packages', '=', False)]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="custom_view_picking_form_mso" model="ir.ui.view">
+        <field name="name">custom.view.picking.form.mso</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="novobi_shipping_account.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header//field[@name='is_create_label']" position="after">
+                <field name="second_is_create_label" invisible="1"/>
+            </xpath>
+            <xpath expr="//button[@name='open_create_label_form']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', '&amp;', ('is_create_label', '=', True), ('second_is_create_label', '=', True), '|', ('state', 'not in', ('assigned', 'done')), ('picking_type_code','!=','outgoing')]}</attribute>
+            </xpath>
+            <xpath expr="//button[@name='button_void_label']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', '&amp;', ('is_create_label', '!=', True), ('second_is_create_label', '!=', True), ('picking_type_code','!=','outgoing')]}</attribute>
+                <attribute name="name">open_mso_void_label_wizard</attribute>
+                <attribute name="confirm"/>
+            </xpath>
+            <xpath expr="//button[@name='do_print_picking']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', '|', ('state', 'not in', ('assigned', 'partially_available')), ('is_locked', '=', False), '&amp;', ('picking_type_code', '=', 'outgoing'), '&amp;', ('is_create_label', '=', False), ('second_is_create_label', '=', False)]}</attribute>
+            </xpath>
+            <button name="action_cancel" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', '|', ('state', 'not in', ('assigned', 'confirmed', 'partially_available', 'draft', 'waiting')), ('is_locked', '=', False), '&amp;', ('is_create_label', '=', True), ('second_is_create_label', '=', True)]}</attribute>
+            </button>
+            <xpath expr="//button[@name='action_cancel'][2]" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', '|', ('state', 'not in', ('assigned', 'confirmed', 'partially_available', 'draft', 'waiting')), ('is_locked', '=', False), '|', '&amp;', ('is_create_label', '!=', True), ('second_is_create_label', '!=', True), ('picking_type_code', '!=', 'outgoing')]}</attribute>
+            </xpath>
+            <xpath expr="//page[@name='shipping_info_has_label']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', '&amp;', ('is_create_label', '=', True), ('second_is_create_label', '=', True), '|', ('state', '!=', 'done'), ('picking_type_code','!=','outgoing')]}</attribute>
+            </xpath>
+            <xpath expr="//page[@name='shipping_info_no_label']" position="before">
+                <field name="second_is_create_label" invisible="1"/>
+            </xpath>
+            <xpath expr="//page[@name='shipping_info_no_label']" position="attributes">
+                <attribute name="string">Shipping Information Option 1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='shipping_info_no_label']/field[@name='is_create_label']" position="after">
+                <field name="second_is_create_label" invisible="1"/>
+            </xpath>
+            <xpath expr="//page[@name='shipping_info_no_label']//field[@name='shipping_insurance']" position="attributes">
+                <attribute name="attrs">{}</attribute>
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='shipping_info_no_label']//field[@name='shipping_insurance_amount']" position="attributes">
+                <attribute name="attrs">{}</attribute>
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='shipping_info_no_label']//field[@name='shipping_estimated_date']/../.." position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='shipping_info_no_label']//field[@name='shipping_date']" position="before">
+                <field name="carrier_tracking_ref" readonly="1" attrs="{'invisible': [('is_mul_packages', '=', True)]}" />
+            </xpath>
+            <xpath expr="//page[@name='shipping_info_no_label']//div[@name='other_shipping_information']/.." position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='shipping_info_no_label']" position="after">
+                <page name="second_shipping_info_no_label" string="Shipping Information Option 2"
+                attrs="{'invisible': ['|',('second_is_create_label', '=', False),('picking_type_code','!=','outgoing')]}">
+                    <field name="second_is_create_label" invisible="1" />
+                    <group string="Delivery Information">
+                        <group>
+                            <field name="currency_id" invisible="1" readonly="1" />
+                            <field name="provider" string="Provider" readonly="1" invisible="1"/>
+                            <field name="shipping_account_id"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   readonly="1" string="Shipping Account"/>
+                            <field name="second_delivery_carrier_id" readonly="1" string="Shipping Service"
+                                   options="{'no_open':True,'no_create':True, 'no_create_edit':True}" />
+                            <field name="second_default_packaging_id" string="Package Type" readonly="1"
+                                   attrs="{'invisible': [('provider', 'not in', ['fedex','shipstation','ups'])]}"
+                                   options="{'no_create': True, 'no_open': True}" />
+                            <label for="second_package_size_length" string="Package Size"/>
+                            <div class="o_row" name="package_size">
+                                <span>L</span>
+                                <field name="second_package_size_length" readonly="1"/>
+                                <span class="pl-3">W</span>
+                                <field name="second_package_size_width" readonly="1"/>
+                                <span class="pl-3">H</span>
+                                <field name="second_package_size_height" readonly="1"/>
+                                <span class="pl-4">(in)</span>
+                            </div>
+                            <label for="second_package_shipping_weight" string="Weight for Shipping"/>
+                            <div class="o_row" name="package_shipping_weight_in_pound">
+                                <field name="second_package_shipping_weight" string="Weight for Shipping" readonly="1"/>
+                                <span>(lb)</span>
+                            </div>
+                            <field name="second_handling_fee" readonly="1" attrs="{'invisible': [('provider', 'not in', ['fedex', 'ups'])]}"/>
+                        </group>
+                        <group>
+                            <field name="second_carrier_tracking_ref" readonly="1"/>
+                            <field name="second_shipping_date" readonly="1"/>
+                            <field name="second_fedex_shipping_confirmation" readonly="1" attrs="{'invisible': [('provider', '!=', 'fedex')]}" string="Confirmation"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
