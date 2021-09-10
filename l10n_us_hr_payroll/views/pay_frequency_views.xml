@@ -24,6 +24,35 @@
                             </div>
                         </group>
                     </group>
+                    <group name="increment" groups="base.group_no_one" class="oe_edit_only"
+                           attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('frequency', 'not in', ['12', '24'])]}">
+                        <div name="increment_alert" colspan="2" class="alert alert-info" role="alert">
+                            <div class="mb-4">
+                                <b>Note: </b>
+                                Be careful before changing <b><i>increment</i></b>. This field will be used to generate upcoming periods.
+                            </div>
+                            <div>
+                                Make sure you <b>always setup the initial date on a month with 31 days</b>,
+                                if your <b>Last Day of Work is at the end of the month</b>.
+                                <p>e.g: <i>Sep 30th</i> &amp;rarr; <i>August 31st</i></p>
+                            </div>
+                            <ul>
+                                <li>
+                                    <div>
+                                        For <b><i>Monthly</i></b>, you need to go back to 1 month,
+                                        and change <b><i>increment</i></b> to <b>1</b>.
+                                    </div>
+                                </li>
+                                <li>
+                                    <div>
+                                        For <b><i>Semi-monthly</i></b>, you need to go back to 1 month,
+                                        and change <b><i>increment</i></b> to <b>2</b>.
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <field name="increment"/>
+                    </group>
                     <group name="period">
                         <group name="left_group">
                             <span class="o_td_label o_form_label">
