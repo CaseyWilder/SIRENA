@@ -23,7 +23,7 @@
                         <div class="o_horizontal_separator">Shipment Options</div>
                         <div>
                             <div>
-                                <field name="is_residential_address" attrs="{'readonly': [('fedex_service_type','in',['FEDEX_GROUND','GROUND_HOME_DELIVERY'])], 'invisible': [('provider', '!=', 'fedex')]}" force_save="1"/>
+                                <field name="is_residential_address" attrs="{'invisible': [('provider', '!=', 'fedex')]}" force_save="1"/>
                                 <label for="is_residential_address" string="Residential (recipient)"/>
                             </div>
                             <div>
