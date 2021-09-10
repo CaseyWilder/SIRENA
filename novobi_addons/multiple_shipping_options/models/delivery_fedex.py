@@ -1,99 +1,20 @@
-# Copyright © 2020 Novobi, LLC
+# Copyright © 2021 Novobi, LLC
 # See LICENSE file for full copyright and licensing details.
+import datetime
+import logging
 
 from odoo.tools import pdf, DEFAULT_SERVER_DATE_FORMAT
 from odoo import api, models, fields, _, tools
 from odoo.addons.delivery_fedex.models.delivery_fedex import _convert_curr_iso_fdx
 from odoo.exceptions import UserError
 
-from .fedex_request import FedexRequest
-from decimal import Decimal
-
-import datetime
-import logging
+from odoo.addons.omni_fedex.models.fedex_request import FedexRequest
 
 _logger = logging.getLogger(__name__)
 
+
 class ProviderFedex(models.Model):
     _inherit = 'delivery.carrier'
-
-    fedex_service_type = fields.Selection(selection_add=[
-        ('FEDEX_GROUND',),
-        ('GROUND_HOME_DELIVERY', 'GROUND_HOME_DELIVERY'),
-        ('SMART_POST', 'SMART_POST')
-    ])
-
-    def _fedex_convert_weight_in_ob(self, weight, unit='LB'):
-        weight_uom_id = self.env.ref('uom.product_uom_lb')
-        if unit == 'KG':
-            weight_value = weight_uom_id._compute_quantity(weight, self.env.ref('uom.product_uom_kgm'), round=False)
-        elif unit == 'LB':
-            weight_value = weight
-        else:
-            raise ValueError
-        return max(weight_value, 0.01) if weight_value <= 0.0 else weight_value
-
-    @api.model
-    def _fedex_convert_cost(self, order_id, company_id, response_type):
-        order_currency = order_id.currency_id
-        company_currency = company_id.currency_id
-        if _convert_curr_iso_fdx(order_currency.name) in response_type:
-            cost = response_type[_convert_curr_iso_fdx(order_currency.name)]
-        else:
-            _logger.info("Preferred currency has not been found in FedEx response")
-            if _convert_curr_iso_fdx(company_currency.name) in response_type:
-                amount = response_type[_convert_curr_iso_fdx(company_currency.name)]
-            else:
-                amount = response_type.get('USD', 0.0)
-            if isinstance(amount, Decimal):
-                amount = float(amount)
-            cost = company_currency._convert(
-                amount, order_currency, company_id, order_id.date_order or fields.Date.today())
-        return cost
-
-    @api.model
-    def fedex_check_connection(self, shipping_account):
-        self += self.env.ref('omni_fedex.fedex_fedex_2_day')
-        product_packaging = self.env.ref('delivery_fedex.fedex_packaging_FEDEX_BOX')
-
-        shipper = self.env.ref('novobi_shipping_account.shipper_test_connection')
-        warehouse = self.env.ref('novobi_shipping_account.ship_from_test_connection')
-        recipient = self.env.ref('novobi_shipping_account.ship_to_test_connection')
-
-        weight_value = self._fedex_convert_weight_in_ob(weight=5)
-        # Authentication stuff
-        request = FedexRequest(self.get_debug_logger_xml(None), request_type="rating",
-                               prod_environment=shipping_account.prod_environment)
-        request.web_authentication_detail(shipping_account.fedex_developer_key,
-                                          shipping_account.fedex_developer_password)
-        request.client_detail(shipping_account.fedex_account_number, shipping_account.fedex_meter_number)
-
-        request.transaction_detail("Check Connection")
-        request.shipment_request(
-            self.fedex_droppoff_type,
-            self.fedex_service_type,
-            product_packaging.shipper_package_code,
-            self.fedex_weight_unit,
-        )
-
-        request.set_currency(_convert_curr_iso_fdx("USD"))
-        request.set_shipper(shipper, warehouse)
-        request.set_recipient(recipient)
-
-        request._add_package(
-            weight_value=weight_value,
-            package_code=product_packaging.shipper_package_code,
-            package_dimension=dict(height=10, width=20, length=30),
-            mode='rating',
-        )
-        request.set_master_package(weight_value, 1)
-
-        response = request.rate()
-
-        error_message = False
-        if response.get('errors_message'):
-            error_message = response['errors_message']
-        return {'error_message': error_message}
 
     @api.model
     def fedex_get_rate_and_delivery_time(self, picking, product_packaging,
@@ -155,7 +76,7 @@ class ProviderFedex(models.Model):
         request.set_recipient(recipient)
         request.set_residential_recipient(residential)
 
-        if not picking.is_mul_packages:
+        if not picking.is_mul_packages or (picking.is_mul_packages and picking.shipping_options == 'option2'):
             weight_value = self._fedex_convert_weight_in_ob(weight, unit=self.fedex_weight_unit)
             package_dimension = dict(height=package_height, width=package_width, length=package_length)
 
@@ -163,13 +84,13 @@ class ProviderFedex(models.Model):
                 weight_value=weight_value,
                 package_code=package_type,
                 package_dimension=package_dimension,
-                confirmation=picking.fedex_shipping_confirmation,
+                confirmation=picking.fedex_shipping_confirmation if picking.shipping_options == 'option1' else picking.second_fedex_shipping_confirmation,
                 mode='rating',
                 insurance_amount=insurance_amount,
-                handling_fee=picking.handling_fee
+                handling_fee=picking.handling_fee if picking.shipping_options == 'option1' else picking.second_handling_fee
             )
             request.set_master_package(weight_value, 1)
-        else:
+        elif picking.shipping_options == 'option1' and picking.is_mul_packages:
             total_weight = 0.0
             for sequence, pkg in enumerate(picking.picking_package_ids, start=1):
                 weight_value = self._fedex_convert_weight_in_ob(pkg.weight, unit=self.fedex_weight_unit)
@@ -177,7 +98,7 @@ class ProviderFedex(models.Model):
                     weight_value=weight_value,
                     package_code=pkg.packaging_id.shipper_package_code or 'YOUR_PACKAGING',
                     package_dimension=dict(width=pkg.width, height=pkg.height, length=pkg.length),
-                    confirmation=picking.fedex_shipping_confirmation,
+                    confirmation=picking.fedex_shipping_confirmation if picking.shipping_options == 'option1' else picking.second_fedex_shipping_confirmation,
                     mode='rating',
                     sequence_number=sequence,
                     insurance_amount=insurance_amount,
@@ -225,7 +146,8 @@ class ProviderFedex(models.Model):
 
         # SmartPost Detail
         if self.fedex_service_type == 'SMART_POST':
-            request.set_smartpost_detail(picking.smartpost_indicia, picking.smartpost_ancillary, picking.smartpost_hubId)
+            request.set_smartpost_detail(picking.smartpost_indicia, picking.smartpost_ancillary,
+                                         picking.smartpost_hubId)
 
         # Sending Get Rate Request
         response = request.rate(return_time_in_transit=True)
@@ -243,7 +165,8 @@ class ProviderFedex(models.Model):
                     'warning_message': response.get('warnings_message')}
 
         price = self._fedex_convert_cost(picking.sale_id, picking.company_id, response['price'])
-        price_without_discounts = self._fedex_convert_cost(picking.sale_id, picking.company_id, response['price_without_discounts'])
+        price_without_discounts = self._fedex_convert_cost(picking.sale_id, picking.company_id,
+                                                           response['price_without_discounts'])
         return {'success': True,
                 'price': price,
                 'price_without_discounts': price_without_discounts,
@@ -301,7 +224,8 @@ class ProviderFedex(models.Model):
 
         request.transaction_detail(picking.name)
 
-        def _generate_shipment_request(package_type, package_details):  # Add package details dictionary to match with package type of the current package
+        def _generate_shipment_request(package_type,
+                                       package_details):  # Add package details dictionary to match with package type of the current package
             request.shipment_request(dropoff_type=self.fedex_droppoff_type,
                                      service_type=self.fedex_service_type,
                                      packaging_type=package_type,
@@ -342,7 +266,8 @@ class ProviderFedex(models.Model):
             if not isinstance(package_details, dict):
                 raise UserError(_('Internal code error: package_details is not a dictionary'))
             information = {
-                'DIMS': '%.0fX%.0fX%.0f' % (package_details.get('length', 0), package_details.get('width', 0), package_details.get('height', 0)),
+                'DIMS': '%.0fX%.0fX%.0f' % (
+                package_details.get('length', 0), package_details.get('width', 0), package_details.get('height', 0)),
                 'Customer': picking.sale_id.display_name,
                 'Phone': recipient.phone or '',
                 'Dept': '',
@@ -394,13 +319,15 @@ class ProviderFedex(models.Model):
             po_number = 'B2B' if picking.partner_id.commercial_partner_id.is_company else 'B2C'
             dept_number = 'BILL D/T: SENDER'
 
-        if not picking.is_mul_packages:
+        if not picking.is_mul_packages or (picking.is_mul_packages and picking.shipping_options == 'option2'):
             # Only one package
             weight_value = self._fedex_convert_weight_in_ob(weight, unit=self.fedex_weight_unit)
             # Set value for return weight
             return_weight = weight_value
             package_dimension = dict(height=package_height, width=package_width, length=package_length)
-            _generate_shipment_request(package_type, dict(height=package_height, width=package_width, length=package_length, weight=weight_value, handling_fee=picking.handling_fee))
+            _generate_shipment_request(package_type,
+                                       dict(height=package_height, width=package_width, length=package_length,
+                                            weight=weight_value, handling_fee=picking.handling_fee if picking.shipping_options == 'option1' else picking.second_handling_fee))
             request._add_package(
                 weight_value=weight_value,
                 package_code=package_type,
@@ -410,17 +337,18 @@ class ProviderFedex(models.Model):
                 dept_number=dept_number,
                 reference=picking.display_name,
                 picking_number=picking_number,
-                confirmation=picking.fedex_shipping_confirmation,
+                confirmation=picking.fedex_shipping_confirmation if picking.shipping_options == 'option1' else picking.second_fedex_shipping_confirmation,
                 insurance_amount=insurance_options['insurance_amount'],
                 advanced_options=advanced_options,
                 advanced_option_values=advanced_option_values,
-                handling_fee=picking.handling_fee
+                handling_fee=picking.handling_fee if picking.shipping_options == 'option1' else picking.second_handling_fee
             )
             request.set_master_package(weight_value, 1)
 
             # SmartPost Detail
             if self.fedex_service_type == 'SMART_POST':
-                request.set_smartpost_detail(picking.smartpost_indicia, picking.smartpost_ancillary, picking.smartpost_hubId)
+                request.set_smartpost_detail(picking.smartpost_indicia, picking.smartpost_ancillary,
+                                             picking.smartpost_hubId)
 
             # Request shipment to fedEx
             response = request.process_shipment()
@@ -447,7 +375,7 @@ class ProviderFedex(models.Model):
                 for label in request._get_labels(self.fedex_label_file_type)]
 
             picking.message_post(body=log_message, attachments=fedex_labels)
-        else:
+        elif picking.shipping_options == 'option1' and picking.is_mul_packages:
             ################
             # Multipackage #
             ################
@@ -460,12 +388,14 @@ class ProviderFedex(models.Model):
             #   of the shipping has to be cancelled separately
             master_tracking_id, package_labels, carrier_tracking_ref = False, [], ""
             package_count = len(picking.picking_package_ids)
-            net_weight = self._fedex_convert_weight(sum([pkg.weight for pkg in picking.picking_package_ids]), self.fedex_weight_unit)
+            net_weight = self._fedex_convert_weight(sum([pkg.weight for pkg in picking.picking_package_ids]),
+                                                    self.fedex_weight_unit)
 
             for sequence, pkg in enumerate(picking.picking_package_ids, start=1):
                 weight_value = self._fedex_convert_weight_in_ob(pkg.weight, unit=self.fedex_weight_unit)
                 package_type = pkg.packaging_id.shipper_package_code or 'YOUR_PACKAGING'
-                _generate_shipment_request(package_type, dict(width=pkg.width, height=pkg.height, length=pkg.length, weight=weight_value, handling_fee=pkg.handling_fee))
+                _generate_shipment_request(package_type, dict(width=pkg.width, height=pkg.height, length=pkg.length,
+                                                              weight=weight_value, handling_fee=pkg.handling_fee))
                 request._add_package(
                     weight_value=weight_value,
                     package_code=package_type,
@@ -476,7 +406,7 @@ class ProviderFedex(models.Model):
                     picking_number=picking_number,
                     sequence_number=sequence,
                     reference=picking.display_name,
-                    confirmation=picking.fedex_shipping_confirmation,
+                    confirmation=picking.fedex_shipping_confirmation if picking.shipping_options == 'option1' else picking.second_fedex_shipping_confirmation,
                     advanced_options=advanced_options,
                     advanced_option_values=advanced_option_values,
                     handling_fee=pkg.handling_fee
@@ -493,8 +423,10 @@ class ProviderFedex(models.Model):
                         # Remove all carrier_tracking_ref in each package
                         picking.picking_package_ids.write(dict(carrier_tracking_ref=False))
 
-                    errors = response.get('errors_message') if isinstance(response.get('errors_message'), list) else [response.get('errors_message')]
-                    error_message = ('Error when sending package No. %s \n ' % sequence).join(str(error) for error in errors)
+                    errors = response.get('errors_message') if isinstance(response.get('errors_message'), list) else [
+                        response.get('errors_message')]
+                    error_message = ('Error when sending package No. %s \n ' % sequence).join(
+                        str(error) for error in errors)
                     return {'success': False,
                             'price': 0.0,
                             'price_without_discounts': 0.0,
@@ -515,8 +447,8 @@ class ProviderFedex(models.Model):
 
                 # Intermediary packages
                 # elif sequence > 1 and sequence < package_count:
-                    # Concat carrier tracking ref with previous one
-                    # carrier_tracking_ref += "," + response['tracking_number']
+                # Concat carrier tracking ref with previous one
+                # carrier_tracking_ref += "," + response['tracking_number']
 
                 # Last package
                 elif sequence == package_count:
@@ -524,14 +456,15 @@ class ProviderFedex(models.Model):
                     # carrier_tracking_ref += "," + response['tracking_number']
 
                     log_message = _("Shipment created into Fedex<br/>"
-                                   "<b>Tracking Numbers:</b> %s<br/>"
-                                   "<b>Packages:</b> %s") % (
-                                 carrier_tracking_ref, ', '.join([str(pl[0]) for pl in package_labels]))
+                                    "<b>Tracking Numbers:</b> %s<br/>"
+                                    "<b>Packages:</b> %s") % (
+                                      carrier_tracking_ref, ', '.join([str(pl[0]) for pl in package_labels]))
                     if self.fedex_label_file_type != 'PDF':
                         attachments = [('LabelFedex-%s.%s' % (str(pl[0]), self.fedex_label_file_type), pl[1]) for pl in
                                        package_labels]
                     if self.fedex_label_file_type == 'PDF':
-                        attachments = [('LabelFedex-%s.pdf' % str(carrier_tracking_ref), pdf.merge_pdf([pl[1] for pl in package_labels]))]
+                        attachments = [('LabelFedex-%s.pdf' % str(carrier_tracking_ref),
+                                        pdf.merge_pdf([pl[1] for pl in package_labels]))]
                     picking.message_post(body=log_message, attachments=attachments)
                 # Write carrier tracking referrence for each package
                 pkg.write(dict(carrier_tracking_ref=response['tracking_number']))
@@ -552,14 +485,20 @@ class ProviderFedex(models.Model):
         # Create return label if user chose "include return label option"
         if advanced_options.get('shipping_include_return_label'):
             tracking_number = carrier_tracking_ref.split(',')[0]
-            if picking.is_mul_packages:
+            if picking.shipping_options == 'option1' and picking.is_mul_packages:
                 labels = []
                 tracking_numbers = []
                 for sequence, pkg in enumerate(picking.picking_package_ids, start=1):
-                    return_result = self.omni_fedex_get_return_label(picking=picking, product_packaging=pkg.packaging_id,
-                                                                     package_dimension=dict(width=pkg.width, height=pkg.height, length=pkg.length), weight=pkg.weight,
-                                                                     pickup_datetime=pickup_datetime, advanced_options=advanced_options,
-                                                                     tracking_number=pkg.carrier_tracking_ref, origin_date=delivery_time)
+                    return_result = self.omni_fedex_get_return_label(picking=picking,
+                                                                     product_packaging=pkg.packaging_id,
+                                                                     package_dimension=dict(width=pkg.width,
+                                                                                            height=pkg.height,
+                                                                                            length=pkg.length),
+                                                                     weight=pkg.weight,
+                                                                     pickup_datetime=pickup_datetime,
+                                                                     advanced_options=advanced_options,
+                                                                     tracking_number=pkg.carrier_tracking_ref,
+                                                                     origin_date=delivery_time)
                     if return_result['errors_message']:
                         return {
                             'success': False,
@@ -579,17 +518,21 @@ class ProviderFedex(models.Model):
                                 "<b>Packages:</b> %s") % (
                                   ', '.join(tracking_numbers), ', '.join([str(pl[0]) for pl in package_labels]))
                 if self.fedex_label_file_type != 'PDF':
-                    attachments = [('ReturnLabelFedex-%s.%s' % (index, self.fedex_label_file_type), label) for index, label in
+                    attachments = [('ReturnLabelFedex-%s.%s' % (index, self.fedex_label_file_type), label) for
+                                   index, label in
                                    enumerate(labels, start=1)]
                 if self.fedex_label_file_type == 'PDF':
                     attachments = [('ReturnLabelFedex-%s.pdf' % ' & '.join(tracking_numbers),
                                     pdf.merge_pdf([label for label in labels]))]
                 picking.message_post(body=log_message, attachments=attachments)
-            else:
+            elif not picking.is_mul_packages or (picking.is_mul_packages and picking.shipping_options == 'option2'):
                 return_result = self.omni_fedex_get_return_label(picking=picking, product_packaging=product_packaging,
-                                                                 package_dimension=package_dimension, weight=return_weight,
-                                                                 pickup_datetime=pickup_datetime, advanced_options=advanced_options,
-                                                                 tracking_number=carrier_tracking_ref, origin_date=delivery_time)
+                                                                 package_dimension=package_dimension,
+                                                                 weight=return_weight,
+                                                                 pickup_datetime=pickup_datetime,
+                                                                 advanced_options=advanced_options,
+                                                                 tracking_number=carrier_tracking_ref,
+                                                                 origin_date=delivery_time)
 
                 if return_result['errors_message']:
                     return {
@@ -602,7 +545,8 @@ class ProviderFedex(models.Model):
                         'warning_message': False
                     }
 
-                log_message = (_("FedEx return label <br/> <b>Tracking Number : </b>%s") % str(return_result['tracking_reference']))
+                log_message = (_("FedEx return label <br/> <b>Tracking Number : </b>%s") % str(
+                    return_result['tracking_reference']))
                 fedex_labels = [('ReturnLabelFedex-%s.%s' % (return_result['tracking_reference'], self.fedex_label_file_type), return_result['label'][0])]
                 picking.message_post(body=log_message, attachments=fedex_labels)
 
@@ -611,8 +555,12 @@ class ProviderFedex(models.Model):
 
         if delivery_time is None:
             delivery_time = self.fedex_get_rate_and_delivery_time(picking=picking, product_packaging=product_packaging,
-                                                                  package_length=package_length, package_width=package_width, package_height= package_height,
-                                                                  weight=weight, shipping_options={}, pickup_date=pickup_date, insurance_amount=0.0)['estimated_date']
+                                                                  package_length=package_length,
+                                                                  package_width=package_width,
+                                                                  package_height=package_height,
+                                                                  weight=weight, shipping_options={},
+                                                                  pickup_date=pickup_date, insurance_amount=0.0)[
+                'estimated_date']
             if delivery_time is not None:
                 delivery_time += ' (subject to change)'
             else:
@@ -628,186 +576,3 @@ class ProviderFedex(models.Model):
             'error_message': False,
             'warning_message': False
         }
-
-    def omni_fedex_get_return_label(self, picking, product_packaging, package_dimension, weight, pickup_datetime,
-                                    advanced_options={}, tracking_number=None, origin_date=None):
-        shipping_account = self.shipping_account_id
-        package_type = product_packaging.shipper_package_code or 'YOUR_PACKAGING'
-
-        warehouse = picking.picking_type_id.warehouse_id.partner_id
-        recipient = picking.company_id.partner_id
-        shipper = picking.partner_id
-        residential_shipper = picking.is_residential_address
-
-        order_currency = picking.sale_id.currency_id or picking.company_id.currency_id
-
-        request = FedexRequest(self.get_debug_logger_xml(None), request_type="shipping",
-                               prod_environment=shipping_account.prod_environment)
-
-        request.web_authentication_detail(shipping_account.fedex_developer_key,
-                                          shipping_account.fedex_developer_password)
-        request.client_detail(shipping_account.fedex_account_number, shipping_account.fedex_meter_number)
-
-        request.transaction_detail(picking.name)
-
-        request.shipment_request(dropoff_type=self.fedex_droppoff_type,
-                                 service_type=self.fedex_service_type,
-                                 packaging_type=package_type,
-                                 overall_weight_unit=self.fedex_weight_unit,
-                                 pickup_datetime=pickup_datetime)
-
-        request.set_currency(_convert_curr_iso_fdx(order_currency.name))
-
-        request.set_shipper(shipper, shipper)
-        request.set_recipient(recipient)
-        request.set_residential_recipient(False)
-        request.set_residential_shipper(residential_shipper)
-
-        shipping_charge_payment_account = shipping_account.fedex_account_number
-        shipping_charge_payment_type = 'SENDER'
-        bill_duties_party = warehouse
-        if advanced_options.get('shipping_change_billing'):
-            shipping_charge_payment_account = picking.shipping_customer_account
-            shipping_charge_payment_type = 'RECIPIENT'
-            bill_duties_party = recipient
-        request._shipping_charges_payment(shipping_charge_payment_account, shipping_charge_payment_type)
-
-        request.shipment_label(label_format_type='COMMON2D',
-                               image_type=self.fedex_label_file_type,
-                               label_stock_type=self.fedex_label_stock_type,
-                               label_printing_orientation='TOP_EDGE_OF_TEXT_FIRST',
-                               label_order='SHIPPING_LABEL_FIRST',
-                               )
-
-        # Setup Doc Tab for label if the label's type is ZPL with DOC_TAB
-        # information: a dict() of 8 elements to be put on Doc Tab in the following format (leave blank '' if no intention to use that element):
-        # |0  |4  |8
-        # |1  |5  |9
-        # |2  |6  |10
-        # |3  |7  |11
-        # 8, 9, 10, 11 are reserved for shipping price details and could be changed in ./fedex_request/set_doc_tab()
-        if not isinstance(package_dimension, dict):
-            raise UserError(_('Internal code error: package_dimension is not a dictionary'))
-        information = {
-            'DIMS': '%.0fX%.0fX%.0f' % (package_dimension.get('length', 0), package_dimension.get('width', 0), package_dimension.get('height', 0)),
-            'Customer': picking.sale_id.display_name,
-            'Phone': recipient.phone or '',
-            'Dept': '',
-            'Date': pickup_datetime.date().strftime('%d%b%y'),
-            'Weight': '%.2f LBS' % weight,
-            'COD': '',
-            'DV': ''
-        }
-        if self.fedex_label_stock_type != 'PDF' and 'DOC_TAB' in self.fedex_label_stock_type:
-            request.set_doc_tab(information, 0.0)
-
-        net_weight = self._fedex_convert_weight_in_ob(weight, unit=self.fedex_weight_unit)
-        po_number = picking.sale_id.display_name or False
-        picking_number, dept_number = picking.name, False
-
-        request._add_package(
-            weight_value=net_weight,
-            package_code=package_type,
-            package_dimension=package_dimension,
-            reference=picking.display_name,
-            po_number=po_number,
-            dept_number=dept_number,
-            picking_number=picking_number
-        )
-
-        request.set_master_package(net_weight, 1)
-        if self.fedex_service_type in ['INTERNATIONAL_ECONOMY', 'INTERNATIONAL_PRIORITY'] or (
-                recipient.country_id.code == 'IN' and warehouse.country_id.code == 'IN'):
-
-            commodity_currency = order_currency
-            total_commodities_amount = 0.0
-            commodity_country_of_manufacture = picking.picking_type_id.warehouse_id.partner_id.country_id.code
-
-            for operation in picking.move_line_ids:
-                commodity_amount = operation.move_id.sale_line_id.price_unit or operation.product_id.list_price
-                total_commodities_amount += (commodity_amount * operation.qty_done)
-                commodity_description = operation.product_id.name
-                commodity_number_of_piece = '1'
-                commodity_weight_units = self.fedex_weight_unit
-                if operation.state == 'done':
-                    commodity_weight_value = self._fedex_convert_weight(
-                        operation.product_id.weight * operation.qty_done, self.fedex_weight_unit)
-                    commodity_quantity = operation.qty_done
-                else:
-                    commodity_weight_value = self._fedex_convert_weight(
-                        operation.product_id.weight * operation.product_uom_qty, self.fedex_weight_unit)
-                    commodity_quantity = operation.product_uom_qty
-                commodity_quantity_units = 'EA'
-                commodity_harmonized_code = operation.product_id.hs_code or ''
-                request.commodities(_convert_curr_iso_fdx(commodity_currency.name), commodity_amount,
-                                    commodity_number_of_piece, commodity_weight_units, commodity_weight_value,
-                                    commodity_description, commodity_country_of_manufacture, commodity_quantity,
-                                    commodity_quantity_units, commodity_harmonized_code)
-            request.customs_value(_convert_curr_iso_fdx(commodity_currency.name), total_commodities_amount,
-                                  "NON_DOCUMENTS")
-            # We consider that returns are always paid by the company creating the label
-
-            request.duties_payment(warehouse, shipping_account.fedex_account_number, 'SENDER')
-
-        if advanced_options.get('shipping_include_return_label'):
-            request.shipment_request_special_services(advanced_options={}, advanced_option_values={})
-
-        if self.fedex_service_type == 'SMART_POST':
-            request.set_smartpost_detail('PARCEL_RETURN', 'NONE', picking.smartpost_hubId)
-
-        request.return_label(tracking_number, origin_date)
-
-        response = request.process_shipment()
-
-        if not response.get('errors_message'):
-            # company_currency = picking.company_id.currency_id
-            # price = self._fedex_convert_cost(picking.sale_id, picking.company_id, response['price'])
-            #
-            # insurance_cost = self._fedex_convert_cost(picking.sale_id, picking.company_id, response['insurance']) if response.get('insurance') else 0
-
-            # fedex_labels = [('%s-%s-%s.%s' % (
-            #    self.get_return_label_prefix(), response['tracking_number'], index, self.fedex_label_file_type), label)
-            #                for index, label in enumerate(request._get_labels(self.fedex_label_file_type))]
-
-            # picking.message_post(body=_('Return Label'), attachments=fedex_labels)
-            return {'errors_message': False, 'tracking_reference': response['tracking_number'], 'label': request._get_labels(self.fedex_label_file_type)}
-
-            # return {'success': True,
-            #         'return_price': price,
-            #         'return_insurance_cost': insurance_cost}
-        else:
-            title = 'Cannot create return label !'
-            exceptions = [{'title': 'Message from fedEx',
-                           'reason': response['errors_message']}]
-            #picking._log_exceptions_on_picking(title, exceptions)
-            _logger.error(response['errors_message'])
-            return {'errors_message': response['errors_message']}
-
-    @api.model
-    def fedex_void_label(self, picking, master_tracking_id=False):
-        request = FedexRequest(self.get_debug_logger_xml(picking), request_type="shipping",
-                               prod_environment=self.prod_environment)
-        shipping_account = self.shipping_account_id
-        request.web_authentication_detail(shipping_account.fedex_developer_key,
-                                          shipping_account.fedex_developer_password)
-        request.client_detail(shipping_account.fedex_account_number, shipping_account.fedex_meter_number)
-        request.transaction_detail(picking.id)
-
-        if not master_tracking_id:
-            master_tracking_id = picking.carrier_tracking_ref.split(',')[0] if picking.carrier_tracking_ref else False
-
-        request.set_deletion_details(master_tracking_id)
-        result = request.delete_shipment()
-
-        if result.get('delete_success') and not result.get('errors_message'):
-            picking.message_post(body=_(u'Shipment N° %s has been cancelled') % master_tracking_id)
-
-            return {
-                'success': True,
-                'error_message': False,
-                'warning_message': _('Warning: %s') % result.get('warnings_message', False)}
-        else:
-            return {
-                'success': False,
-                'error_message': _('Error: %s') % result.get('errors_message', False),
-                'warning_message': _('Warning: %s') % result.get('warnings_message', False)}
