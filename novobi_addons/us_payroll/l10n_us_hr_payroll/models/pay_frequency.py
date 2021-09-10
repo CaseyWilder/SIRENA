@@ -293,8 +293,8 @@ class PayFrequency(models.Model):
 
         # Monthly
         else:
+            start = first_work + relativedelta.relativedelta(months=increment-1, days=1)
             end = first_work + relativedelta.relativedelta(months=increment)
-            start = end + relativedelta.relativedelta(months=-1, days=1)
             pay_date = first_pay + relativedelta.relativedelta(months=increment)
 
         return start, end, pay_date

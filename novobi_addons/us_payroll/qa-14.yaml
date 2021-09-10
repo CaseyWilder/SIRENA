@@ -1,3 +1,13 @@
+1.4.8:
+  time_line: [2021-09-01]
+  upgrade_modules:
+    - l10n_us_hr_payroll
+  install_modules:
+  database:
+    - payroll-14-qa
+  release_notes:
+    - Upgrade Payroll
+
 1.4.7:
   time_line: [2021-08-16]
   upgrade_modules:
