@@ -9,7 +9,7 @@ class SaleOrderLine(models.Model):
 
     @api.depends('order_id.state')
     def _compute_commission_amount(self):
-        CommissionList = self.env['commission.list']
+        CommissionList = self.sudo().env['commission.list']
         self.filtered(lambda x: x.order_id.state == 'cancel').write({
             'commission_user_id': False,
             'commission_amount': False
