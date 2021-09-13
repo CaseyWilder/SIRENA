@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="generate_commission_report_wizard_view" model="ir.ui.view">
+        <field name="name">generate.commission.report.wizard.form</field>
+        <field name="model">generate.commission.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create Commission Report">
+                <sheet>
+                    <group name="group_main_left">
+                        <field name="start_date" required="1"/>
+                        <field name="end_date" required="1"/>
+                        <field name="company_id" required="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="button_generate_commission_report" type="object" class="btn-primary" string="Generate"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_generate_commission_report" model="ir.actions.act_window">
+        <field name="name">Generate Commission Report</field>
+        <field name="res_model">generate.commission.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_is_amazon_report': False}</field>
+    </record>
+    <record id="action_generate_amazon_commission_report" model="ir.actions.act_window">
+        <field name="name">Generate Amazon Commission Report</field>
+        <field name="res_model">generate.commission.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_is_amazon_report': True}</field>
+    </record>
+</odoo>
