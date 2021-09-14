@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_sale_order_line_tree_commission" model="ir.ui.view">
+        <field name="name">sale.order.line.tree.commission</field>
+        <field name="model">sale.order.line</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <tree string="Commission Lines" default_order='date_order' create="0" edit="0">
+                <field name="company_id" invisible="1"/>
+                <field name="date_order"/>
+                <field name="order_id"/>
+                <field name="product_id"/>
+                <field name="order_partner_id"/>
+                <field name="commission_user_id"/>
+                <field name="commission_amount" sum="Total"/>
+                <field name="commission_state" widget="badge" string="State"
+                       decoration-info="commission_state == 'new'"
+                       decoration-success="commission_state == 'posted'"
+                       decoration-muted="commission_state == 'cancel'"/>
+                <button name="action_create_commission_payment" type="object" string="Create" title="Create Check"
+                        class="btn-link" icon="fa-money" attrs="{'invisible': [('commission_state', '!=', 'new')]}"/>
+                <button name="action_view_commission_payment" type="object" string="View" title="View Check"
+                        class="btn-link" icon="fa-arrow-right" attrs="{'invisible': [('commission_state', '=', 'new')]}"/>
+            </tree>
+        </field>
+    </record>
+</odoo>
