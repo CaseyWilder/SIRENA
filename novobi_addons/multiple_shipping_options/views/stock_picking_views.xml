@@ -111,10 +111,11 @@
         <field name="inherit_id" ref="novobi_shipping_account.view_picking_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header//field[@name='is_create_label']" position="after">
+                <field name="mso_country_code" invisible="1"/>
                 <field name="second_is_create_label" invisible="1"/>
             </xpath>
             <xpath expr="//button[@name='open_create_label_form']" position="attributes">
-                <attribute name="attrs">{'invisible': ['|', '&amp;', ('is_create_label', '=', True), ('second_is_create_label', '=', True), '|', ('state', 'not in', ('assigned', 'done')), ('picking_type_code','!=','outgoing')]}</attribute>
+                <attribute name="attrs">{'invisible': ['|', '|', '&amp;', ('is_create_label', '=', True), ('second_is_create_label', '=', True), '|', ('state', 'not in', ('assigned', 'done')), ('picking_type_code','!=','outgoing'), '&amp;', ('is_create_label', '=', True), ('mso_country_code', '=', 'CA')]}</attribute>
             </xpath>
             <xpath expr="//button[@name='button_void_label']" position="attributes">
                 <attribute name="attrs">{'invisible': ['|', '&amp;', ('is_create_label', '!=', True), ('second_is_create_label', '!=', True), ('picking_type_code','!=','outgoing')]}</attribute>

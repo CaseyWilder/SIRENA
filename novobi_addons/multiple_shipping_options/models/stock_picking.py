@@ -22,6 +22,7 @@ LABEL_STATUS = [
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
+    mso_country_code = fields.Char(related='company_id.country_id.code')
     shipping_options = fields.Selection(SHIPPING_OPTIONS, string='Create Shipping Label Options', copy=False, required=True, default=lambda self: self.default_shipping_options())
     label_status = fields.Selection(LABEL_STATUS, string='Keep track label status of the DO', copy=False, compute='_compute_label_status')
     is_void_first_label = fields.Boolean(string='Shipping Option 1', copy=False)
