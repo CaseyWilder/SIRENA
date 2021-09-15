@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_account_payment_form_commission" model="ir.ui.view">
+        <field name="name">account.payment.form.commission</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <field name="commission_line_id" invisible="1"/>
+                <button name="action_open_commission_line" type="object" class="oe_stat_button" icon="fa-money" string="Commission"
+                        attrs="{'invisible': [('commission_line_id','=', False)]}">
+                </button>
+            </div>
+        </field>
+    </record>
+</odoo>
