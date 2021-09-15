@@ -6,6 +6,7 @@ from dateutil import parser
 from odoo import api, fields, models, tools, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.addons.novobi_shipping_account.utils.tracking_url import guess_carrier
+from odoo.addons.novobi_shipping_account.models.stock_picking import Picking
 
 SHIPPING_OPTIONS = [
     ('option1', 'Shipping Option 1'),
@@ -18,6 +19,40 @@ LABEL_STATUS = [
     ('3', 'Both labels created')
 ]
 
+
+def button_validate(self):
+    """
+    Change self.is_create_label to self.label_status to check if no label has been created
+    """
+    self.ensure_one()
+
+    if self.picking_type_code != 'outgoing':
+        return super(Picking, self).button_validate()
+
+    self = self.sudo()
+
+    open_update_done_quantities_form = self.check_open_update_done_quantities_form('confirm_create_shipping_label')
+    if open_update_done_quantities_form:
+        return open_update_done_quantities_form
+
+    if not self.label_status and 'is_confirm_wiz' not in self.env.context:
+        wiz = self.env['confirm.create.shipping.label'].create({'picking_id': self.id})
+        return {
+            'name': _('Confirmation'),
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'confirm.create.shipping.label',
+            'views': [(False, 'form')],
+            'view_id': False,
+            'target': 'new',
+            'res_id': wiz.id,
+            'context': self.env.context,
+        }
+
+    res = super(Picking, self).button_validate()
+    return res
+
+Picking.button_validate = button_validate
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
@@ -272,35 +307,6 @@ class StockPicking(models.Model):
         self.sudo().write(self._reset_label_fields())
         if self.is_void_first_label and self.picking_package_ids:  # Only unlink the MPS table if void Shipping Option 1's label
             self.sudo().picking_package_ids.unlink()
-
-    def button_validate(self):
-        self.ensure_one()
-
-        if self.picking_type_code != 'outgoing':
-            return super(StockPicking, self).button_validate()
-
-        self = self.sudo()
-
-        open_update_done_quantities_form = self.check_open_update_done_quantities_form('confirm_create_shipping_label')
-        if open_update_done_quantities_form:
-            return open_update_done_quantities_form
-
-        if not self.label_status and 'is_confirm_wiz' not in self.env.context:  # Switch to label_status to check if no label has been created
-            wiz = self.env['confirm.create.shipping.label'].create({'picking_id': self.id})
-            return {
-                'name': _('Confirmation'),
-                'type': 'ir.actions.act_window',
-                'view_mode': 'form',
-                'res_model': 'confirm.create.shipping.label',
-                'views': [(False, 'form')],
-                'view_id': False,
-                'target': 'new',
-                'res_id': wiz.id,
-                'context': self.env.context,
-            }
-
-        res = super(StockPicking, self).button_validate()
-        return res
 
     def open_create_label_form(self):
         res = super().open_create_label_form()
