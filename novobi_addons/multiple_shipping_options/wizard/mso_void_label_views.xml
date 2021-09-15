@@ -12,11 +12,16 @@
                     </group>
                     <group colspan="2">
                         <group>
-                            <strong>Shipping label options</strong>
-                        </group>
-                        <group colspan="2">
-                            <field name="is_void_first_label" attrs="{'invisible': [('label_status', '=', '2')]}"/>
-                            <field name="is_void_second_label" attrs="{'invisible': [('label_status', '=', '1')]}"/>
+                            <label for="is_void_first_label" string="Shipping label options"/>
+                            <div>
+                                <span>
+                                    <field name="is_void_first_label" nolabel="1"/>Option 1
+                                </span>
+                                <br/>
+                                <span>
+                                    <field name="is_void_second_label" nolabel="1"/>Option 2
+                                </span>
+                            </div>
                         </group>
                     </group>
                 </group>

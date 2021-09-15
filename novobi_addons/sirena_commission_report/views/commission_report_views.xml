@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="commission_report_view_tree" model="ir.ui.view">
+        <field name="name">commission.report.view.tree</field>
+        <field name="model">commission.report</field>
+        <field name="arch" type="xml">
+            <tree string="Commission Report" create="false">
+                <field name="name"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="total_amount"/>
+                <field name="company_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_commission_report_form" model="ir.ui.view">
+        <field name="name">commission_report_form</field>
+        <field name="model">commission.report</field>
+        <field name="arch" type="xml">
+            <form create="0">
+                <header>
+                    <button name="action_create_commission_payments" type="object" class="btn-primary" string="Create Checks"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_commission_payments" type="object" class="oe_stat_button" icon="fa-money"
+                                attrs="{'invisible': [('number_payments', '=', 0)]}">
+                            <field name="number_payments" widget="statinfo" string="Checks"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group name="group_main">
+                        <field name="start_date" readonly="1"/>
+                        <field name="end_date" readonly="1"/>
+                        <field name="is_amazon_report" readonly="1"/>
+                        <field name="company_id" readonly="1"/>
+                    </group>
+
+                    <group string="Commission Lines" name="group_detail">
+                        <field name="commission_lines" nolabel="1"
+                               domain="[('commission_user_id', '!=', False),('company_id', '=', company_id),
+                                    ('date_order', '&gt;=', start_date),('date_order', '&lt;=', end_date),
+                                    ('is_amazon_order_item', '=', is_amazon_report)]"
+                               context="{'tree_view_ref': 'sirena_commission_report.view_sale_order_line_tree_commission'}">
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sales_commission_report" model="ir.actions.act_window">
+        <field name="name">Commission Report</field>
+        <field name="res_model">commission.report</field>
+        <field name="domain">[('is_amazon_report', '=', False)]</field>
+        <field name="view_id" ref="commission_report_view_tree"/>
+    </record>
+    <record id="action_amazon_commission_report" model="ir.actions.act_window">
+        <field name="name">Amazon Commission Report</field>
+        <field name="res_model">commission.report</field>
+        <field name="domain">[('is_amazon_report', '=', True)]</field>
+        <field name="view_id" ref="commission_report_view_tree"/>
+    </record>
+
+</odoo>

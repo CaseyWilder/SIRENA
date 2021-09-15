@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_commission" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.commission</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <div id="connectors_setting_container" position="after">
+                <h2 class="mt32">Commission Report</h2>
+                <div class="row mt16 o_settings_container" id="commision_report">
+                    <div class="col-12 col-lg-6 o_setting_box" id="down_payments">
+                        <div class="o_setting_left_pane"/>
+                        <div class="o_setting_right_pane">
+                            <span class="o_form_label">Sales Bank Journal</span>
+                            <div class="text-muted">
+                                Journal for creating check payments in Sales.
+                            </div>
+                            <div class="text-muted">
+                                <field name="commission_journal_id" domain="[('type', 'in', ('bank', 'cash'))]"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="down_payments">
+                        <div class="o_setting_left_pane"/>
+                        <div class="o_setting_right_pane">
+                            <span class="o_form_label">Amazon Bank Journal</span>
+                            <div class="text-muted">
+                                Journal for creating check payments in Amazon.
+                            </div>
+                            <div class="text-muted">
+                                <field name="commission_amazon_journal_id" domain="[('type', 'in', ('bank', 'cash'))]"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </field>
+    </record>
+</odoo>
