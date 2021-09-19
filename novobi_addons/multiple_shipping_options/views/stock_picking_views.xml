@@ -132,7 +132,7 @@
                 <attribute name="attrs">{'invisible': ['|', '|', ('state', 'not in', ('assigned', 'confirmed', 'partially_available', 'draft', 'waiting')), ('is_locked', '=', False), '|', '&amp;', ('is_create_label', '!=', True), ('second_is_create_label', '!=', True), ('picking_type_code', '!=', 'outgoing')]}</attribute>
             </xpath>
             <xpath expr="//page[@name='shipping_info_has_label']" position="attributes">
-                <attribute name="attrs">{'invisible': ['|', '&amp;', ('is_create_label', '=', True), ('second_is_create_label', '=', True), '|', ('state', '!=', 'done'), ('picking_type_code','!=','outgoing')]}</attribute>
+                <attribute name="attrs">{'invisible': ['|', '|', ('is_create_label', '=', True), ('second_is_create_label', '=', True), '|', ('state', '!=', 'done'), ('picking_type_code','!=','outgoing')]}</attribute>
             </xpath>
             <xpath expr="//page[@name='shipping_info_no_label']" position="before">
                 <field name="second_is_create_label" invisible="1"/>
