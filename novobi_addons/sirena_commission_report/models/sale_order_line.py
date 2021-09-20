@@ -22,7 +22,7 @@ class SaleOrderLine(models.Model):
             commission = CommissionList.search([('product_id','=', rec.product_id.id), ('partner_id','=',rec.order_partner_id.id)], limit=1)
             if commission:
                 rec.commission_user_id = commission.user_id
-                rec.commission_amount = commission.commission_amount
+                rec.commission_amount = rec.product_uom_qty*commission.commission_amount
 
     @api.depends('commission_payment', 'commission_payment.state')
     def _compute_commission_state(self):
@@ -50,7 +50,8 @@ class SaleOrderLine(models.Model):
                 'amount': record.commission_amount,
                 'payment_method_id': check_method.id,
                 'journal_id': journal_id.id,
-                'commission_line_id': record.id,
+                'commission_line_ids': record.ids,
+                'currency_id': record.currency_id.id,
             })
 
     def action_view_commission_payment(self):
