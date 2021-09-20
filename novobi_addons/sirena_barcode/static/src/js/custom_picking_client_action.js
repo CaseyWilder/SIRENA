@@ -1,19 +1,21 @@
 odoo.define('sirena_barcode.custom_picking_client_action', function (require) {
     "use strict";
 
-    var core = require('web.core');
-    var CustomPickingClientAction = require('stock_barcode.picking_client_action');
-    var ViewsWidget = require('stock_barcode.ViewsWidget');
-    var LinesWidget = require('stock_barcode.LinesWidget');
-    var SettingsWidget = require('stock_barcode.SettingsWidget');
+    let core = require('web.core');
+    let CustomPickingClientAction = require('stock_barcode.picking_client_action');
+    let LinesWidget = require('stock_barcode.LinesWidget');
 
-    var _t = core._t;
+    let _t = core._t;
 
     CustomPickingClientAction.include({
         /**
+         * @override
          * Changed mechanism of finding a candidate line:
          * - Removed lot_id comparison
          * - Removed lot_name comparison
+         *
+         * @param {Object} params properties to search for a candidate line in the current page
+         * @return {Object} the candidate line
          */
         _findCandidateLineToIncrement: function (params) {
             var product = params.product;
@@ -59,6 +61,7 @@ odoo.define('sirena_barcode.custom_picking_client_action', function (require) {
                         lineInCurrentPage.qty_done >= lineInCurrentPage.product_uom_qty) {
                         continue;
                     }
+                    // [SRN-129] Removed check for stock.picking lotId and lotName in the below conditional statement
                     if (lotId &&
                         (this.actionParams.model === 'stock.inventory' &&
                             lineInCurrentPage.prod_lot_id &&
@@ -84,6 +87,7 @@ odoo.define('sirena_barcode.custom_picking_client_action', function (require) {
         },
 
         /**
+         * @override
          * Changed the search_read function variable
          *
          * @param {string} barcode scanned barcode
@@ -207,7 +211,7 @@ odoo.define('sirena_barcode.custom_picking_client_action', function (require) {
             var searchRead = function (barcode) {
                 // Check before if it exists reservation with the lot.
                 var lines_with_lot = _.filter(self.currentState.move_line_ids, function (line) {
-                    return line.lot_id && line.lot_id[1] === barcode;  // [SRN-129]
+                    return line.lot_id && line.lot_id[1] === barcode;  // [SRN-129] Rewrote filter
                 });
                 var line_with_lot;
                 if (lines_with_lot.length > 0) {
@@ -338,6 +342,7 @@ odoo.define('sirena_barcode.custom_picking_client_action', function (require) {
 
     LinesWidget.include({
         /**
+         * @override
          * Changed to update the lot name regardless.
          *
          * @param {Number|string} id_or_virtual_id

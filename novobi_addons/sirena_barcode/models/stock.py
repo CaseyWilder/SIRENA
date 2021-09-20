@@ -12,11 +12,11 @@ class StockPicking(models.Model):
             return super(StockPicking, self).button_validate()
 
         lot_ids = self.move_line_ids.mapped('lot_id')
-        delivery_orders = []
-        for lot_id in lot_ids:
-            conflicting_lines = self.env['stock.move.line'].search([('lot_id', '=', lot_id.id), ('state', '=', 'assigned')])
-            for line in conflicting_lines:
-                delivery_orders.append(self.env['stock.picking'].search([('id', '=', line.picking_id.id), ('id', '!=', self.id), ('state', '=', 'assigned')]))
+        conflicting_lines = self.env['stock.move.line'].search([
+            ('lot_id', 'in', lot_ids.ids),
+            ('state', '=', 'assigned')
+        ])
+        delivery_orders = conflicting_lines.mapped('picking_id').filtered(lambda l: l.state == 'assigned') - self
 
         res = super(StockPicking, self).button_validate()
 
