@@ -43,14 +43,12 @@
                         <field name="company_id" readonly="1"/>
                     </group>
 
-                    <group string="Commission Lines" name="group_detail">
-                        <field name="commission_lines" nolabel="1"
-                               domain="[('commission_user_id', '!=', False),('company_id', '=', company_id),
-                                    ('date_order', '&gt;=', start_date),('date_order', '&lt;=', end_date),
-                                    ('is_amazon_order_item', '=', is_amazon_report)]"
-                               context="{'tree_view_ref': 'sirena_commission_report.view_sale_order_line_tree_commission'}">
-                        </field>
-                    </group>
+                    <field name="commission_lines" nolabel="1"
+                           domain="[('commission_user_id', '!=', False),('company_id', '=', company_id),
+                                ('date_order', '&gt;=', start_date),('date_order', '&lt;=', end_date),
+                                ('is_amazon_order_item', '=', is_amazon_report)]"
+                           context="{'tree_view_ref': 'sirena_commission_report.view_sale_order_line_tree_commission'}">
+                    </field>
                 </sheet>
             </form>
         </field>

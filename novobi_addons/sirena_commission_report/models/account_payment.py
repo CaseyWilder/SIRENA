@@ -4,10 +4,10 @@ from odoo import models, fields
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
-    commission_line_id = fields.Many2one('sale.order.line', string='Commission Line', copy=False)
+    commission_line_ids = fields.One2many('sale.order.line', 'commission_payment', string='Commission Line', copy=False)
 
     def action_open_commission_line(self):
-        order_lines = self.mapped('commission_line_id')
+        order_lines = self.mapped('commission_line_ids')
 
         if not order_lines:
             return

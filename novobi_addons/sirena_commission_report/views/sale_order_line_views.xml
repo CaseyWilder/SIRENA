@@ -19,8 +19,6 @@
                        decoration-muted="commission_state == 'cancel'"/>
                 <button name="action_create_commission_payment" type="object" string="Create" title="Create Check"
                         class="btn-link" icon="fa-money" attrs="{'invisible': [('commission_state', '!=', 'new')]}"/>
-                <button name="action_view_commission_payment" type="object" string="View" title="View Check"
-                        class="btn-link" icon="fa-arrow-right" attrs="{'invisible': [('commission_state', '=', 'new')]}"/>
             </tree>
         </field>
     </record>
