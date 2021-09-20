@@ -42,6 +42,10 @@ class CommissionList(models.Model):
         if not journal_id:
             raise UserError(_(
                 'Please make sure the bank journal for commission report has been set in Sales > Configuration > Settings and try again.'))
+        if not self.commission_lines:
+            return
+        commission_line_ids = tuple(self.commission_lines.ids) if len(self.commission_lines) > 1 \
+            else "(%s)" % str(self.commission_lines.id)
 
         sql_query = """
             SELECT      sol.commission_user_id as commission_user_id,
@@ -53,7 +57,7 @@ class CommissionList(models.Model):
                 and     sol.commission_payment is null
                 and     sol.id in %s
             GROUP BY    sol.commission_user_id
-        """ % (str(self.company_id.id), tuple(self.commission_lines.ids,))
+        """ % (str(self.company_id.id), commission_line_ids)
         self._cr.execute(sql_query)
         full_data = self._cr.dictfetchall()
         for data in full_data:
