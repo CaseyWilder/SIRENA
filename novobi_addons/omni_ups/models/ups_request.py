@@ -222,6 +222,9 @@ class UPSRequest(UPSRequestBase):
         if service_type == '92':
             weight_measurement = 'OZS'
 
+        total_weight = 0.0
+        for detail in package_detail:
+            total_weight += detail['weight']
         request_data = {
             "RateRequest": {
                 "Request": {
@@ -236,6 +239,12 @@ class UPSRequest(UPSRequestBase):
                         "Description": "Service Code"
                     },
                     "Package": self.set_package_detail(package_detail, insurance_detail, False, shipping_confirmation, weight_measurement),
+                    "ShipmentTotalWeight": {
+                        "UnitOfMeasurement": {
+                            "Code": weight_measurement
+                        },
+                        "Weight": str(total_weight)
+                    },
                     "DeliveryTimeInformation": delivery_time_info,
                     "ShipmentRatingOptions": {
                         "NegotiatedRatesIndicator": "1"
