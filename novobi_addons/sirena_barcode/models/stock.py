@@ -21,8 +21,6 @@ class StockPicking(models.Model):
         res = super(StockPicking, self).button_validate()
 
         if delivery_orders:
-            delivery_orders = set(delivery_orders)
-            for do in delivery_orders:
-                do.action_assign()
+            delivery_orders.action_assign()
 
         return res
