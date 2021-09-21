@@ -7,12 +7,14 @@
             <field name="mode">primary</field>
             <field name="priority">20</field>
             <field name="arch" type="xml">
-                <tree string="Sales Margin" create="false">
+                <tree string="Sales Margin" editable="bottom" create="false">
+                    <field name="company_id" invisible="1"/>
+                    <field name="is_returned"/>
                     <field name="date_order"/>
-                    <field name="product_id"/>
-                    <field name="order_id"/>
-                    <field name="order_partner_id"/>
-                    <field name="product_uom_qty"/>
+                    <field name="product_id" readonly="1"/>
+                    <field name="order_id" readonly="1"/>
+                    <field name="order_partner_id" readonly="1"/>
+                    <field name="product_uom_qty" readonly="1"/>
                     <field name="retail_price" sum="Total"/>
                     <field name="amazon_fee" sum="Total"/>
                     <field name="gross_pay" sum="Total"/>
@@ -20,9 +22,34 @@
                     <field name="gross_profit" sum="Total"/>
                     <field name="dealer_cost" sum="Total"/>
                     <field name="net_profit" sum="Total"/>
-                    <field name="line_tax_amount" sum="Total" optional="hide" string="Tax"/>
+                    <field name="line_tax_amount" sum="Total" optional="hide" string="Tax" readonly="1"/>
                     <field name="is_florida_tax" optional="hide"/>
                 </tree>
+            </field>
+        </record>
+
+        <record id="margin_view_sales_order_line_filter" model="ir.ui.view">
+            <field name="name">margin.sale.order.line.select</field>
+            <field name="model">sale.order.line</field>
+            <field name="priority">20</field>
+            <field name="arch" type="xml">
+                <search string="Search">
+                    <field name="order_id"/>
+                    <field name="order_partner_id" operator="child_of"/>
+                    <field name="product_id"/>
+
+                    <filter string="Not Returned" name="not_returned" domain="[('is_returned','=', False)]"/>
+                    <separator/>
+                    <filter string="Returned" name="returned" domain="[('is_returned','=', True)]"/>
+                    <separator/>
+                    <filter string="Date" name="date_filter" date="date_order"/>
+
+                    <group expand="0" string="Group By">
+                        <filter string="Product" name="product" domain="[]" context="{'group_by':'product_id'}"/>
+                        <filter string="Order" name="order" domain="[]" context="{'group_by':'order_id'}"/>
+                        <filter string="Date" name="date" domain="[]" context="{'group_by':'date_order'}"/>
+                    </group>
+                </search>
             </field>
         </record>
 
@@ -30,7 +57,9 @@
             <field name="name">Amazon Margin Report</field>
             <field name="res_model">sale.order.line</field>
             <field name="domain">[('is_amazon_order_item', '=', True)]</field>
+            <field name="context">{"search_default_not_returned":1}</field>
             <field name="view_id" ref="amazon_view_order_line_tree"/>
+            <field name="search_view_id" ref="margin_view_sales_order_line_filter"/>
         </record>
 
         <menuitem id="menu_action_amazon_margin_report" name="Amazon Margin Report"
