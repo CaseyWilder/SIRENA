@@ -14,6 +14,7 @@ class SaleOrderLine(models.Model):
     dealer_cost = fields.Float("Dealer Cost", related='product_id.dealer_cost', store=True)
     net_profit = fields.Monetary("Net Profit", compute='_compute_net_profit', store=True)
     is_florida_tax = fields.Boolean("Is Florida tax?", compute='_compute_is_florida_tax', store=True)
+    is_returned = fields.Boolean('Returned?')
 
     @api.depends('product_id', 'order_id.state')
     def _compute_is_amazon_order_item(self):
