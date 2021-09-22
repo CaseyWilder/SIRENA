@@ -8,6 +8,8 @@
 from odoo import api, fields, models, _
 import datetime
 from dateutil.relativedelta import relativedelta
+from odoo.tools.float_utils import float_round
+from odoo.tools.misc import get_lang
 
 
 class CashFlowProjection(models.TransientModel):
@@ -17,17 +19,22 @@ class CashFlowProjection(models.TransientModel):
     @api.model
     def get_cash_flow_period_number(self):
         return {
-            'period_number': self.env.user.company_id.cash_flow_period_number,
-            'period_type': self.env.user.company_id.cash_flow_last_period_type,
+            'period_number': self.env.company.cash_flow_period_number,
+            'period_type': self.env.company.cash_flow_last_period_type,
         }
 
     @api.model
     def get_html(self, options={}):
         rcontext, num_period, period_unit = self.get_data(options)
         report_template = self.env.ref('cash_flow_projection.cash_flow_projection_report')
+        current_language = get_lang(self.env)
+        thousand_separator = current_language.thousands_sep
+        decimal_separator = current_language.decimal_point
         result = {
             'html': report_template._render(values=rcontext),
             'report_context': {'nb_periods': num_period, 'period': period_unit},
+            'thousand_separator': thousand_separator,
+            'decimal_separator': decimal_separator
         }
         return result
 
@@ -38,11 +45,16 @@ class CashFlowProjection(models.TransientModel):
         @param options: options for filtering records
         @return: a dictionary contains info for rendering cash flow projection table
         """
+        options.update({
+            'companies': self._get_companies(),
+            'currency_table_query': self._get_currency_table(),
+            'main_company_currency_id': self.env.company.currency_id.id
+        })
         periods = []
-        num_period = options.get('num_period') or self.env.user.company_id.cash_flow_period_number or 6
+        num_period = options.get('num_period') or self.env.company.cash_flow_period_number or 6
         period_unit = options and options.get('period')
         if not options:
-            period_unit = self.env.user.company_id.cash_flow_last_period_type
+            period_unit = self.env.company.cash_flow_last_period_type
         date_spacing = week_spacing = month_spacing = 0
         if period_unit == 'day':
             date_spacing = 1
@@ -152,10 +164,22 @@ class CashFlowProjection(models.TransientModel):
         rcontext = {
             'num_period': num_period,
             'periods': periods,
-            'currency': self.env.user.company_id.currency_id,
+            'currency': self.env.company.currency_id,
             'period_type': period_unit,
         }
         return rcontext, num_period, period_unit
+
+    def _get_companies(self):
+        """
+        Get selecting companies in string format '(1,2,3)'
+        """
+        companies = self.env.companies.ids
+        companies_str = '{}'.format(tuple(companies))
+        if len(companies) == 1:
+            # If there is only one company selected, need to get rid of "," from the string "(1,)"
+            companies_str = companies_str.replace(',', '')
+
+        return companies_str
 
     def _get_period_name(self, start_date, end_date, period_type, is_due_period):
         """
@@ -207,21 +231,34 @@ class CashFlowProjection(models.TransientModel):
         transaction_type = self.env['cash.flow.transaction.type'].sudo().search([('code', '=', transaction_code)])
         if not transaction_type:
             return 0.0
-        record = self.env['cash.flow.user.configuration'].sudo().search(
+        custom_configuration = self.env['cash.flow.user.configuration'].sudo().search(
             [('cash_type', '=', cash_type), ('period_type', '=', period_type),
              ('transaction_type', '=', transaction_type.id),
-             ('period', '=', period), ('company_id', '=', self.env.user.company_id.id)]) or \
-                 self.env['cash.flow.user.configuration'].sudo().search(
-                     [('cash_type', '=', cash_type), ('period_type', '=', period_type),
-                      ('transaction_type', '=', transaction_type.id),
-                      ('period', '=', period_type), ('company_id', '=', self.env.user.company_id.id)])
-        if len(record) > 1:
-            value = record[0].value
-            # Unlink redundant records
-            for item in record[1:]:
-                item.unlink()
-            return value
-        return record and record.value or 0.0
+             ('period', '=', period), ('company_id', 'in', self.env.companies.ids)])
+        remaining_company_ids = (self.env.companies - custom_configuration.mapped('company_id'))
+        default_configuration = self.env['cash.flow.user.configuration'].sudo().search(
+            [('cash_type', '=', cash_type), ('period_type', '=', period_type),
+             ('transaction_type', '=', transaction_type.id),
+             ('period', '=', period_type), ('company_id', 'in', remaining_company_ids.ids)])
+
+        # Compute currency table
+        main_company = self.env.company
+        companies = self.env.companies
+        currency_rates = companies.mapped('currency_id')._get_rates(main_company, fields.Date.today())
+
+        conversion_rates = {}
+        for company in companies:
+            conversion_rates[company.id] = [
+                currency_rates[main_company.currency_id.id] / currency_rates[company.currency_id.id],
+                main_company.currency_id.decimal_places,
+            ]
+
+        total_value = 0
+        for config in custom_configuration + default_configuration:
+            total_value += float_round(config.value * conversion_rates[config.company_id.id][0],
+                                       conversion_rates[config.company_id.id][1])
+
+        return total_value
 
     @api.model
     def save_user_value(self, options):
@@ -237,7 +274,7 @@ class CashFlowProjection(models.TransientModel):
         record = self.env['cash.flow.user.configuration'].sudo().search(
             [('cash_type', '=', options['cash_type']), ('period_type', '=', options['period_type']),
              ('transaction_type', '=', transaction_type.id),
-             ('period', '=', options['period']), ('company_id', '=', self.env.user.company_id.id)])
+             ('period', '=', options['period']), ('company_id', '=', self.env.company.id)])
         if not record:
             vals = {
                 'period': options['period'],
@@ -245,7 +282,7 @@ class CashFlowProjection(models.TransientModel):
                 'cash_type': options['cash_type'],
                 'transaction_type': transaction_type.id,
                 'value': options['value'],
-                'company_id': self.env.user.company_id.id,
+                'company_id': self.env.company.id,
             }
             self.env['cash.flow.user.configuration'].sudo().create(vals)
             return
@@ -254,34 +291,27 @@ class CashFlowProjection(models.TransientModel):
     @api.model
     def save_last_period_option(self, period_type):
         if period_type in ['day', 'week', 'month']:
-            self.env.user.company_id.cash_flow_last_period_type = period_type
+            self.env.company.cash_flow_last_period_type = period_type
         return
 
     @api.model
-    def _get_currency_table(self, options):
+    def _get_currency_table(self):
         """ Construct the currency table as a mapping company -> rate to convert the amount to the user's company
         currency in a multi-company/multi-currency environment.
         The currency_table is a small postgresql table construct with VALUES.
         :param options: The report options.
         :return: The query representing the currency table.
         """
-        user_company = self.env.user.company_id
-        user_currency = user_company.currency_id
-        if options.get('multi_company'):
-            company_ids = list(set([c['id'] for c in self._get_options_companies(options)] + [user_company.id]))
-            companies = self.env['res.company'].browse(company_ids)
-            conversion_date = options['currency_date']
-            currency_rates = companies.mapped('currency_id')._get_rates(user_company, conversion_date)
-        else:
-            companies = user_company
-            currency_rates = {user_currency.id: 1.0}
+        main_company = self.env.company
+        companies = self.env.companies
+        currency_rates = companies.mapped('currency_id')._get_rates(main_company, fields.Date.today())
 
         conversion_rates = []
         for company in companies:
             conversion_rates.append((
                 company.id,
-                currency_rates[user_company.currency_id.id] / currency_rates[company.currency_id.id],
-                user_currency.decimal_places,
+                currency_rates[main_company.currency_id.id] / currency_rates[company.currency_id.id],
+                main_company.currency_id.decimal_places,
             ))
 
         currency_table = ','.join('{}'.format(args) for args in conversion_rates)
@@ -296,7 +326,7 @@ class CashFlowProjection(models.TransientModel):
         """
         if not options.get('date'):
             return []
-        currency_table_query = self._get_currency_table(options)
+        currency_table_query = self._get_currency_table()
         query = """
                         SELECT
                             account_move_line.account_id as account_id,
@@ -404,20 +434,20 @@ class CashFlowProjection(models.TransientModel):
             cash_in_options[configuration['code']] = configuration['is_show']
 
         if cash_in_options.get('future_customer_payment'):
-            query_table.append(self._query_incoming_payment_lines(from_date, to_date))
+            query_table.append(self._query_incoming_payment_lines(from_date, to_date, options))
         if cash_in_options.get('sale_order'):
             query_table.append(
-                self._query_so_lines(from_date, to_date))
+                self._query_so_lines(from_date, to_date, options))
         if cash_in_options.get('ar_credit_note'):
-            query_table.append(self._query_ar_credit_note_lines(from_date, to_date))
+            query_table.append(self._query_ar_credit_note_lines(from_date, to_date, options))
         if cash_in_options.get('ar_invoice'):
-            query_table.append(self._query_ar_invoice_lines(from_date, to_date))
+            query_table.append(self._query_ar_invoice_lines(from_date, to_date, options))
         if cash_in_options.get('cash_in_other'):
             query_table.append(self._query_other_cash_in_lines(from_date, to_date))
 
         return query_table
 
-    def _query_incoming_payment_lines(self, from_date, to_date):
+    def _query_incoming_payment_lines(self, from_date, to_date, options):
         """
         Generate statement for querying incoming payment lines
         :param from_date: the beginning date of the period
@@ -432,43 +462,60 @@ class CashFlowProjection(models.TransientModel):
         elif to_date < today:
             to_date = from_date - relativedelta(days=1)
         query_incoming_payment_lines = """
-            SELECT cast('future_customer_payment' as text) as id, cast('Future Customer Payments' as text) as name, aml.debit as amount, am.name as account_name, TO_CHAR(aml.date + aa.payment_lead_time, 'mm/dd/yyyy') as date, aml.id as line_id, aa.id as account_id, rp.name as partner_name
+            SELECT cast('future_customer_payment' as text) as id, cast('Future Customer Payments' as text) as name,
+                     CASE
+                        WHEN aml.currency_id != {} THEN ROUND(aml.debit * currency_table.rate, currency_table.precision)
+                        ELSE aml.amount_residual_currency
+                     END AS amount,
+                     am.name as account_name,
+                     TO_CHAR(aml.date + aa.payment_lead_time, 'mm/dd/yyyy') as date,
+                     aml.id as line_id,
+                     aa.id as account_id,
+                     rp.name as partner_name
             FROM account_move_line aml
                      JOIN account_account aa ON aml.account_id = aa.id
-                     JOIN account_account_type aat ON aa.user_type_id = aat.id
                      JOIN account_move am ON aml.move_id = am.id
+                     JOIN account_journal aj on am.journal_id = aj.id
                      LEFT JOIN res_partner rp ON aml.partner_id = rp.id
+                     LEFT JOIN {} ON currency_table.company_id = aml.company_id
             WHERE am.state = 'posted'
                      AND aml.debit > 0
                      AND (aml.date + aa.payment_lead_time) >= '{}'
                      AND (aml.date + aa.payment_lead_time) <= '{}'
-                     AND aat.type = 'liquidity'
-                     AND aml.company_id = {}
-        """.format(from_date, to_date, self.env.user.company_id.id)
+                     AND aml.account_id = aj.payment_debit_account_id
+                     AND aml.company_id IN {}
+        """.format(options['main_company_currency_id'], options['currency_table_query'], from_date, to_date,
+                   options['companies'])
         return query_incoming_payment_lines
 
-    def _query_so_lines(self, from_date, to_date):
+    def _query_so_lines(self, from_date, to_date, options):
         """
         Generate statement for querying Sale Order's remaining amount
         :param from_date: the beginning date of the period
         :param to_date: the ending date of the period
         :return: string the selection statement
         """
-        so_lead_time = self.env.user.company_id.customer_payment_lead_time
+        so_lead_time = self.env.company.customer_payment_lead_time
         query_so_lines = """
              SELECT cast('sale_order' as text) as id, cast('Sales' as text) as name,
-              so.remaining_total/(case coalesce(so.currency_rate,0) when 0 then 1.0 else so.currency_rate end) as amount, 
+              CASE
+                WHEN so.currency_id = {} THEN so.amount_so_remaining
+                ELSE ROUND((currency_table.rate * so.amount_so_remaining / so.currency_rate)::numeric, currency_table.precision)
+              END AS amount,
               so.name as account_name, TO_CHAR(so.date_order + interval '{}' day, 'mm/dd/yyyy') as date, so.id as line_id, so.id as account_id, rp.name as partner_name
-             FROM sale_order so LEFT JOIN res_partner rp ON so.partner_id = rp.id
+             FROM sale_order so 
+                LEFT JOIN res_partner rp ON so.partner_id = rp.id
+                LEFT JOIN {} ON currency_table.company_id = so.company_id
              WHERE state NOT IN ('draft', 'cancel')
-                            AND so.remaining_total > 0
+                            AND so.amount_so_remaining > 0
                             AND cast((date_order + interval '{}' day) as date) >= '{}'
                             AND cast((date_order + interval '{}' day) as date) <= '{}'
-                            AND so.company_id = {}
-        """.format(so_lead_time, so_lead_time, from_date, so_lead_time, to_date, self.env.user.company_id.id)
+                            AND so.company_id IN {}
+        """.format(options['main_company_currency_id'], so_lead_time, options['currency_table_query'], so_lead_time,
+                   from_date, so_lead_time, to_date, options['companies'])
         return query_so_lines
 
-    def _query_ar_invoice_lines(self, from_date, to_date):
+    def _query_ar_invoice_lines(self, from_date, to_date, options):
         """
         Generate statement for querying Account Receivable invoice lines
         :param from_date: the beginning date of the period
@@ -476,22 +523,33 @@ class CashFlowProjection(models.TransientModel):
         :return: string the selection statement
         """
         query_ar_invoice_lines = """
-            SELECT cast('ar_invoice' as text) as id, cast('Receivable' as text) as name, aml1.amount_residual as amount, am.name as account_name, TO_CHAR(aml1.date_maturity, 'mm/dd/yyyy') as date, aml1.id as line_id, aml1.account_id, aml1.partner_name
+            SELECT cast('ar_invoice' as text) as id, cast('Receivable' as text) as name, 
+                CASE
+                    WHEN aml1.currency_id != {} THEN ROUND(aml1.amount_residual * currency_table.rate, currency_table.precision)
+                    ELSE aml1.amount_residual_currency
+                END AS amount,
+                am.name as account_name, 
+                TO_CHAR(aml1.date_maturity, 'mm/dd/yyyy') as date, 
+                aml1.id as line_id, 
+                aml1.account_id, 
+                aml1.partner_name
             FROM
-                (SELECT aml.amount_residual, aml.move_id, aml.date_maturity, aml.id, aa.id as account_id, rp.name as partner_name
+                (SELECT aml.amount_residual, aml.amount_residual_currency, aml.currency_id, aml.move_id, aml.date_maturity, aml.id, aa.id as account_id, rp.name as partner_name
                  FROM account_move_line aml JOIN account_account aa ON aml.account_id = aa.id
                     LEFT JOIN res_partner rp ON aml.partner_id = rp.id
                  WHERE aa.internal_type = 'receivable'
                            AND aml.date_maturity >= '{}'
                            AND aml.date_maturity <= '{}'
                            AND aml.amount_residual > 0
-                           AND aml.company_id = {}) aml1
+                           AND aml.company_id IN {}) aml1
                JOIN account_move am ON aml1.move_id = am.id
+               LEFT JOIN {} ON currency_table.company_id = am.company_id
             WHERE am.state = 'posted'
-        """.format(from_date, to_date, self.env.user.company_id.id)
+        """.format(options['main_company_currency_id'], from_date, to_date, options['companies'],
+                   options['currency_table_query'])
         return query_ar_invoice_lines
 
-    def _query_ar_credit_note_lines(self, from_date, to_date):
+    def _query_ar_credit_note_lines(self, from_date, to_date, options):
         """
         Generate statement for querying Account Receivable credit note lines
         :param from_date: the beginning date of the period
@@ -499,17 +557,27 @@ class CashFlowProjection(models.TransientModel):
         :return: string the selection statement
         """
         query_ar_credit_note_lines = """
-            SELECT cast('ar_credit_note' as text) as id, cast('Customer Credit Notes' as text) as name, aml1.amount_residual as amount, am.name as account_name, TO_CHAR(aml1.date_maturity, 'mm/dd/yyyy') as date, aml1.id as line_id, aml1.account_id, aml1.partner_name
+            SELECT cast('ar_credit_note' as text) as id, cast('Customer Credit Notes' as text) as name, 
+                CASE
+                    WHEN aml1.currency_id != {} THEN ROUND(aml1.amount_residual * currency_table.rate, currency_table.precision)
+                    ELSE aml1.amount_residual_currency
+                END AS amount,
+                am.name as account_name, 
+                TO_CHAR(aml1.date_maturity, 'mm/dd/yyyy') as date, 
+                aml1.id as line_id, 
+                aml1.account_id, 
+                aml1.partner_name
             FROM
-                (SELECT aml.amount_residual, aml.move_id, aml.date_maturity, aml.id, aa.id as account_id, rp.name as partner_name
+                (SELECT aml.amount_residual, aml.amount_residual_currency, aml.currency_id, aml.move_id, aml.date_maturity, aml.id, aa.id as account_id, rp.name as partner_name
                  FROM account_move_line aml JOIN account_account aa ON aml.account_id = aa.id
                     LEFT JOIN res_partner rp ON aml.partner_id = rp.id
                  WHERE aa.internal_type = 'receivable'
                         AND aml.date_maturity >= '{}'
                         AND aml.date_maturity <= '{}'
                         AND aml.amount_residual < 0
-                        AND aml.company_id = {}) aml1
+                        AND aml.company_id IN {}) aml1
               JOIN account_move am ON aml1.move_id = am.id
+              LEFT JOIN {} ON currency_table.company_id = am.company_id
             WHERE am.state = 'posted'
                 AND am.id NOT IN (
                     SELECT distinct am2.id
@@ -517,11 +585,13 @@ class CashFlowProjection(models.TransientModel):
                          JOIN account_move am2 ON aml.move_id = am2.id
                          JOIN account_account aa ON aml.account_id = aa.id
                          JOIN account_account_type aat ON aa.user_type_id = aat.id
+                         JOIN account_journal aj on am2.journal_id = aj.id
                     WHERE am.state = 'posted'
                          AND aml.debit > 0
-                         AND aat.type = 'liquidity'
+                         AND aml.account_id = aj.payment_debit_account_id
                 )
-        """.format(from_date, to_date, self.env.user.company_id.id)
+        """.format(options['main_company_currency_id'], from_date, to_date, options['companies'],
+                   options['currency_table_query'])
         return query_ar_credit_note_lines
 
     def _query_other_cash_in_lines(self, from_date, to_date):
@@ -582,19 +652,19 @@ class CashFlowProjection(models.TransientModel):
             cash_out_options[configuration['code']] = configuration['is_show']
         if cash_out_options.get('future_vendor_payment'):
             query_table.append(
-                self._query_outgoing_payment_lines(from_date, to_date))
+                self._query_outgoing_payment_lines(from_date, to_date, options))
         if cash_out_options.get('purchase_order'):
-            query_table.append(self._query_po_lines(from_date, to_date))
+            query_table.append(self._query_po_lines(from_date, to_date, options))
         if cash_out_options.get('ap_credit_note'):
-            query_table.append(self._query_ap_credit_note_lines(from_date, to_date))
+            query_table.append(self._query_ap_credit_note_lines(from_date, to_date, options))
         if cash_out_options.get('ap_invoice'):
-            query_table.append(self._query_ap_invoice_lines(from_date, to_date))
+            query_table.append(self._query_ap_invoice_lines(from_date, to_date, options))
         if cash_out_options.get('cash_out_other'):
             query_table.append(
                 self._query_other_cash_out_lines(from_date, to_date))
         return query_table
 
-    def _query_outgoing_payment_lines(self, from_date, to_date):
+    def _query_outgoing_payment_lines(self, from_date, to_date, options):
         """
         Generate statement for querying outgoing payments
         :param from_date: the beginning date of the period
@@ -609,43 +679,60 @@ class CashFlowProjection(models.TransientModel):
         elif to_date < today:
             to_date = from_date - relativedelta(days=1)
         query_outgoing_payment_lines = """
-            SELECT cast('future_vendor_payment' as text) as id, cast('Future Vendor Payments' as text) as name, aml.credit as amount, am.name as account_name, TO_CHAR(aml.date + aa.payment_lead_time, 'mm/dd/yyyy') as date, aml.id as line_id, aa.id as account_id, rp.name as partner_name
+            SELECT cast('future_vendor_payment' as text) as id, cast('Future Vendor Payments' as text) as name, 
+                CASE
+                    WHEN aml.currency_id != {} THEN ROUND(aml.credit * currency_table.rate, currency_table.precision)
+                    ELSE -aml.amount_residual_currency
+                END AS amount,
+                am.name as account_name, 
+                TO_CHAR(aml.date + aa.payment_lead_time, 'mm/dd/yyyy') as date, 
+                aml.id as line_id, 
+                aa.id as account_id, 
+                rp.name as partner_name
             FROM account_move_line aml
                       JOIN account_account aa ON aml.account_id = aa.id
-                      JOIN account_account_type aat ON aa.user_type_id = aat.id
                       JOIN account_move am ON aml.move_id = am.id
+                      JOIN account_journal aj on am.journal_id = aj.id
                       LEFT JOIN res_partner rp ON aml.partner_id = rp.id
+                      LEFT JOIN {} ON currency_table.company_id = aml.company_id
             WHERE am.state = 'posted'
                       AND aml.credit > 0
                       AND (aml.date + aa.payment_lead_time) >= '{}'
                       AND (aml.date + aa.payment_lead_time) <= '{}'
-                      AND aat.type = 'liquidity'
-                      AND aml.company_id = {}
-        """.format(from_date, to_date, self.env.user.company_id.id)
+                      AND aml.account_id = aj.payment_credit_account_id
+                      AND aml.company_id IN {}
+        """.format(options['main_company_currency_id'], options['currency_table_query'], from_date, to_date,
+                   options['companies'])
         return query_outgoing_payment_lines
 
-    def _query_po_lines(self, from_date, to_date):
+    def _query_po_lines(self, from_date, to_date, options):
         """
         Generate statement for querying Purchase Order's remaining amount
         :param from_date: the beginning date of the period
         :param to_date: the ending date of the period
         :return: string the selection statement
         """
-        po_lead_time = self.env.user.company_id.vendor_payment_lead_time
+        po_lead_time = self.env.company.vendor_payment_lead_time
         query_po_lines = """
             SELECT cast('purchase_order' as text) as id, cast('Purchases' as text) as name, 
-            po.remaining_total/(case coalesce(po.currency_rate,0) when 0 then 1.0 else po.currency_rate end) as amount,
+            CASE
+                WHEN po.currency_id = {} THEN po.amount_so_remaining
+                ELSE ROUND((currency_table.rate * po.amount_so_remaining / po.currency_rate)::numeric, currency_table.precision)
+            END AS amount,
             po.name as account_name, TO_CHAR(po.date_approve + interval '{}' day, 'mm/dd/yyyy') as date, po.id as line_id, po.id as account_id, rp.name as partner_name
-            FROM purchase_order po LEFT JOIN res_partner rp ON po.partner_id = rp.id
+            FROM purchase_order po 
+                LEFT JOIN res_partner rp ON po.partner_id = rp.id
+                LEFT JOIN {} ON currency_table.company_id = po.company_id
             WHERE state NOT IN ('draft', 'cancel')
-                       AND po.remaining_total > 0
+                       AND po.amount_so_remaining > 0
                        AND cast((date_approve + interval '{}' day) as date) >= '{}'
                        AND cast((date_approve + interval '{}' day) as date) <= '{}'
-                       AND po.company_id = {}
-        """.format(po_lead_time, po_lead_time, from_date, po_lead_time, to_date, self.env.user.company_id.id)
+                       AND po.company_id IN {}
+        """.format(options['main_company_currency_id'], po_lead_time, options['currency_table_query'], po_lead_time,
+                   from_date, po_lead_time, to_date, options['companies'])
         return query_po_lines
 
-    def _query_ap_invoice_lines(self, from_date, to_date):
+    def _query_ap_invoice_lines(self, from_date, to_date, options):
         """
         Generate statement for querying Account Payable invoice lines
         :param from_date: the beginning date of the period
@@ -653,22 +740,33 @@ class CashFlowProjection(models.TransientModel):
         :return: string the selection statement
         """
         query_ap_invoice_lines = """
-            SELECT cast('ap_invoice' as text) as id, cast('Payable' as text) as name, -aml1.amount_residual as amount, am.name as account_name, TO_CHAR(aml1.date_maturity, 'mm/dd/yyyy') as date, aml1.id as line_id, aml1.account_id, aml1.partner_name
+            SELECT cast('ap_invoice' as text) as id, cast('Payable' as text) as name, 
+                CASE
+                    WHEN aml1.currency_id != {} THEN ROUND(-aml1.amount_residual * currency_table.rate, currency_table.precision)
+                    ELSE -aml1.amount_residual_currency
+                END AS amount, 
+                am.name as account_name, 
+                TO_CHAR(aml1.date_maturity, 'mm/dd/yyyy') as date, 
+                aml1.id as line_id, 
+                aml1.account_id, 
+                aml1.partner_name
             FROM
-                (SELECT aml.amount_residual, aml.move_id, aml.date_maturity, aml.id, aa.id as account_id, rp.name as partner_name
+                (SELECT aml.amount_residual, aml.amount_residual_currency, aml.currency_id, aml.move_id, aml.date_maturity, aml.id, aa.id as account_id, rp.name as partner_name
                  FROM account_move_line aml JOIN account_account aa ON aml.account_id = aa.id
                     LEFT JOIN res_partner rp ON aml.partner_id = rp.id
                  WHERE aa.internal_type = 'payable'
                           AND aml.date_maturity >= '{}'
                           AND aml.date_maturity <= '{}'
                           AND aml.amount_residual < 0
-                          AND aml.company_id = {}) aml1
+                          AND aml.company_id IN {}) aml1
                JOIN account_move am ON aml1.move_id = am.id
+               LEFT JOIN {} ON currency_table.company_id = am.company_id
             WHERE am.state = 'posted'
-        """.format(from_date, to_date, self.env.user.company_id.id)
+        """.format(options['main_company_currency_id'], from_date, to_date, options['companies'],
+                   options['currency_table_query'])
         return query_ap_invoice_lines
 
-    def _query_ap_credit_note_lines(self, from_date, to_date):
+    def _query_ap_credit_note_lines(self, from_date, to_date, options):
         """
         Generate statement for querying Account Payable credit note lines
         :param from_date: the beginning date of the period
@@ -676,17 +774,27 @@ class CashFlowProjection(models.TransientModel):
         :return: string the selection statement
         """
         query_ap_credit_note_lines = """
-           SELECT cast('ap_credit_note' as text) as id, cast('Vendor Credit Notes' as text) as name, -aml1.amount_residual as amount, am.name as account_name, TO_CHAR(aml1.date_maturity, 'mm/dd/yyyy') as date, aml1.id as line_id, aml1.account_id, aml1.partner_name
+           SELECT cast('ap_credit_note' as text) as id, cast('Vendor Credit Notes' as text) as name, 
+                CASE
+                    WHEN aml1.currency_id != {} THEN ROUND(-aml1.amount_residual * currency_table.rate, currency_table.precision)
+                    ELSE -aml1.amount_residual_currency
+                END AS amount, 
+                am.name as account_name, 
+                TO_CHAR(aml1.date_maturity, 'mm/dd/yyyy') as date, 
+                aml1.id as line_id, 
+                aml1.account_id, 
+                aml1.partner_name
            FROM
-               (SELECT aml.amount_residual, aml.move_id, aml.date_maturity, aml.id, aa.id as account_id, rp.name as partner_name
+               (SELECT aml.amount_residual, aml.amount_residual_currency, aml.currency_id, aml.move_id, aml.date_maturity, aml.id, aa.id as account_id, rp.name as partner_name
                 FROM account_move_line aml JOIN account_account aa ON aml.account_id = aa.id
                     LEFT JOIN res_partner rp ON aml.partner_id = rp.id
                 WHERE aa.internal_type = 'payable'
                         AND aml.date_maturity >= '{}'
                         AND aml.date_maturity <= '{}'
                         AND aml.amount_residual > 0
-                        AND aml.company_id = {}) aml1
+                        AND aml.company_id IN {}) aml1
               JOIN account_move am ON aml1.move_id = am.id
+              LEFT JOIN {} ON currency_table.company_id = am.company_id
            WHERE am.state = 'posted'
                 AND am.id NOT IN (
                     SELECT distinct am2.id
@@ -694,11 +802,13 @@ class CashFlowProjection(models.TransientModel):
                          JOIN account_move am2 ON aml.move_id = am2.id
                          JOIN account_account aa ON aml.account_id = aa.id
                          JOIN account_account_type aat ON aa.user_type_id = aat.id
+                         JOIN account_journal aj on am2.journal_id = aj.id
                     WHERE am.state = 'posted'
                          AND aml.credit > 0
-                         AND aat.type = 'liquidity'
+                         AND aml.account_id = aj.payment_credit_account_id
                 )
-        """.format(from_date, to_date, self.env.user.company_id.id)
+        """.format(options['main_company_currency_id'], from_date, to_date, options['companies'],
+                   options['currency_table_query'])
         return query_ap_credit_note_lines
 
     def _query_other_cash_out_lines(self, from_date, to_date):

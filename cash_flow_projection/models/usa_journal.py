@@ -18,8 +18,8 @@ class UsaJournal(models.Model):
     _inherit = 'usa.journal'
     
     def action_open_cashflow_forecast_summary(self):
-        self.env.user.company_id.cash_flow_last_period_type = 'month'
-        action = self.env.ref('cash_flow_projection.cash_flow_projection_action_client').read()[0]
+        self.sudo().env.company.cash_flow_last_period_type = 'month'
+        action = self.env["ir.actions.actions"]._for_xml_id('cash_flow_projection.cash_flow_projection_action_client')
         return action
     
     @api.model

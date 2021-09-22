@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, api, _, fields
-
+from odoo.tools import float_compare
 
 class BankReconciliationDifference(models.TransientModel):
     _name = 'account.bank.reconciliation.difference'
@@ -22,9 +22,12 @@ class BankReconciliationDifference(models.TransientModel):
     def _get_account_side(self, journal_id, difference):
         self.ensure_one()
 
-        debit_account = journal_id.default_account_id if difference >= 0 \
+        company_currency = self.env.company.currency_id
+        debit_account = journal_id.default_account_id if float_compare(difference, 0,
+                                                                       precision_rounding=company_currency.rounding) >= 0 \
             else self.reconciliation_discrepancies_account_id
-        credit_account = self.reconciliation_discrepancies_account_id if difference >= 0 \
+        credit_account = self.reconciliation_discrepancies_account_id if float_compare(difference, 0,
+                                                                                       precision_rounding=company_currency.rounding) >= 0 \
             else journal_id.default_account_id
 
         return debit_account, credit_account

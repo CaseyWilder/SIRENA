@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from ..utils.time_utils import BY_MONTH
+from ..utils.utils import get_currency_table
 from odoo import api, fields, models
 
 
@@ -54,20 +55,25 @@ class AccountMoveLine(models.Model):
         sql_params = [period_type, date_from, date_to]
         sql_params.extend(extend_where_params)
 
+        main_company = self.env.company
+        companies = self.env.companies
+        currency_table = get_currency_table(main_company, companies)
+
         query = """
             SELECT date_part('year', "account_move_line".date::DATE) AS year,
                 date_part(%s, "account_move_line".date::DATE) AS period,
                 COUNT (*),
                 MIN("account_move_line".date) AS date_in_period,
-                SUM("account_move_line".balance) AS total_balance,
-                SUM("account_move_line".credit) AS total_credit,
-                SUM("account_move_line".debit) AS total_debit
-            FROM "account_move" AS "account_move_line__move_id", "account_move_line" 
+                SUM(ROUND("account_move_line".balance * currency_table.rate, currency_table.precision)) AS total_balance,
+                SUM(ROUND("account_move_line".credit * currency_table.rate, currency_table.precision)) AS total_credit,
+                SUM(ROUND("account_move_line".debit * currency_table.rate, currency_table.precision)) AS total_debit
+            FROM "account_move" AS "account_move_line__move_id",
+                "account_move_line" LEFT JOIN {currency_table} ON currency_table.company_id = "account_move_line".company_id
             WHERE ("account_move_line"."move_id"="account_move_line__move_id"."id") AND
                 "account_move_line".parent_state = 'posted' AND
                 "account_move_line".date >= %s AND
                 "account_move_line".date <= %s AND
-                """ + extend_condition_clause + """
+                """.format(currency_table=currency_table) + extend_condition_clause + """
             GROUP BY year, period
             ORDER BY year, period;
         """

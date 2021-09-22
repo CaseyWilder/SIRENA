@@ -17,7 +17,6 @@ class AccountPaymentUSA(models.Model):
     income_account = fields.Many2one('account.account', string='Income Account',
                                      domain=lambda self: [('user_type_id', 'in', [self.env.ref('account.data_account_type_revenue').id,
                                                                                   self.env.ref('account.data_account_type_other_income').id])])
-    is_deposit = fields.Boolean('Is a Deposit?')
 
     # Reconcile with invoices/entries
     available_move_line_ids = fields.Many2many('account.move.line', compute='_compute_available_move_line',
@@ -43,6 +42,28 @@ class AccountPaymentUSA(models.Model):
             res['partner_name'] = self.partner_id.check_name
 
         return res
+
+    def _get_invoice_balance_due_and_credit_amount(self, inv):
+        """
+        Used to print payment receipt PDF
+        :param inv:
+        :return: array contains balance due and credit amount of invoice/bill
+        """
+        other_payment_amount = credit_amount = 0
+        for partial, amount, counterpart_line in inv._get_reconciled_invoices_partials():
+            account_payment_id = counterpart_line.payment_id.id
+            move_type = counterpart_line.move_id.move_type
+            # Deposit reconciled info: move type is entry and there is no link to deposit payment
+            if account_payment_id != self.id and \
+                    (account_payment_id or (move_type == 'entry' and not account_payment_id)):
+                other_payment_amount += amount
+            elif move_type in ['out_refund', 'in_refund']:
+                credit_amount += amount
+
+        return {
+            'balance_due': inv.amount_total - other_payment_amount,
+            'credit': credit_amount
+        }
 
     # -------------------------------------------------------------------------
     # COMPUTE METHODS
@@ -145,15 +166,8 @@ class AccountPaymentUSA(models.Model):
         """
         Override to add deposit/check move line like a write-off move line
         """
-        is_deposit = values.get('is_deposit', False)
-        is_expense_check = values.get('is_payment_receipt', False)
-        if is_deposit or is_expense_check:
-            account_id = None
-            if is_deposit:
-                account_id = values.get('property_account_customer_deposit_id') \
-                             or values.get('property_account_vendor_deposit_id')
-            elif is_expense_check:
-                account_id = values.get('expense_account') or values.get('income_account')
+        if values.get('is_payment_receipt', False):
+            account_id = values.get('expense_account') or values.get('income_account')
             values['write_off_line_vals'] = {
                 'account_id': account_id,
                 'amount': -values.get('amount', 0.0)
@@ -163,30 +177,30 @@ class AccountPaymentUSA(models.Model):
 
     def _synchronize_to_moves(self, changed_fields):
         """
-        Override to update move lines of deposit payment/check when changing fields on the form
+        Override to update move lines of payment receipt when changing fields on the payment form
         """
         if self._context.get('skip_account_move_synchronization'):
             return
 
-        special_payments = self.with_context(skip_account_move_synchronization=True).filtered(lambda x: x.is_deposit or x.is_payment_receipt)
-        if 'is_payment_receipt' in changed_fields and not special_payments:
-            # When change from bill payment to normal payment, we need to remove write-off move line
+        payment_receipts = self.with_context(skip_account_move_synchronization=True).filtered(lambda x: x.is_payment_receipt)
+        if 'is_payment_receipt' in changed_fields and not payment_receipts:
+            # When change from payment receipt to normal payment, we need to remove write-off move line
             for payment in self.with_context(skip_account_move_synchronization=True):
                 liquidity_lines, counterpart_lines, other_lines = payment._seek_for_lines()
                 line_vals_list = payment._prepare_move_line_default_vals(write_off_line_vals={})
                 line_ids_commands = [
                     (1, liquidity_lines.id, line_vals_list[0]),
                     (1, counterpart_lines.id, line_vals_list[1]),
-                    (2, other_lines.id, 0),
+                    (2, other_lines[0].id, 0),
                 ]
                 payment.move_id.write({
                     'line_ids': line_ids_commands
                 })
             super(AccountPaymentUSA, self)._synchronize_to_moves(changed_fields)
         elif any(field in changed_fields for field in ['partner_id', 'partner_bank_id', 'date', 'payment_reference', 'amount', 'currency_id', 'expense_account', 'income_account', 'is_payment_receipt']):
-            for payment in special_payments:
+            for payment in payment_receipts:
                 liquidity_lines, counterpart_lines, other_lines = payment._seek_for_lines()
-                # When change from normal payment to bill payment, we need to create write-off move line
+                # When change from normal payment to payment receipt, we need to create write-off move line
                 if other_lines:
                     other_line_vals = {
                         'name': other_lines[0].name,
@@ -204,7 +218,7 @@ class AccountPaymentUSA(models.Model):
                     line_ids_commands = [
                         (1, liquidity_lines.id, line_vals_list[0]),
                         (1, counterpart_lines.id, line_vals_list[1]),
-                        (1, other_lines.id, line_vals_list[2]),
+                        (1, other_lines[0].id, line_vals_list[2]),
                     ]
                 else:
                     # Need to set debit and credit of counter part move line to 0
@@ -221,7 +235,7 @@ class AccountPaymentUSA(models.Model):
                     'partner_bank_id': payment.partner_bank_id.id,
                     'line_ids': line_ids_commands
                 })
-            super(AccountPaymentUSA, self - special_payments)._synchronize_to_moves(changed_fields)
+            super(AccountPaymentUSA, self - payment_receipts)._synchronize_to_moves(changed_fields)
         else:
             super(AccountPaymentUSA, self)._synchronize_to_moves(changed_fields)
 
@@ -256,7 +270,7 @@ class AccountPaymentUSA(models.Model):
 
     def button_draft_usa(self):
         self.ensure_one()
-        action = self.env.ref('l10n_us_accounting.action_view_button_set_to_draft_message').read()[0]
+        action = self.env["ir.actions.actions"]._for_xml_id("l10n_us_accounting.action_view_button_set_to_draft_message")
         action['context'] = isinstance(action.get('context', {}), dict) or {}
         action['context']['default_payment_id'] = self.id
         return action

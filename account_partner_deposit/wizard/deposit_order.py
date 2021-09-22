@@ -47,6 +47,7 @@ class DepositOrder(models.TransientModel):
                 'default_partner_id': order.partner_id.id,
                 'default_amount': amount,
                 'default_currency_id': order.currency_id.id,
+                'default_move_journal_types': ('bank', 'cash')
             }
 
             if active_model == 'sale.order':

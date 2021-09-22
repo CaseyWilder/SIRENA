@@ -28,6 +28,30 @@
                     </div>
                 </div>
             </xpath>
+
+            <div id="print_vendor_checks_setting_container" position="inside">
+                <div name="report_1099_top_margin" class="col-12 col-lg-6 o_setting_box">
+                    <div class="o_setting_left_pane"/>
+                    <div class="o_setting_right_pane">
+                        <span class="o_form_label">1099 Report</span>
+                        <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." role="img"
+                              aria-label="Values set here are company-specific." groups="base.group_multi_company"/>
+                        <div class="text-muted">
+                            Adjust the margins of generated 1099 report to make it fit your printer's settings
+                        </div>
+                        <div class="content-group mt16">
+                            <div class="row">
+                                <label for="report_1099_printing_margin_top" class="col-lg-4 o_light_label"/>
+                                <field name="report_1099_printing_margin_top"/>
+                            </div>
+                            <div class="row">
+                                <label for="report_1099_printing_margin_left" class="col-lg-4 o_light_label"/>
+                                <field name="report_1099_printing_margin_left"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </field>
     </record>
 </odoo>

@@ -1,13 +1,18 @@
 odoo.define('l10n_us_accounting.ReconciliationRenderer', function (require) {
     "use strict";
-
+    var session = require("web.session");
+    const field_utils = require('web.field_utils');
     let LineRenderer = require('account.ReconciliationRenderer').LineRenderer;
+    const mappingFormatTable = {
+        '%d': 'dd',
+        '%m': 'mm',
+        '%Y': 'yy'
+    }
     LineRenderer.include({
         events: _.extend({}, LineRenderer.prototype.events, {
             'click .accounting_view caption .o_exclude_button button': '_onExclude',
             'click table.accounting_view td.sort': '_onSortColumn',
         }),
-
         start: function () {
             let state = this._initialState;
             let model = _.find(state.reconcileModels, function (item) {
@@ -33,7 +38,7 @@ odoo.define('l10n_us_accounting.ReconciliationRenderer', function (require) {
          * Handle when users click on each bank statement line, change partner, update transaction lines...
          * @param {Object} state
          */
-        update: function(state) {
+        update: function (state) {
             // Remove Bank rule name
             let numOfLines = this.$el.find('table.accounting_view tbody tr.mv_line').length;
             this.filterBatchPayment(state);
@@ -112,16 +117,56 @@ odoo.define('l10n_us_accounting.ReconciliationRenderer', function (require) {
             this._hideReconciliationModelName();
         },
 
+
+        /**
+         * Get current active currencies of current user
+         * @param
+         */
+        getCurrentCurrency() {
+            const currentCurrencies = this._rpc({
+                model: "res.currency",
+                method: "search_read",
+                fields: ["symbol"],
+                domain: [["active", "=", true]],
+            }).then(function (result) {
+                return result.map(record => record.symbol).join('');
+            });
+            return currentCurrencies;
+        },
+        /**
+         * Get float number format for current language of current user.
+         * @param
+         */
+        getLanguageFormat() {
+            const currentFormat = this._rpc({
+                model: "res.lang",
+                method: "search_read",
+                fields: ["date_format"],
+                domain: [["code", "=", session.user_context.lang]],
+            }).then(function (result) {
+                let pythonDateFormat = result[0].date_format;
+                let dateSeparator = pythonDateFormat[2]
+                let pythonDateFormatList = pythonDateFormat.split(dateSeparator);
+                let jsDateFormat = pythonDateFormatList.map(record => mappingFormatTable[record])
+                return jsDateFormat.join(dateSeparator);
+            });
+            return currentFormat;
+        },
         /**
          * Sort suggested matching list when users click on header of table.
          * @param {event} event
          * @private
          */
-        _onSortColumn: function(event) {
+        _onSortColumn: async function (event) {
             // Convert string to other values
-            let strDateToDate = str => $.datepicker.parseDate('mm/dd/yy', str);
-            let strCurrencyToNum = str => Number(str.replace(/[^0-9.-]+/g,""));
-            let strNumToNum = str => Number(str.replace(/\u200B/g,''));
+            var date_format = await this.getLanguageFormat();
+            let currencies = await this.getCurrentCurrency();
+            let strDateToDate = (str) => $.datepicker.parseDate(date_format, str);
+            let strCurrencyToNum = (str) => {
+                const currencySymbolRegex = RegExp(`[${currencies}]`, 'g');
+                return field_utils.parse.float(str.replace(currencySymbolRegex, "").trim()).toFixed(2);
+            }
+            let strNumToNum = str => Number(str.replace(/\u200B/g, ''));
 
             // Get string value from a cell.
             let getCellValue = (row, index) => $(row).children('td').eq(index).text().trim();

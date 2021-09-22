@@ -4,6 +4,9 @@ import dateutil
 from pytz import timezone
 from odoo.tools.safe_eval import wrap_module
 from odoo.tools import formatLang
+from odoo.tools.misc import get_lang
+from datetime import date
+
 
 mods = ['parser', 'relativedelta', 'rrule', 'tz']
 for mod in mods:
@@ -11,7 +14,7 @@ for mod in mods:
 
 
 def format_currency(self, value):
-    currency = self.env.user.company_id.currency_id
+    currency = self.env.company.currency_id
     return_value = formatLang(self.env, currency.round(value) + 0.0, currency_obj=currency)
     return return_value
 
@@ -97,6 +100,7 @@ def get_short_currency_amount(value, currency_id):
     short_title = format_currency_amount(converted_amount, currency_id)
     return short_title
 
+
 def get_list_companies_child(cur_coms):
     list_com_id = cur_coms.ids
     for com in cur_coms:
@@ -104,8 +108,37 @@ def get_list_companies_child(cur_coms):
             list_com_id += get_list_companies_child(child)
     return list_com_id
 
+
 def reverse_formatLang(self, string):
-    symbols = [com.currency_id.symbol for com in self.env.user.company_ids]
-    for c in [',', ' '] + symbols:
-        string = string.replace(c, '')
+    currency_symbol = self.env['res.currency'].search([('active', '=', True)]).mapped('symbol')
+    active_language = get_lang(self.env)
+    thousand_separator = active_language.thousands_sep
+    decimal_separator = active_language.decimal_point
+    symbols_to_replace = {thousand_separator: '', decimal_separator: '.', ' ': ''}
+    currency_symbol_to_replace = {symbol: '' for symbol in currency_symbol}
+    symbols_to_replace.update(currency_symbol_to_replace)
+    for symbol, replace_value in symbols_to_replace.items():
+        string = string.replace(symbol, replace_value)
     return float(string)
+
+
+def get_currency_table(main_company, companies):
+    """ Construct the currency table as a mapping company -> rate to convert the amount to the user's company
+    currency in a multi-company/multi-currency environment.
+    The currency_table is a small postgresql table construct with VALUES.
+    :param main_company: main company record
+    :param companies: selecting companies record set
+    :return: The query representing the currency table.
+    """
+    currency_rates = companies.mapped('currency_id')._get_rates(main_company, date.today())
+
+    conversion_rates = []
+    for company in companies:
+        conversion_rates.append((
+            company.id,
+            currency_rates[main_company.currency_id.id] / currency_rates[company.currency_id.id],
+            main_company.currency_id.decimal_places,
+        ))
+
+    currency_table = ','.join('{}'.format(args) for args in conversion_rates)
+    return '(VALUES {}) AS currency_table(company_id, rate, precision)'.format(currency_table)

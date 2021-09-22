@@ -11,7 +11,7 @@ from ..utils.graph_utils import get_json_render, get_json_data_for_selection, ge
     append_data_fetch_to_list
 from ..utils.time_utils import get_list_period_by_type, get_start_end_date_value, BY_DAY, BY_WEEK, BY_MONTH, BY_QUARTER, \
     BY_FISCAL_YEAR
-from ..utils.utils import get_list_companies_child
+from ..utils.utils import get_currency_table
 
 PRIMARY_GREEN = "#00A09D"
 PRIMARY_PURPLE = "#875a7b"
@@ -139,7 +139,7 @@ class USAJournal(models.Model):
             domain = GRAPH_CONFIG[self.type]['action'].get('domain', "")
             context = GRAPH_CONFIG[self.type]['action'].get('context', {})
 
-        [action] = self.env.ref(action_name).read()
+        action = self.env["ir.actions.actions"]._for_xml_id(action_name)
         action['domain'] = domain
         action['context'] = context
 
@@ -147,7 +147,7 @@ class USAJournal(models.Model):
 
     def action_recurring_amount(self):
         self.ensure_one()
-        action = self.env.ref('account_dashboard.usa_journal_recurring_payment_view_action').read()[0]
+        action = self.env["ir.actions.actions"]._for_xml_id('account_dashboard.usa_journal_recurring_payment_view_action')
         action['res_id'] = self.id
         return action
 
@@ -336,21 +336,19 @@ class USAJournal(models.Model):
         date_to = datetime.strptime(date_to, '%Y-%m-%d')
         periods = get_list_period_by_type(self, date_from, date_to, period_type)
 
-        currency = """
-                SELECT c.id, COALESCE((
-                    SELECT r.rate
-                    FROM res_currency_rate r
-                    WHERE r.currency_id = c.id AND r.name <= %s AND (r.company_id IS NULL OR r.company_id IN %s)
-                    ORDER BY r.company_id, r.name DESC
-                    LIMIT 1), 1.0) AS rate
-                FROM res_currency c
-            """
+        main_company = self.env.company
+        companies = self.env.companies
+        currency_table = get_currency_table(main_company, companies)
 
         transferred_currency = """
-                SELECT ai.invoice_date, ai.move_type, ai.amount_untaxed/(CASE COALESCE(c.rate, 0) WHEN 0 THEN 1.0 ELSE c.rate END) AS amount_tran, state, company_id
+                SELECT ai.invoice_date, 
+                    ai.move_type,
+                    ai.amount_untaxed_signed * currency_table.rate AS amount_tran,
+                    ai.state, 
+                    ai.company_id
                 FROM account_move AS ai
-                    LEFT JOIN ({currency_table}) AS c ON ai.currency_id = c.id
-            """.format(currency_table=currency)
+                    LEFT JOIN {currency_table} ON currency_table.company_id = ai.company_id
+            """.format(currency_table=currency_table)
 
         query = """
                 SELECT date_part('year', aic.invoice_date::DATE) AS year,
@@ -367,9 +365,7 @@ class USAJournal(models.Model):
                 ORDER BY year, date_in_period;
             """.format(transferred_currency_table=transferred_currency)
 
-        company_ids = get_list_companies_child(self.env.company)
-        name = fields.Date.today()
-        self.env.cr.execute(query, (period_type, name, tuple(company_ids), date_from, date_to, tuple(company_ids),))
+        self.env.cr.execute(query, (period_type, date_from, date_to, tuple(companies.ids),))
         data_fetch = self.env.cr.dictfetchall()
         # Prepare data for drawing graph with chartJS
         data_list, graph_label, total_sales = self.prepare_data_for_graph(dimension=2, data_fetch=data_fetch,
@@ -411,16 +407,22 @@ class USAJournal(models.Model):
         date_to = datetime.strptime(date_to, '%Y-%m-%d')
         periods = get_list_period_by_type(self, date_from, date_to, period_type)
         type_account_id = self.env.ref('account.data_account_type_liquidity').id
+
+        main_company = self.env.company
+        companies = self.env.companies
+        currency_table = get_currency_table(main_company, companies)
+
         query = """
                 SELECT date_part('year', aml.date::DATE) AS year,
                     date_part(%s, aml.date::DATE) AS period,
                     MIN(aml.date) AS date_in_period,
-                    SUM(aml.debit) AS total_debit,
-                    SUM(aml.credit) AS total_credit
+                    SUM(aml.debit * currency_table.rate) AS total_debit,
+                    SUM(aml.credit * currency_table.rate) AS total_credit
                 FROM account_move_line AS aml
                     INNER JOIN account_move AS am ON aml.move_id = am.id
                     INNER JOIN account_account AS aa ON aml.account_id = aa.id
                     INNER JOIN account_account_type AS aat ON aa.user_type_id = aat.id
+                    LEFT JOIN {currency_table} ON currency_table.company_id = aml.company_id
                 WHERE aml.date >= %s AND 
                     aml.date <= %s AND
                     am.state = 'posted' AND
@@ -428,9 +430,8 @@ class USAJournal(models.Model):
                     aml.company_id IN %s
                 GROUP BY year, period
                 ORDER BY year, date_in_period;
-            """
-        company_ids = get_list_companies_child(self.env.company)
-        self.env.cr.execute(query, (period_type, date_from, date_to, type_account_id, tuple(company_ids),))
+            """.format(currency_table=currency_table)
+        self.env.cr.execute(query, (period_type, date_from, date_to, type_account_id, tuple(companies.ids),))
         data_fetch = self.env.cr.dictfetchall()
 
         # Prepare data for drawing graph with chartJS

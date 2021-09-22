@@ -83,7 +83,9 @@ odoo.define('cash_flow_projection.cash_flow_projection_report', function (requir
                 kwargs: {context: session.user_context},
             })
                 .then(function (result) {
-                     self.html_content = result.html;
+                    self.html_content = result.html;
+                    self.thousand_separator = result.thousand_separator;
+                    self.decimal_separator = result.decimal_separator;
                     $('.o_cfp_template_content').html(self.html_content);
                     self.report_context = result.report_context;
                     self.re_renderElement();
@@ -128,7 +130,7 @@ odoo.define('cash_flow_projection.cash_flow_projection_report', function (requir
                             value = firstChild.nodeValue;
                             firstChild.nodeValue = self.numberWithCommas(value);
                         }
-                        total_cash_in_amount += field_utils.parse.float(value);
+                        total_cash_in_amount += field_utils.parse.float(self.numberWithCommas(value));
                     } catch (error) {
                         return this.do_warn(_t("Wrong value entered!"), error);
                     }
@@ -144,7 +146,7 @@ odoo.define('cash_flow_projection.cash_flow_projection_report', function (requir
                             value = firstChild.nodeValue;
                             firstChild.nodeValue = self.numberWithCommas(value);
                         }
-                        total_cash_out_amount += field_utils.parse.float(value);
+                        total_cash_out_amount += field_utils.parse.float(self.numberWithCommas(value));
                     } catch (error) {
                         return this.do_warn(_t("Wrong value entered!"), error);
                     }
@@ -154,7 +156,7 @@ odoo.define('cash_flow_projection.cash_flow_projection_report', function (requir
                     opening_balances.cells[col].innerHTML = "<strong>0.00</strong>";
                 } else {
                     forward_balances.cells[col].innerHTML = "<strong>0.00</strong>";
-                    opening_balances.cells[col].innerHTML = `<strong>${self.numberWithCommas(field_utils.parse.float(opening_balances.cells[col].innerText).toFixed(2))}</strong>`;
+                    opening_balances.cells[col].innerHTML = `<strong>${self.numberWithCommas(opening_balances.cells[col].innerText)}</strong>`;
                 }
                 var opening_balance_amount = field_utils.parse.float(opening_balances.cells[col].innerText);
                 var opening_forward_amount = field_utils.parse.float(forward_balances.cells[col].innerText);
@@ -225,9 +227,13 @@ odoo.define('cash_flow_projection.cash_flow_projection_report', function (requir
             return this.do_action(act);
         },
         numberWithCommas: function (x) {
-            var stringValue = x.toString().replace(/,/g, "");
+            var thousandSeparator = this.thousand_separator;
+            var decimalSeparator = this.decimal_separator;
+            var stringValue = x.trim().toString().replace(/,/g, "");
+            stringValue = stringValue.replace('.', decimalSeparator);
             var number = field_utils.parse.float(stringValue).toFixed(2);
-            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            number = number.replace('.', decimalSeparator)
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, thousandSeparator);
         },
         export_xlsx: function () {
             var self = this;
@@ -469,7 +475,8 @@ odoo.define('cash_flow_projection.cash_flow_projection_report', function (requir
                                     'period_type': self.period,
                                     'cash_type': cash_type,
                                     'default_period_type': self.period,
-                                    'default_amount': result,
+                                    'default_amount': result.amount,
+                                    'default_company_id': result.company_id
                                 },
                             });
                         });
