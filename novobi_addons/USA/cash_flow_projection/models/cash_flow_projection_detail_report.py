@@ -18,7 +18,7 @@ class CashflowDetailReport(models.AbstractModel):
     
     # filter_unfold_all = True
     # filter_date = {'date_from': '', 'date_to': '', 'filter': 'this_month'}
-    filter_multi_company = None
+    filter_multi_company = True
     
     def _get_columns_name(self, options):
         columns = [{'name': ''}, {'name': 'Payment Date/Due date', 'class': 'date'},
@@ -270,16 +270,21 @@ class CashflowDetailReport(models.AbstractModel):
         ctx_period_name = self.env.context.get('period_name') or options.get('period_name')
         period_type = self.env.context.get('period_type') or options.get('period_type')
         date_from, date_to = self.get_date_from_string(ctx_period_name, options)
+        company_info = {
+            'companies': cfp._get_companies(),
+            'currency_table_query': cfp._get_currency_table(),
+            'main_company_currency_id': self.env.company.currency_id.id
+        }
         
         if transaction_code == 'future_customer_payment':
-            query = cfp._query_incoming_payment_lines(date_from, date_to)
+            query = cfp._query_incoming_payment_lines(date_from, date_to, company_info)
         elif transaction_code == 'sale_order':
             caret_options = 'sale.order'
-            query = cfp._query_so_lines(date_from, date_to)
+            query = cfp._query_so_lines(date_from, date_to, company_info)
         elif transaction_code == 'ar_credit_note':
-            query = cfp._query_ar_credit_note_lines(date_from, date_to)
+            query = cfp._query_ar_credit_note_lines(date_from, date_to, company_info)
         elif transaction_code == 'ar_invoice':
-            query = cfp._query_ar_invoice_lines(date_from, date_to)
+            query = cfp._query_ar_invoice_lines(date_from, date_to, company_info)
         elif transaction_code == 'cash_in_other':
             show_past_due_transaction = ctx_period_name and ctx_period_name == 'Past Due Transactions' or False
             if ctx_period_name and period_type:
@@ -290,14 +295,14 @@ class CashflowDetailReport(models.AbstractModel):
             should_return_details = False
             caret_options = ''
         elif transaction_code == 'future_vendor_payment':
-            query = cfp._query_outgoing_payment_lines(date_from, date_to)
+            query = cfp._query_outgoing_payment_lines(date_from, date_to, company_info)
         elif transaction_code == 'purchase_order':
             caret_options = 'purchase.order'
-            query = cfp._query_po_lines(date_from, date_to)
+            query = cfp._query_po_lines(date_from, date_to, company_info)
         elif transaction_code == 'ap_credit_note':
-            query = cfp._query_ap_credit_note_lines(date_from, date_to)
+            query = cfp._query_ap_credit_note_lines(date_from, date_to, company_info)
         elif transaction_code == 'ap_invoice':
-            query = cfp._query_ap_invoice_lines(date_from, date_to)
+            query = cfp._query_ap_invoice_lines(date_from, date_to, company_info)
         elif transaction_code == 'cash_out_other':
             if ctx_period_name and period_type:
                 show_past_due_transaction = ctx_period_name and ctx_period_name == 'Past Due Transactions' or False

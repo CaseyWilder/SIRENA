@@ -5,7 +5,8 @@ from odoo import api, fields, models, _
 class DepositPurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
-    deposit_ids = fields.One2many('account.payment', 'purchase_deposit_id', string='Deposits', domain=[('state', '!=', 'draft')])
+    deposit_ids = fields.One2many('account.payment', 'purchase_deposit_id', string='Deposits',
+                                  domain=[('state', 'not in', ['draft', 'cancel'])])
     deposit_count = fields.Integer('Deposit Count', compute='_get_deposit_total', store=True)
     deposit_total = fields.Monetary(string='Total Deposit', compute='_get_deposit_total', store=True)
     remaining_total = fields.Monetary(string='Net Total', compute='_get_deposit_total', store=True)
@@ -18,10 +19,10 @@ class DepositPurchaseOrder(models.Model):
         for order in self:
             deposit_total_signed = sum(order.deposit_ids.mapped('amount_total_signed'))
             # Convert total deposit to currency of SO using currency date is purchase order date
-            deposit_total = self.env.company.currency_id._convert(
+            deposit_total = order.company_id.currency_id._convert(
                 deposit_total_signed,
                 order.currency_id,
-                order.env.company,
+                order.company_id,
                 order.date_order or fields.Date.today()
             )
             order.update({
@@ -34,7 +35,7 @@ class DepositPurchaseOrder(models.Model):
     # BUSINESS METHODS
     # -------------------------------------------------------------------------
     def action_view_deposit(self):
-        action = self.env.ref('account_partner_deposit.action_account_payment_supplier_deposit').read()[0]
+        action = self.sudo().env.ref('account_partner_deposit.action_account_payment_supplier_deposit').read()[0]
         action['domain'] = [('id', 'in', self.deposit_ids.ids)]
         return action
 
@@ -44,6 +45,6 @@ class DepositPurchaseOrder(models.Model):
         Unlink deposits when canceling POs
         """
         res = super(DepositPurchaseOrder, self).button_cancel()
-        for order in self.filtered(lambda x: x.state == 'cancel'):
+        for order in self.sudo().filtered(lambda x: x.state == 'cancel'):
             order.deposit_ids = [(5, 0, 0)]
         return res

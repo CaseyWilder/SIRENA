@@ -83,10 +83,12 @@ class AccountPaymentLine(models.Model):
 
     @api.onchange('payment')
     def _onchange_payment_amount(self):
-        if self.payment <= 0 and self.account_move_line_id:
+        if self.currency_id:
+            rounding = self.currency_id.rounding
+        else:
+            rounding = self.env.company.currency_id.rounding
+        if float_compare(self.payment, 0, precision_rounding=rounding) <= 0 and self.account_move_line_id:
             raise ValidationError(_('Please enter an amount greater than 0'))
-
-        rounding = self.currency_id.rounding
         if float_compare(self.payment, self.residual, precision_rounding=rounding) == 1:
             self.payment = self.residual
 
@@ -113,7 +115,8 @@ class AccountPaymentLine(models.Model):
     @api.constrains('payment')
     def _check_payment_amount(self):
         for record in self:
-            if record.payment <= 0:
+            rounding = record.currency_id.rounding
+            if float_compare(record.payment, 0, precision_rounding=rounding) <= 0:
                 raise ValidationError(_('Payment Amount must be greater than 0'))
 
     # -------------------------------------------------------------------------

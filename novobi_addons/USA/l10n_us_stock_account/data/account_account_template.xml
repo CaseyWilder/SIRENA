@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="l10n_generic_coa.stock_in" model="account.account.template">
+            <field name="name">Stock Received Not Billed</field>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
+        </record>
+
+        <record id="l10n_generic_coa.stock_out" model="account.account.template">
+            <field name="name">Stock Delivered Not Invoiced</field>
+        </record>
+
+        <record id="wip_account" model="account.account.template">
+            <field name="name">Work in Process</field>
+            <field name="code">1300</field>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="chart_template_id" ref="l10n_generic_coa.configurable_chart_template"/>
+        </record>
+
+        <record id="inv_adjustment_account" model="account.account.template">
+            <field name="name">Inventory Adjustments</field>
+            <field name="code">5500</field>
+            <field name="user_type_id" ref="account.data_account_type_direct_costs"/>
+            <field name="chart_template_id" ref="l10n_generic_coa.configurable_chart_template"/>
+        </record>
+
+        <record id="scrap_account" model="account.account.template">
+            <field name="name">Scrap</field>
+            <field name="code">5200</field>
+            <field name="user_type_id" ref="account.data_account_type_direct_costs"/>
+            <field name="chart_template_id" ref="l10n_generic_coa.configurable_chart_template"/>
+        </record>
+    </data>
+
+    <data noupdate="1">
+        <function model="res.company" name="set_stock_valuation_accounts"/>
+    </data>
+</odoo>

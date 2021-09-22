@@ -33,37 +33,6 @@
             <field name="partner_type" position="attributes">
                 <attribute name="attrs">{'readonly': ['|', ('state', '!=', 'draft'), ('is_deposit', '=', True)], 'invisible': [('is_internal_transfer', '=', True)]}</attribute>
             </field>
-
-            <!--Hide Sales/Purchases Receipt checkbox-->
-            <field name="is_payment_receipt" position="attributes">
-                <attribute name="attrs">{'invisible': 1}</attribute>
-            </field>
-            <label id="is_payment_receipt_for_customer" position="attributes">
-                <attribute name="attrs">{'invisible': 1}</attribute>
-            </label>
-            <label id="is_payment_receipt_for_vendor" position="attributes">
-                <attribute name="attrs">{'invisible': 1}</attribute>
-            </label>
-            <field name="expense_account" position="attributes">
-                <attribute name="attrs">{'invisible': 1}</attribute>
-            </field>
-            <field name="income_account" position="attributes">
-                <attribute name="attrs">{'invisible': 1}</attribute>
-            </field>
-
-            <!--Hide Open Transactions section-->
-            <notebook name="open_trans" position="attributes">
-                <attribute name="attrs">{'invisible': 1}</attribute>
-            </notebook>
-            <notebook name="applied_trans" position="attributes">
-                <attribute name="attrs">{'invisible': 1}</attribute>
-            </notebook>
-            <group name="payment_total" position="attributes">
-                <attribute name="attrs">{'invisible': 1}</attribute>
-            </group>
-            <field name="date" position="before">
-                <field name="amount" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-            </field>
         </field>
     </record>
 
@@ -76,6 +45,9 @@
             <field name="currency_id" position="after">
                 <field name="is_deposit" invisible="1"/>
                 <field name="payment_type" invisible="1"/>
+            </field>
+            <field name="partner_id" position="attributes">
+                <attribute name="string">Customer/Vendor</attribute>
             </field>
         </field>
     </record>
@@ -98,7 +70,8 @@
                 'titleDisplay': 'Search by Total Amount',
                 'compareField': 'amount_total_signed',
                 'searchByAmountFilter': 1,
-                'isNegativeChecking': 0
+                'isNegativeChecking': 0,
+                'default_move_journal_types': ('bank', 'cash')
             }
         </field>
         <field name="domain">[('is_deposit', '=', True), ('payment_type', '=', 'inbound'), ('partner_type', '=', 'customer')]</field>
@@ -121,7 +94,8 @@
                 'titleDisplay': 'Search by Payment Amount',
                 'compareField': 'amount',
                 'searchByAmountFilter': 1,
-                'isNegativeChecking': 0
+                'isNegativeChecking': 0,
+                'default_move_journal_types': ('bank', 'cash')
             }
         </field>
         <field name="domain">[('is_deposit', '=', True), ('payment_type', '=', 'outbound'), ('partner_type', '=', 'supplier')]</field>

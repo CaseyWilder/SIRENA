@@ -55,6 +55,7 @@
         'views/usa_bank_reconciliation_views.xml',
         'views/account_journal_view.xml',
         'views/account_journal_dashboard_views.xml',
+        'views/report_payment_receipt_templates.xml',
 
         # ============================== SECURITY ============================
         'security/ir.model.access.csv',

@@ -1,0 +1,72 @@
+.report_1099_page {
+    position: relative;
+    font-size: 10pt;
+    width: 9.6in!important;
+    zoom: 1.25;
+    margin-left: -15px;
+    margin-right: -15px;
+
+    &:after {
+        display: block;
+        content: ".";
+        width: 9.6in;
+        visibility: hidden;
+    }
+
+    .report_1099_form {
+        position: absolute;
+    }
+
+    .report_1099_form > * {
+        position: absolute;
+        white-space: nowrap;
+    }
+
+    .payer_address {
+        top: 0.847in;
+        left: 0.15in;
+        overflow: hidden;
+        white-space: normal;
+        width: 4.2in;
+        height: 1.25in;
+    }
+
+    .partner_ssn {
+        top: 2.486in;
+        left: 0.15in;
+        width: 2in;
+    }
+
+    .recipient_tin {
+        top: 2.486in;
+        left: 2.435in;
+        width: 2in;
+    }
+
+    .partner_name {
+        top: 3.368in;
+        left: 0.15in;
+        width: 4.2in;
+    }
+
+    .partner_street_address_print {
+        top: 3.972in;
+        left: 0.15in;
+        overflow: hidden;
+        white-space: normal;
+        width: 4.2in;
+        height: 0.33in;
+        line-height: 1.2;
+    }
+
+    .partner_city_address_print {
+        top: 4.652in;
+        left: 0.15in;
+        width: 4.2in;
+    }
+
+    .total_balance {
+        top: 3.368in;
+        left: 4.65in;
+    }
+}

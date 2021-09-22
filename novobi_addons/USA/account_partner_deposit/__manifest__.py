@@ -13,7 +13,7 @@
         'l10n_generic_coa',
         'account_reports',
         'account',
-        'l10n_us_accounting',
+        'account_followup'
     ],
 
     'data': [

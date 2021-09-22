@@ -46,8 +46,6 @@ INDEX_TO_MONTH = {
 }
 # Beginning cell number not including title
 start = 5
-# Maximum number of cells that we want to expanse for a line (Odoo will handle if number of accounts not equal maximum number)
-N = 10
 # Dictionary which defined content in each cells in sheet
 # cells = {"A3": ... , "A4": ...., "M5": ...}
 
@@ -356,7 +354,7 @@ def generate_section_per_column(report_type, header, style_header, format_header
 
 def generate_full_column(report_type, index_list, sheet, col, header, type_col, style_header, format_header, period,
                          pivots, year,
-                         data_last_year=False, signs=[]):
+                         data_last_year=False, signs=[], num_of_rows_per_line=50):
     """
 
     :param index_list: list of header index
@@ -397,29 +395,31 @@ def generate_full_column(report_type, index_list, sheet, col, header, type_col, 
                                                         style_header=style_header,
                                                         format_header=format_header, start=_start, period=period,
                                                         pivot=pivot,
-                                                        loop=N, year=year, data_last_year=data_last_year, sign=signs[i]
+                                                        loop=num_of_rows_per_line, year=year,
+                                                        data_last_year=data_last_year, sign=signs[i]
                                                         )
             else:
                 s = index_list[i]
-                header1 = f"=sum({col}{s + 1}:{col}{s + N})"
+                header1 = f"=sum({col}{s + 1}:{col}{s + num_of_rows_per_line})"
                 param_col = generate_section_per_column(report_type=report_type, header=header1, name_col=type_col,
                                                         col=col,
                                                         style_header=style_header,
                                                         format_header=format_header, start=_start, period=period,
                                                         pivot=pivot,
-                                                        loop=N, year=year, data_last_year=data_last_year, sign=signs[i])
-            _start += (N + 1)
+                                                        loop=num_of_rows_per_line, year=year,
+                                                        data_last_year=data_last_year, sign=signs[i])
+            _start += (num_of_rows_per_line + 1)
         column = sheet["col" + col]
         column.update(param_col)
 
 
-def update_cell(lines):
+def update_cell(lines, num_of_rows_per_line=50):
     count = start
     index_list = [count]
     for line in lines:
         line['cell'] = count
         if line['is_lowest']:
-            count += (N + 1)
+            count += (num_of_rows_per_line + 1)
         else:
             count += 1
         index_list.append(count)
@@ -428,7 +428,7 @@ def update_cell(lines):
 
 
 def generate_spreadsheet_template(report_type, period_type, spreadsheet_name, lines_dict, year, analytic_account,
-                                  create_budget_from_last_year, currency):
+                                  create_budget_from_last_year, currency, num_of_rows_per_line=50):
     """
     This function generates json file which used to create spreadsheet.
     Json file will have similar structure as "quarterly_budget_spreadsheet_template.json" in
@@ -452,7 +452,7 @@ def generate_spreadsheet_template(report_type, period_type, spreadsheet_name, li
     pivots_list, pivots_in_sheet = generate_pivots(lines_dict, period_type, analytic_account)
     # Generate sheet
     sheet = generate_columns(sheet, period_type, spreadsheet_name, pivots_in_sheet, year, analytic_account, currency)
-    lines, index_list = update_cell(lines_dict)
+    lines, index_list = update_cell(lines_dict, num_of_rows_per_line)
     signs = [line['sign'] for line in lines_dict]
 
     ## Generate Account Column, Only generate once
@@ -465,7 +465,7 @@ def generate_spreadsheet_template(report_type, period_type, spreadsheet_name, li
                          type_col='name',
                          style_header=style_header,
                          format_header=format_header, period=periods, pivots=lines, year=year,
-                         signs=signs)
+                         signs=signs, num_of_rows_per_line=num_of_rows_per_line)
     column = sheet["col" + name_cell]
     cells.update(column)
     # For each period of year, generate 4 columns Actual, Budget, Variace and Perf
@@ -484,7 +484,8 @@ def generate_spreadsheet_template(report_type, period_type, spreadsheet_name, li
                 style_header=style_header,
                 format_header=format_header,
                 period={'type': periods['type'], 'time': INDEX_TO_MONTH[periods['type']][i]},
-                pivots=lines, year=year, data_last_year=create_budget_from_last_year, signs=signs)
+                pivots=lines, year=year, data_last_year=create_budget_from_last_year, signs=signs,
+                num_of_rows_per_line=num_of_rows_per_line)
             column = sheet["col" + col]
             cells.update(column)
 

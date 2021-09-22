@@ -135,3 +135,23 @@ class AccountReconciliation(models.AbstractModel):
                 '&', ('credit', '=', 0), ('debit', '<=', statement_line.amount),
         ]
         return super(AccountReconciliation, self)._get_query_reconciliation_widget_miscellaneous_matching_lines(statement_line, domain)
+
+    # -------------------------------------------------------------------------
+    # HELPER AND PRIVATE
+    # -------------------------------------------------------------------------
+    @api.model
+    def _get_trailing_query(self, statement_line, limit=None, offset=None):
+        trailing_query, params = super()._get_trailing_query(statement_line, limit=limit, offset=offset)
+        order_by_position = trailing_query.find('ORDER BY')
+        offset_index = len('ORDER By') + 1
+        sort_by_date_stmt = 'account_move_line.date DESC,'
+        trailing_query_with_date_sorted = trailing_query[
+                                          :order_by_position + offset_index] + sort_by_date_stmt + trailing_query[
+                                                                                                   order_by_position + offset_index:]
+        return trailing_query_with_date_sorted, params
+
+    @api.model
+    def _get_query_select_clause(self):
+        select_clause = super()._get_query_select_clause()
+        select_clause_with_date = select_clause + ",account_move_line.date"
+        return select_clause_with_date

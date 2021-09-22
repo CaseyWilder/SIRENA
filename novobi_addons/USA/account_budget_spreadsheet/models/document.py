@@ -138,9 +138,12 @@ class Document(models.Model):
         lines_dict = self.build_line_hierarchy(report_type)
         analytic_account_id = self.env['account.analytic.account'].browse(analytic_account)
         currency = self.env.company.currency_id.display_name
+        num_of_rows_per_line = int(
+            self.env["ir.config_parameter"].sudo().get_param("account_budget_spreadsheet.no_of_lines"))
         data = generate_spreadsheet_template(report_type, period_type, spreadsheet_name, lines_dict, year,
                                              analytic_account_id,
-                                             create_budget_from_last_year, currency=currency)
+                                             create_budget_from_last_year, currency=currency,
+                                             num_of_rows_per_line=num_of_rows_per_line)
         data_json = json.dumps(data).encode('utf-8')
         spreadsheet = self.env['spreadsheet.template'].create({
             'name': spreadsheet_name,

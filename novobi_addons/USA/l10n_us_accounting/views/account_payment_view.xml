@@ -12,25 +12,29 @@
                 <button name="button_draft_usa" string="Reset to Draft" type="object" groups="account.group_account_invoice"
                         attrs="{'invisible' : [('state', 'not in', ('posted', 'cancel'))]}"/>
             </button>
+            <field name="state" position="before">
+                <button name="%(account.action_report_payment_receipt)d" string="Print Payment Receipt" type="action"/>
+            </field>
             <field name="move_id" position="after">
                 <field name="ar_in_charge" attrs="{'invisible': [('payment_type', '!=', 'inbound')], 'readonly': [('state', '!=', 'draft')]}"/>
             </field>
             <field name="partner_id" position="after">
                 <div class="oe_inline o_td_label">
                     <label for="is_payment_receipt" string="Sales Receipt" id="is_payment_receipt_for_customer"
-                           attrs="{'invisible': ['|', ('payment_type', '=', 'outbound'), '&amp;', ('payment_type', '=', 'inbound'), ('partner_type', '=', 'supplier')]}"/>
+                           attrs="{'invisible': ['|', '|', ('is_internal_transfer', '=', True), ('payment_type', '=', 'outbound'), '&amp;', ('payment_type', '=', 'inbound'), ('partner_type', '=', 'supplier')]}"/>
                     <label for="is_payment_receipt" string="Purchase Receipt" id="is_payment_receipt_for_vendor"
-                           attrs="{'invisible': ['|', ('payment_type', '=', 'inbound'), '&amp;', ('payment_type', '=', 'outbound'), ('partner_type', '=', 'customer')]}"/>
+                           attrs="{'invisible': ['|', '|', ('is_internal_transfer', '=', True), ('payment_type', '=', 'inbound'), '&amp;', ('payment_type', '=', 'outbound'), ('partner_type', '=', 'customer')]}"/>
                 </div>
-                <field name="is_payment_receipt" attrs="{ 'invisible': ['|', '&amp;', ('payment_type', '=', 'outbound'), ('partner_type', '=', 'customer'),
-                                                                               '&amp;', ('payment_type', '=', 'inbound'), ('partner_type', '=', 'supplier')],
-                                                            'readonly': [('state', '!=', 'draft')]}" nolabel="1"/>
+                <field name="is_payment_receipt" attrs="{ 'invisible': ['|', '|', ('is_internal_transfer', '=', True),
+                                                                            '&amp;', ('payment_type', '=', 'outbound'), ('partner_type', '=', 'customer'),
+                                                                            '&amp;', ('payment_type', '=', 'inbound'), ('partner_type', '=', 'supplier')],
+                                                           'readonly': [('state', '!=', 'draft')]}" nolabel="1"/>
             </field>
             <field name="partner_id" position="attributes">
                 <attribute name="attrs">{'readonly': ['|', ('state', '!=', 'draft'), ('is_internal_transfer', '=', True)], 'required': [('is_payment_receipt', '=', True)]}</attribute>
             </field>
             <field name="destination_account_id" position="attributes">
-                <attribute name="attrs">{'invisible': [('is_payment_receipt', '=', True)]}</attribute>
+                <attribute name="attrs">{'readonly': ['|', ('state', '!=', 'draft'), ('is_internal_transfer', '=', True)], 'invisible': [('is_payment_receipt', '=', True)]}</attribute>
             </field>
             <field name="destination_account_id" position="after">
                 <field name="expense_account" attrs="{'invisible': ['|', ('is_payment_receipt', '=', False), ('payment_type', '=', 'inbound')], 'required': [('is_payment_receipt', '=', True), ('payment_type', '=', 'outbound')], 'readonly': [('state', '!=', 'draft')]}"/>
@@ -149,7 +153,6 @@
             'searchByAmountFilter': 1,
             'isNegativeChecking': 0
         }</field>
-        <field name="domain">[('is_deposit', '=', False)]</field>
     </record>
 
     <record id="account.action_account_payments_payable" model="ir.actions.act_window">
@@ -163,6 +166,5 @@
             'searchByAmountFilter': 1,
             'isNegativeChecking': 0
         }</field>
-        <field name="domain">[('is_deposit', '=', False)]</field>
     </record>
 </odoo>

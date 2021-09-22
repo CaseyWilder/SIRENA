@@ -1,0 +1,54 @@
+# Start by giving a name to your workflow
+name: Scan-Source-Code
+
+# then define on which event, here a push
+on:
+  push:
+  # and the target with some regex to match our specific  branch names
+    branches:
+      - 14.0
+      - 13.0
+      - 12.0
+      - qa-14.0
+      - qa-13.0
+      - qa-12.0
+# We can now build our job
+jobs:
+  build:
+    name: Scan Source Code
+    runs-on: ubuntu-latest  
+    steps:
+      - name: Make variable environment
+        run: echo "REPOSITORY_NAME=$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}' | sed -e "s/:refs//")"  >> $GITHUB_ENV
+        shell: bash
+      - name: Setup sonar scanner
+        uses: warchant/setup-sonar-scanner@v3  
+      # Another existing action, this one to checkout the repository
+      - name: 'Checkout repository on branch: ${{ github.REF }}'
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.REF }}
+          fetch-depth: 0  
+      - name: Sonarqube Scan
+        env:
+          # to get access to secrets.SONAR_TOKEN, provide GITHUB_TOKEN
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: sonar-scanner
+          -Dsonar.host.url=https://sonarqube.novobi.com/
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          -Dsonar.projectKey=$REPOSITORY_NAME
+          -Dsonar.qualitygate.wait=true
+          -Dsonar.branch.name=${GITHUB_REF:11}
+          -Dsonar.scm.provider=git
+      - name: Set up Python actions
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: Set up Sonarqube users
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+          python ./.github/workflows/setup-sonar.py
