@@ -66,7 +66,7 @@
                         <field name="model_id" options="{'no_open': True, 'no_create_edit': True, 'no_create': True}"
                                required="1"
                                attrs="{'readonly': [('state', 'in', ['confirmed', 'cancel'])]}"
-                               domain="[('transient', '=', False), ('abstract', '=', False), ('model', '!=', 'audit.trail.log')]"
+                               domain="[('transient', '=', False), ('model', '!=', 'audit.trail.log')]"
                                context="{'tree_view_ref': 'novobi_audit_trail.view_model_selection_tree'}"/>
                     </group>
                     <notebook colspan="4">

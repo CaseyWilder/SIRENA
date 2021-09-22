@@ -12,3 +12,13 @@ class ResCompany(models.Model):
                                           domain=[('deprecated', '=', False)])
     reconciliation_discrepancies_account_id = fields.Many2one('account.account', 'Reconciliation Discrepancies Account',
                                                               domain=[('deprecated', '=', False)])
+    report_1099_printing_margin_top = fields.Float(
+        string='Report 1099 Top Margin',
+        default=0.25,
+        help="Adjust the margins of generated 1099 report to make it fit your printer's settings.",
+    )
+    report_1099_printing_margin_left = fields.Float(
+        string='Report 1099 Left Margin',
+        default=0.25,
+        help="Adjust the margins of generated 1099 report to make it fit your printer's settings.",
+    )

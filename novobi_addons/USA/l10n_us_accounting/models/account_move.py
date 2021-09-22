@@ -44,11 +44,8 @@ class AccountMoveUSA(models.Model):
 
         for val in reconciled_vals:
             move_id = self.browse(val.get('move_id'))
-            val['trans_label'] = ''
             if val.get('account_payment_id'):
                 val['trans_label'] = move_id.journal_id.code
-            elif move_id.is_deposit:
-                val['trans_label'] = 'Deposit'
             elif move_id.move_type in ['out_refund', 'in_refund']:
                 val['trans_label'] = 'Credit Note'
 
@@ -84,7 +81,7 @@ class AccountMoveUSA(models.Model):
 
     def button_draft_usa(self):
         self.ensure_one()
-        action = self.env.ref('l10n_us_accounting.action_view_button_set_to_draft_message').read()[0]
+        action = self.env["ir.actions.actions"]._for_xml_id("l10n_us_accounting.action_view_button_set_to_draft_message")
         action['context'] = isinstance(action.get('context', {}), dict) or {}
         action['context']['default_move_id'] = self.id
         return action

@@ -1,11 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Report 1099 Form Template-->
+    <template id="report_1099_form_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div t-att-data-oe-model="o._name" t-att-data-oe-id="o.id" t-foreach="o._get_data_for_1099_form()"
+                     t-as="page" class="page article report_1099_page"
+                     t-attf-style="top: {{ o.env.company.report_1099_printing_margin_top }}in; left: {{ o.env.company.report_1099_printing_margin_left }}in;">
+                    <t t-call="l10n_us_accounting.report_1099_form"/>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_1099_form">
+        <div class="report_1099_form">
+            <div class="payer_address">
+                <div class="payer_name" t-esc="page['payer_name']"/>
+                <div class="payer_street_address" t-esc="page['payer_street_address']"/>
+                <div class="payer_city_address" t-esc="page['payer_city_address']"/>
+            </div>
+            <div class="partner_ssn" t-esc="page['partner_ssn']"/>
+            <div class="recipient_tin" t-esc="page['recipient_tin']"/>
+            <div class="partner_name" t-esc="page['partner_name']"/>
+            <div class="partner_street_address_print" t-esc="page['partner_street_address_print']"/>
+            <div class="partner_city_address_print" t-esc="page['partner_city_address_print']"/>
+            <div class="total_balance" t-esc="page['total_balance']"/>
+        </div>
+    </template>
+
     <!--Add option to see transactions from Vendor 1099 Report-->
     <template id="line_caret_vendor_1099" inherit_id="account_reports.line_caret_options">
         <li role="presentation" position="after">
             <li t-if="line['caret_options'] == 'vendor.1099'" role="presentation">
                 <a role="menuitem" tabindex="-1" t-att-data-id="line['id']"
                    action="open_vendor_1099" class="dropdown-item">See Transactions
+                </a>
+                <a role="menuitem" tabindex="-1" t-att-data-id="line['id']"
+                   action="print_report_1099" class="dropdown-item">Print Report 1099
                 </a>
             </li>
         </li>

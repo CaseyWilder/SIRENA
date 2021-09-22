@@ -240,8 +240,14 @@ class KPIJournal(models.Model):
                 cur_group = result_group
 
             if len(cur_group) == 1:
+                # Compute company list
+                main_company = self.env.company
+                other_companies = self.env.companies - main_company
+                multi_company = [{'id': main_company.id, 'name': main_company.name}] +\
+                                [{'id': company.id, 'name': company.name} for company in other_companies]
                 options = {
                     "unfolded_lines": [],
+                    "multi_company": multi_company,
                     "date": {
                         "period_type": "fiscalyear",
                         "mode": "range",

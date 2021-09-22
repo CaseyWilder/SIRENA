@@ -1,7 +1,8 @@
 odoo.define('l10n_us_accounting.ManualReconciliationRenderer', function (require) {
     "use strict";
-
+    const field_utils = require('web.field_utils');
     let ManualLineRenderer = require('account.ReconciliationRenderer').ManualLineRenderer;
+
     ManualLineRenderer.include({
         events: _.extend({}, ManualLineRenderer.prototype.events, {
             'click table.accounting_view td.sort': '_onSortColumn',
@@ -11,12 +12,16 @@ odoo.define('l10n_us_accounting.ManualReconciliationRenderer', function (require
          * @param {event} event
          * @private
          */
-        _onSortColumn: function(event) {
+        _onSortColumn: async function (event) {
             // Convert string to other values
-            let strDateToDate = str => $.datepicker.parseDate('mm/dd/yy', str);
-            let strCurrencyToNum = str => Number(str.replace(/[^0-9.-]+/g,""));
-            let strNumToNum = str => Number(str.replace(/\u200B/g,''));
-
+            var date_format = await this.getLanguageFormat();
+            let currencies = await this.getCurrentCurrency();
+            let strDateToDate = (str) => $.datepicker.parseDate(date_format, str);
+            let strCurrencyToNum = (str) => {
+                const currencySymbolRegex = RegExp(`[${currencies}]`, 'g');
+                return field_utils.parse.float(str.replace(currencySymbolRegex, "").trim()).toFixed(2);
+            }
+            let strNumToNum = str => Number(str.replace(/\u200B/g, ''));
             // Get string value from a cell.
             let getCellValue = (row, index) => $(row).children('td').eq(index).text().trim();
 

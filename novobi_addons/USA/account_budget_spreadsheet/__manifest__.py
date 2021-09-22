@@ -17,6 +17,8 @@
         'account_reports',
     ],
     'data': [
+        # ============================== DATA =============================
+        'data/budget_spreadsheet_data.xml',
         # ============================== VIEWS =============================
         'views/assets.xml',
         'views/documents_views.xml',

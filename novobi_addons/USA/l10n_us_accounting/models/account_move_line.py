@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
 from odoo.tools.float_utils import float_is_zero
+from odoo.tools import float_compare
 from odoo.addons.l10n_custom_dashboard.utils.graph_setting import format_currency
 from odoo.tools.misc import formatLang, format_date
 # -------------------------------------------------------------------------
@@ -53,30 +54,18 @@ class AccountMoveLineUSA(models.Model):
         partial_amount_currency = self._context.get('partial_amount', False)
         company_currency = self.env.company.currency_id
         partial_vals = res and res[0] or False
-        if not float_is_zero(partial_amount_currency, precision_digits=company_currency.rounding) and partial_vals:
+        if not float_is_zero(partial_amount_currency, precision_rounding=company_currency.rounding) and partial_vals:
             debit_line = self.env['account.move.line'].browse(partial_vals['debit_move_id'])
             credit_line = self.env['account.move.line'].browse(partial_vals['credit_move_id'])
 
-            debit_line_currency = debit_line.currency_id or debit_line.company_currency_id
-            credit_line_currency = credit_line.currency_id or credit_line.company_currency_id
-            if debit_line_currency != credit_line_currency:
+            if debit_line.currency_id != credit_line.currency_id:
                 return res
 
-            # Convert amount to currency of company if needed
-            currency_date = debit_line.amount_residual < -credit_line.amount_residual and debit_line.date or credit_line.date
-            partial_amount = partial_amount_currency
-            if company_currency != debit_line_currency:
-                partial_amount = debit_line_currency._convert(
-                    partial_amount_currency,
-                    company_currency,
-                    self.env.company,
-                    currency_date or fields.Date.today()
-                )
-            if partial_amount >= partial_vals['amount']:
+            if float_compare(partial_amount_currency,partial_vals['amount'],precision_rounding=company_currency.rounding)>=0:
                 return res
 
             partial_vals.update({
-                'amount': partial_amount,
+                'amount': partial_amount_currency,
                 'debit_amount_currency': partial_amount_currency,
                 'credit_amount_currency': partial_amount_currency,
             })
