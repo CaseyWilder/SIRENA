@@ -359,14 +359,10 @@ class AuditTrailRule(models.Model):
                     for field in one2many_list:
                         if field.relation_field:
                             column_name = field.relation_field
-                            relation_table = field.relation.replace('.', '_')
-                            query_stmt = """
-                                SELECT id
-                                FROM {}
-                                WHERE {} = {}
-                            """.format(relation_table, column_name, record.id)
-                            cr.execute(query_stmt)
-                            field_result = cr.dictfetchall()
+                            relation_table = field.relation
+                            field_result = self.env[relation_table].search_read(
+                                domain=[(column_name, '=', record.id)],
+                                fields=['id'])
                             result[record.id][field.name] = [value['id'] for value in field_result]
 
                     value_dict = {}

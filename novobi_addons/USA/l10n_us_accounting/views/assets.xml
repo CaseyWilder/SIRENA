@@ -27,6 +27,12 @@
         </xpath>
     </template>
 
+    <template id="1099_report_assets_common" name="1099_report_assets_common" inherit_id="web.report_assets_common">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" type="text/scss" href="/l10n_us_accounting/static/src/scss/report_1099.scss"/>
+        </xpath>
+    </template>
+
     <!--Add asset to print followup report -->
     <template id="usa_assets_followup_report" inherit_id="account_followup.assets_followup_report">
         <xpath expr="link[last()]" position="after">

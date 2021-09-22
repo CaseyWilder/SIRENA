@@ -159,15 +159,6 @@ class AccountMoveDeposit(models.Model):
 
         if self.env.context.get('partial_amount', False):
             amount = self.env.context.get('partial_amount')
-            # Convert amount to currency of company if needed
-            company_currency_id = self.env.company.currency_id
-            if company_currency_id != invoice_line.currency_id:
-                amount = invoice_line.currency_id._convert(
-                    amount,
-                    company_currency_id,
-                    self.env.company,
-                    invoice_line.date or fields.Date.today()
-                )
 
         if float_is_zero(amount, precision_rounding=self.currency_id.rounding):
             return False
@@ -228,7 +219,7 @@ class AccountMoveDeposit(models.Model):
         """
         Helper method: reconcile deposit automatically when confirming Invoice/Bill
         """
-        for deposit in deposits:
+        for deposit in deposits.filtered(lambda r: r.state == 'posted'):
             move_type = invoice.move_type
             move_lines = deposit.line_ids.filtered(lambda line: line.account_id.reconcile and line.account_id.internal_type != 'liquidity' and not line.reconciled)
             if move_type == 'out_invoice':
@@ -237,3 +228,17 @@ class AccountMoveDeposit(models.Model):
                 move_line = move_lines.filtered(lambda line: line.debit > 0)
             if move_line:
                 invoice.js_assign_outstanding_line(move_line.id)
+
+    def _get_reconciled_info_JSON_values(self):
+        """
+        Override
+        Add label of applied transactions to dict values to show in payment widget on invoice form
+        """
+        reconciled_vals = super(AccountMoveDeposit, self)._get_reconciled_info_JSON_values()
+
+        for val in reconciled_vals:
+            move_id = self.browse(val.get('move_id'))
+            if move_id.is_deposit:
+                val['trans_label'] = 'Deposit'
+
+        return reconciled_vals
