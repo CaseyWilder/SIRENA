@@ -1,4 +1,6 @@
 from odoo import api, models, fields, _
+from odoo.tools import float_compare
+from odoo.exceptions import UserError
 
 
 class StockPicking(models.Model):
@@ -10,6 +12,9 @@ class StockPicking(models.Model):
         """
         if self.picking_type_code != 'outgoing':
             return super(StockPicking, self).button_validate()
+
+        if any(float_compare(move.product_uom_qty, move.quantity_done, 2) != 0 for move in self.move_ids_without_package):
+            raise UserError(_('The fulfillment for this Delivery Order is not correct!'))
 
         lot_ids = self.move_line_ids.mapped('lot_id')
         conflicting_lines = self.env['stock.move.line'].search([
