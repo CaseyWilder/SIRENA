@@ -10,7 +10,7 @@
     'author': 'Novobi LLC',
     "license": "OPL-1",
     'website': 'https://www.novobi.com',
-    'depends': ['stock_barcode', 'sirena_shipping'],
+    'depends': ['stock_barcode', 'sirena_shipping', 'multiple_shipping_options'],
     'data': [
         # ============================== DATA =================================
 

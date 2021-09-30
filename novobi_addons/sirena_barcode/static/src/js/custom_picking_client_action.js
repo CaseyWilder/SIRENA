@@ -274,8 +274,8 @@ odoo.define('sirena_barcode.custom_picking_client_action', function (require) {
                     return Promise.reject();
                 }
                 def = Promise.resolve({lot_name: barcode, product: product});
-            } else if (!this.currentState.use_create_lots &&
-                this.currentState.use_existing_lots) {
+            } else if (! this.currentState.use_create_lots &&
+                    this.currentState.use_existing_lots) {
                 def = searchRead(barcode);
             } else {
                 def = searchRead(barcode).then(function (res) {
