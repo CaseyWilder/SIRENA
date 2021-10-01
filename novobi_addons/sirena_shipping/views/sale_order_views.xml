@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_quotation_tree_sirena" model="ir.ui.view">
+        <field name="name">sale.order.tree.sirena</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
+        <field name="arch" type="xml">
+            <field name="state" position="after">
+                <field name="delivery_status" string="Delivery Status"
+                       decoration-success="delivery_status == 'done'"
+                       decoration-info="delivery_status == 'in_progress'"
+                       decoration-muted="delivery_status in ['draft', 'cancel']" widget="badge"/>
+            </field>
+        </field>
+    </record>
+</odoo>
