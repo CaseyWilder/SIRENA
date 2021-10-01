@@ -8,20 +8,20 @@ class HrPublicHolidays(models.Model):
 
     @api.model
     def init_public_holidays(self):
-        self.env['ir.config_parameter'].sudo().set_param('sirena_holiday.lifespan', [
+        self.env['ir.config_parameter'].sudo().set_param('judson_holiday.lifespan', [
             'New Year\'s Day',
-            'Good Friday',
             'Memorial Day',
             'Independence Day',
             'Labor Day',
             'Thanksgiving',
+            'Friday After Thanksgiving'
             'Christmas Day'
         ])
 
     def action_generate_default_holidays(self, create_leave_type=True):
         """
-        Override to handle specific case of Sirena:
-        - State is Florida, but include some holiday(s) in other state (e.g 'Good Friday' in Texas)
+        Override to handle specific case of Judson Studios:
+        - State is California, but include some holiday(s) in other state (e.g 'Good Friday' in Texas)
         - Apply observed day (default=false -> true)
         :param create_leave_type:
         """
@@ -49,7 +49,7 @@ class HrPublicHolidays(models.Model):
         :param raw_state_holidays: {datetime: "holiday name"}
         :return: state_holidays: {datetime: "holiday name"}
         """
-        allowed_holidays = self.env['ir.config_parameter'].sudo().get_param('sirena_holiday.lifespan')
+        allowed_holidays = self.env['ir.config_parameter'].sudo().get_param('judson_holiday.lifespan')
 
         if not allowed_holidays:
             return raw_state_holidays
