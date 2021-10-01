@@ -9,7 +9,8 @@
     "license": "OPL-1",
     'website': 'https://www.novobi.com',
     'depends': [
-        'novobi_shipping_account'
+        'novobi_shipping_account',
+        'sale_stock'
     ],
     'data': [
         # ============================== DATA =================================
@@ -17,6 +18,7 @@
         # ============================== SECURITY =============================
 
         # ============================== VIEWS ================================
+        'views/sale_order_views.xml',
         'views/stock_picking_views.xml',
         'views/shipping_account_views.xml',
 
