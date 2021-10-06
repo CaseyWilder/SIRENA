@@ -268,13 +268,13 @@ class PayrollPayslip(models.Model):
                         'overtime': False,
                         'double_overtime': False
                     }
-                    outdated_working_hours = any(not float_compare(working_hours[field], record[field], precision_digits=2)
+                    outdated_working_hours = any(float_compare(working_hours[field], record[field], precision_digits=2)
                                                  for field in working_hours)
 
                 # Time Off
                 if not record.manual_leaves:
                     holiday_hours = record.get_holiday_hours()[1] if is_calculated else False
-                    outdated_leaves = not float_compare(holiday_hours, record.holiday, precision_digits=2)
+                    outdated_leaves = float_compare(holiday_hours, record.holiday, precision_digits=2)
 
             record.outdated_working_hours = outdated_working_hours
             record.outdated_leaves = outdated_leaves
