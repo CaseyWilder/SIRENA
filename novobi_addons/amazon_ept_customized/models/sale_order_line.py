@@ -11,7 +11,7 @@ class SaleOrderLine(models.Model):
     gross_pay = fields.Monetary("Gross Pay", compute='_compute_gross_pay', store=True)
     shipping_cost = fields.Monetary("Shipping Cost",compute='_compute_shipping_cost', store=True)
     gross_profit = fields.Monetary("Gross profit", compute='_compute_net_profit', store=True)
-    dealer_cost = fields.Float("Dealer Cost", related='product_id.dealer_cost', store=True)
+    dealer_cost = fields.Float("Dealer Cost", compute='_compute_gross_pay', store=True)
     net_profit = fields.Monetary("Net Profit", compute='_compute_net_profit', store=True)
     is_florida_tax = fields.Boolean("Is Florida tax?", compute='_compute_is_florida_tax', store=True)
     is_returned = fields.Boolean('Returned?')
@@ -34,15 +34,16 @@ class SaleOrderLine(models.Model):
             related_lines = sale_order_line_obj.search([('is_amazon_order_item', '=', False), ('amazon_order_item_id', 'ilike', rec.amazon_order_item_id)])
             rec.retail_price = rec.price_subtotal + related_lines.filtered(lambda x: x.product_id.id == x.order_id.amz_seller_id.promotion_discount_product_id.id).price_subtotal
             rec.amazon_fee = 0.15*(rec.price_subtotal + sum(related_lines.mapped('price_subtotal')))
+            rec.dealer_cost = max(rec.product_uom_qty * (rec.product_id.dealer_cost - 1.5) + 1.5, 0.0)
             if rec.order_id.amz_instance_id.market_place_id == 'A2EUQ1WTGCTBG2':
                 rec.amazon_fee += 0.029*rec.line_tax_amount
             rec.gross_pay = rec.retail_price - rec.amazon_fee
 
-    @api.depends('gross_pay','shipping_cost','dealer_cost')
+    @api.depends('gross_pay','shipping_cost')
     def _compute_net_profit(self):
         for rec in self.filtered('is_amazon_order_item'):
             rec.gross_profit = rec.gross_pay - rec.shipping_cost
-            rec.net_profit = rec.gross_profit - rec.product_id.dealer_cost
+            rec.net_profit = rec.gross_profit - rec.dealer_cost
 
     @api.depends('order_id.picking_ids.shipping_cost')
     def _compute_shipping_cost(self):
