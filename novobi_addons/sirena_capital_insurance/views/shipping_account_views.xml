@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="insurance_shipping_account_form_settings" model="ir.ui.view">
+            <field name="name">insurance.shipping.account.form.settings</field>
+            <field name="model">shipping.account</field>
+            <field name="inherit_id" ref="sirena_shipping.custom_shipping_account_form_settings" />
+            <field name="arch" type="xml">
+                <field name="ups_label_stock_type" position="after">
+                    <br/>
+                    <br/>
+                    <div class="o_horizontal_separator" name="capital_insurance_settings" attrs="{'invisible':[('provider', '!=', 'fedex')]}">Insurance</div>
+                    <field name="capital_bearer" attrs="{'invisible': [('provider', '!=', 'fedex')]}"/>
+                    <field name="capital_client_id" attrs="{'invisible': [('provider', '!=', 'fedex')]}"/>
+                    <field name="capital_client_secret" password="True" attrs="{'invisible': [('provider', '!=', 'fedex')]}"/>
+                    <field name="capital_partner_id" attrs="{'invisible': [('provider', '!=', 'fedex')]}"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>
