@@ -9,7 +9,7 @@
                 <attribute name="invisible"/>
                 <attribute name="attrs">{'invisible': [('provider', '=', 'fedex')]}</attribute>
             </field>
-            <field name="fedex_shipping_confirmation" position="after">
+            <field name="second_fedex_shipping_confirmation" position="after">
                 <field name="second_fedex_service_type" invisible="1"/>
                 <field name="capital_insurance_value"
                        attrs="{'invisible': ['|', ('provider', '!=', 'fedex'),
