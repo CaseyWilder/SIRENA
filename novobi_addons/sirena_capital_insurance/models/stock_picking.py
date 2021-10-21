@@ -24,7 +24,8 @@ class StockPicking(models.Model):
         insurance_request = CapitalInsuranceRequest(bearer=self.shipping_account_id.capital_bearer or '',
                                                     client_id=self.shipping_account_id.capital_client_id or '',
                                                     client_secret=self.shipping_account_id.capital_client_secret or '',
-                                                    partner_id=self.shipping_account_id.capital_partner_id or '')
+                                                    partner_id=self.shipping_account_id.capital_partner_id or '',
+                                                    prod_environment=self.shipping_account_id.prod_environment)
         if self.shipping_options == 'option1':
             if self.fedex_service_type not in ['GROUND_HOME_DELIVERY', 'FEDEX_GROUND']:
                 return result
@@ -89,7 +90,8 @@ class StockPicking(models.Model):
         insurance_request = CapitalInsuranceRequest(bearer=self.shipping_account_id.capital_bearer or '',
                                                     client_id=self.shipping_account_id.capital_client_id or '',
                                                     client_secret=self.shipping_account_id.capital_client_secret or '',
-                                                    partner_id=self.shipping_account_id.capital_partner_id or '')
+                                                    partner_id=self.shipping_account_id.capital_partner_id or '',
+                                                    prod_environment=self.shipping_account_id.prod_environment)
 
         if self.is_create_label and self.fedex_service_type in ['GROUND_HOME_DELIVERY', 'FEDEX_GROUND'] and self.capital_insurance_quote_id:
             insurance_result = insurance_request.confirm_insurance_quote(self.capital_insurance_quote_id, self.carrier_tracking_ref if not self.is_mul_packages else self.picking_package_ids[0].carrier_tracking_ref)
@@ -128,7 +130,8 @@ class StockPicking(models.Model):
         insurance_request = CapitalInsuranceRequest(bearer=self.shipping_account_id.capital_bearer or '',
                                                     client_id=self.shipping_account_id.capital_client_id or '',
                                                     client_secret=self.shipping_account_id.capital_client_secret or '',
-                                                    partner_id=self.shipping_account_id.capital_partner_id or '')
+                                                    partner_id=self.shipping_account_id.capital_partner_id or '',
+                                                    prod_environment=self.shipping_account_id.prod_environment)
 
         if self.is_void_first_label and fedex_service_type in ['GROUND_HOME_DELIVERY', 'FEDEX_GROUND'] and self.capital_insurance_quote_id:
             insurance_result = insurance_request.void_insurance_quote(self.capital_insurance_quote_id, carrier_tracking_ref)

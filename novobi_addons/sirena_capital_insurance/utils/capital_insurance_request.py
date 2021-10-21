@@ -6,13 +6,14 @@ import json
 from datetime import datetime
 
 class CapitalInsuranceRequest:
-    def __init__(self, bearer, client_id, client_secret, partner_id):
+    def __init__(self, bearer, client_id, client_secret, partner_id, prod_environment=False):
+        self.prod_environment = prod_environment
         self.bearer = bearer
         self.client_id = client_id
         self.client_secret = client_secret
         self.partner_id = partner_id
 
-        self.restful_url = "https://upscapi.ams1907.com/apis/list-extstg/"
+        self.restful_url = "https://upscapi.ups.com/apis/list/" if prod_environment else "https://upscapi.ams1907.com/apis/list-extstg/"
 
         self.create_restful = 'quote/v2'
         self.confirm_restful = 'coverage/v2'
@@ -22,8 +23,9 @@ class CapitalInsuranceRequest:
             "Content-Type": 'application/json',
             "Bearer": self.bearer,
             "X-IBM-Client-Id": self.client_id,
-            "X-IBM-Client-Secret": self.client_secret,
         }
+        if not self.prod_environment:  # No X-IBM-Client-Secret header in production environment
+            headers.update({"X-IBM-Client-Secret": self.client_secret})
         return headers
 
     def _set_origin_address(self, address):
@@ -68,7 +70,6 @@ class CapitalInsuranceRequest:
                 "error_message": "Missing Shipping To address!"
             }
 
-        headers = self._generate_header()
         api_endpoint = self.restful_url + self.create_restful
         body = {
             "status": "UNCONFIRMED",
@@ -84,7 +85,7 @@ class CapitalInsuranceRequest:
         body.update(self._set_destination_address(insurance_details['destination_address']))
 
         try:
-            response = requests.post(url=api_endpoint, data=json.dumps(body), headers=headers)
+            response = requests.post(url=api_endpoint, data=json.dumps(body), headers=self._generate_header())
             parsed = response.json()
 
             if response.status_code == 200:
