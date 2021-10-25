@@ -102,6 +102,7 @@ class StockPicking(models.Model):
                                                               ('INDIRECT', 'Indirect Signature Required')],
                                                           default='SERVICE_DEFAULT',
                                                           help='Confirmation')
+    second_shipping_cost = fields.Monetary(string='Label 2 Shipping Cost', copy=False)
 
     @api.onchange('shipping_options')
     def _onchange_shipping_options(self):
@@ -222,7 +223,7 @@ class StockPicking(models.Model):
         Rewrite method to reset fields based on the selecting shipping option (used when voiding labels).
         """
         vals = {
-            'shipping_cost': 0.0,
+            # 'shipping_cost': 0.0,
             'shipping_cost_without_discounts': 0.0,
             # 'handling_fee': 0.0,
             'no_shipping_cost': False,
@@ -277,6 +278,7 @@ class StockPicking(models.Model):
         }
         if self.is_void_first_label:
             vals.update({
+                'shipping_cost': 0.0,
                 'default_packaging_id': False,
                 'package_size_length': 0,
                 'package_size_width': 0,
@@ -291,6 +293,7 @@ class StockPicking(models.Model):
             })
         if self.is_void_second_label:
             vals.update({
+                'second_shipping_cost': 0.0,
                 'second_default_packaging_id': False,
                 'second_package_size_length': 0,
                 'second_package_size_width': 0,
@@ -402,7 +405,7 @@ class StockPicking(models.Model):
         vals = {
             # 'carrier_id': self.delivery_carrier_id.id,
             # 'is_create_label': True,
-            'shipping_cost': shipping_cost,
+            # 'shipping_cost': shipping_cost,
             'shipping_cost_without_discounts': shipping_cost_without_discounts,
             'shipping_estimated_date': estimated_date or 'N/A',
             # 'carrier_tracking_ref': res['carrier_tracking_ref'],
@@ -412,6 +415,7 @@ class StockPicking(models.Model):
         # Update fields according to their selected shipping option when creating label.
         if self.shipping_options == 'option1':
             vals.update({
+                'shipping_cost': shipping_cost,
                 'is_create_label': True,
                 'carrier_tracking_ref': res['carrier_tracking_ref'],
                 'first_option_package_weight': self.package_shipping_weight,
@@ -422,6 +426,7 @@ class StockPicking(models.Model):
             })
         else:
             vals.update({
+                'second_shipping_cost': shipping_cost,
                 'second_is_create_label': True,
                 'second_carrier_tracking_ref': res['carrier_tracking_ref']
             })
