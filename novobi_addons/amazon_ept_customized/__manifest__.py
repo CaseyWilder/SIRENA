@@ -8,7 +8,7 @@
     'website': 'https://novobi.com',
     'author': 'Novobi',
     # Dependencies
-    'depends': ['amazon_ept'],
+    'depends': ['amazon_ept', 'multiple_shipping_options'],
 
     # Views
     'data': [

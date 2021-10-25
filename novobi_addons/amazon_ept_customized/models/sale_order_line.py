@@ -45,14 +45,14 @@ class SaleOrderLine(models.Model):
             rec.gross_profit = rec.gross_pay - rec.shipping_cost
             rec.net_profit = rec.gross_profit - rec.dealer_cost
 
-    @api.depends('order_id.picking_ids.shipping_cost')
+    @api.depends('order_id.picking_ids.shipping_cost','order_id.picking_ids.second_shipping_cost')
     def _compute_shipping_cost(self):
         for rec in self.filtered(lambda x: x.is_amazon_order_item and x.product_id.type != 'service'):
             order = rec.order_id
             amz_order_lines = order.order_line.filtered(lambda x: x.is_amazon_order_item and x.product_id.type != 'service')
             if amz_order_lines:
-                shipping_cost = sum(order.picking_ids.filtered(
-                    lambda x: x.picking_type_code == 'outgoing' and x.state != 'cancel').mapped('shipping_cost'))
+                picking_ids = order.picking_ids.filtered(lambda x: x.picking_type_code == 'outgoing' and x.state != 'cancel')
+                shipping_cost = sum(picking_ids.mapped('shipping_cost') + picking_ids.mapped('second_shipping_cost'))
                 rec.shipping_cost = shipping_cost/len(amz_order_lines)
 
 

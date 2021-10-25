@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_picking_create_label_form_insurance" model="ir.ui.view">
+        <field name="name">stock.picking.create.label.form.insurance</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="multiple_shipping_options.custom_create_label_form_fedex_mso"/>
+        <field name="arch" type="xml">
+            <field name="shipping_insurance" position="attributes">
+                <attribute name="invisible"/>
+                <attribute name="attrs">{'invisible': [('provider', '=', 'fedex')]}</attribute>
+            </field>
+            <field name="second_fedex_shipping_confirmation" position="after">
+                <field name="second_fedex_service_type" invisible="1"/>
+                <field name="capital_insurance_value"
+                       attrs="{'invisible': ['|', ('provider', '!=', 'fedex'),
+                       '|',
+                            '&amp;', ('shipping_options', '=', 'option1'), ('fedex_service_type', 'not in', ['FEDEX_GROUND', 'GROUND_HOME_DELIVERY']),
+                            '&amp;', ('shipping_options', '=', 'option2'), ('second_fedex_service_type', 'not in', ['FEDEX_GROUND', 'GROUND_HOME_DELIVERY'])],
+
+                                'required': ['&amp;', ('provider', '=', 'fedex'),
+                       '|',
+                            '&amp;', ('shipping_options', '=', 'option1'), ('fedex_service_type', 'in', ['FEDEX_GROUND', 'GROUND_HOME_DELIVERY']),
+                            '&amp;', ('shipping_options', '=', 'option2'), ('second_fedex_service_type', 'in', ['FEDEX_GROUND', 'GROUND_HOME_DELIVERY'])]}"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="custom_view_picking_form_insurance" model="ir.ui.view">
+        <field name="name">custom.view.picking.form.insurance</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="multiple_shipping_options.custom_view_picking_form_mso"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='shipping_info_no_label']//field[@name='fedex_shipping_confirmation']" position="after">
+                <field name="capital_insurance_quote_id" readonly="1" attrs="{'invisible': [('provider', '!=', 'fedex')]}"/>
+                <field name="capital_insurance_premium_amount" readonly="1" attrs="{'invisible': [('provider', '!=', 'fedex')]}"/>
+            </xpath>
+            <xpath expr="//page[@name='second_shipping_info_no_label']//field[@name='second_fedex_shipping_confirmation']" position="after">
+                <field name="second_capital_insurance_quote_id" readonly="1" attrs="{'invisible': [('provider', '!=', 'fedex')]}"/>
+                <field name="second_capital_insurance_premium_amount" readonly="1" attrs="{'invisible': [('provider', '!=', 'fedex')]}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
