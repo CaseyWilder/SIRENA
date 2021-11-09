@@ -7,3 +7,4 @@ from . import sale_order_line
 from . import product_template
 from . import amazon_product_mapping
 from . import account_bank_statement_line
+from . import sale_order
