@@ -20,10 +20,11 @@ class SaleOrder(models.Model):
     @staticmethod
     def amz_prepare_parcel_values_ept(carrier_name, tracking_no, amazon_order, fulfillment_date_concat):
 
-        shipment_service_level_category = amazon_order.picking_ids.mapped('carrier_id.fbm_shipping_method') \
-                                          and amazon_order.picking_ids.mapped('carrier_id.fbm_shipping_method')[0] \
-                                          or amazon_order.picking_ids.mapped('carrier_id.amz_shipping_service_level_category') \
-                                          and amazon_order.picking_ids.mapped('carrier_id.amz_shipping_service_level_category')[0] \
+        delivery_carrier_ids = amazon_order.picking_ids.mapped('delivery_carrier_id')
+        fbm_shipping_methods = delivery_carrier_ids.mapped('fbm_shipping_method')
+        amz_shipping_service_level_categories = delivery_carrier_ids.mapped('amz_shipping_service_level_category')
+        shipment_service_level_category = fbm_shipping_methods and fbm_shipping_methods[0] \
+                                          or amz_shipping_service_level_categories and amz_shipping_service_level_categories[0] \
                                           or amazon_order.amz_shipment_service_level_category
         parcel = {
             'tracking_no': tracking_no or '',
