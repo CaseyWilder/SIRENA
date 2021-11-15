@@ -13,8 +13,6 @@ pivot_template = {
                 }
             ],
             "domain": [
-                          "&",
-                          "&",
                           [
                               "display_type",
                               "not in",
@@ -28,13 +26,11 @@ pivot_template = {
                               "!=",
                               "cancel"
                           ],
-                          "&",
                           [
                               "move_id.state",
                               "=",
                               "posted"
                           ]
-
                       ],
             "context": {
                 "lang": "en_US",
