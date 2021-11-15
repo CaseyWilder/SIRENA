@@ -22,7 +22,11 @@ class AccountMove(models.Model):
         if 'budget_spreadsheet' in self._context:
             user_id_type = \
                 list(filter(lambda x: 'account_id.user_type_id' in x or 'account_id.user_type_id.type' in x,
-                            domain))[0]
+                            domain))
+            if not user_id_type:
+                return result
+            else:
+                user_id_type = user_id_type[0]
             analytic_account_domain = list(filter(lambda x: 'analytic_account_id' in x, domain))
             user_id_domain = [user_id_type[-1]] if type(user_id_type[-1]) in [str, int] else user_id_type[-1]
             accounts = self.env['account.account'].search([('user_type_id', 'in', user_id_domain)])

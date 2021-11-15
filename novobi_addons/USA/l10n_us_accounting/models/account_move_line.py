@@ -50,26 +50,39 @@ class AccountMoveLineUSA(models.Model):
         Allow to apply partial payment
         Only handle the case that invoice and payment have the same currency
         """
-        res = super(AccountMoveLineUSA, self)._prepare_reconciliation_partials()
-        partial_amount_currency = self._context.get('partial_amount', False)
+        partial_vals_list = super(AccountMoveLineUSA, self)._prepare_reconciliation_partials()
+        partial_amount = self._context.get('partial_amount', False)
         company_currency = self.env.company.currency_id
-        partial_vals = res and res[0] or False
-        if not float_is_zero(partial_amount_currency, precision_rounding=company_currency.rounding) and partial_vals:
-            debit_line = self.env['account.move.line'].browse(partial_vals['debit_move_id'])
-            credit_line = self.env['account.move.line'].browse(partial_vals['credit_move_id'])
+        rounding = company_currency.rounding
+        is_partial = True if not float_is_zero(partial_amount, precision_rounding=rounding) else False
+        if is_partial and partial_vals_list:
+            for partial_vals in partial_vals_list:
+                # When payment term has multiple terms => invoice move has multiple receivable/payable move lines
+                if float_is_zero(partial_amount, precision_rounding=rounding):
+                    # If there's no partial amount left, set "amount" of partial_vals = 0 to filter out it later
+                    partial_vals.update(amount=0)
+                    continue
 
-            if debit_line.currency_id != credit_line.currency_id:
-                return res
+                debit_line, credit_line = self.env['account.move.line'].browse([partial_vals['debit_move_id'],
+                                                                                partial_vals['credit_move_id']])
 
-            if float_compare(partial_amount_currency,partial_vals['amount'],precision_rounding=company_currency.rounding)>=0:
-                return res
+                if debit_line.currency_id != credit_line.currency_id \
+                        or debit_line.currency_id != debit_line.company_id.currency_id:
+                    continue
 
-            partial_vals.update({
-                'amount': partial_amount_currency,
-                'debit_amount_currency': partial_amount_currency,
-                'credit_amount_currency': partial_amount_currency,
-            })
-        return res
+                amount_reconcile = min(partial_vals['amount'], partial_amount)
+                partial_amount -= amount_reconcile
+
+                partial_vals.update({
+                    'amount': amount_reconcile,
+                    'debit_amount_currency': amount_reconcile,
+                    'credit_amount_currency': amount_reconcile,
+                })
+
+            partial_vals_list = list(filter(lambda l: not float_is_zero(l['amount'], precision_rounding=rounding),
+                                            partial_vals_list))
+
+        return partial_vals_list
 
     # -------------------------------------------------------------------------
     # HELPERS

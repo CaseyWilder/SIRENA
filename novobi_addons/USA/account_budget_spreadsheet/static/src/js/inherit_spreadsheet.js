@@ -30,8 +30,8 @@ odoo.define("account_budget_spreadsheet.inherit_spreadsheet", function (require)
     const Composer = Spreadsheet.components.Grid.components.Composer;
     const {
         parseNumber, parseDateTime, formatDateTime, compile, isNumber, _lt, _parse, RefError, _tokenize, enrichTokens,
-        mergeSymbolsIntoRanges, toSimpleTokens, cellReference,mapParenthesis,tokenColor,rangeReference,
-        getComposerSheetName,MatchingParenColor,colors
+        mergeSymbolsIntoRanges, toSimpleTokens, cellReference, mapParenthesis, tokenColor, rangeReference,
+        getComposerSheetName, MatchingParenColor, colors
     } = spreadsheet_utils
     spreadsheet.parse = _parse;
 
@@ -150,6 +150,9 @@ odoo.define("account_budget_spreadsheet.inherit_spreadsheet", function (require)
         updateCell(sheet, col, row, data) {
             const nbspRegexp = new RegExp(String.fromCharCode(160), "g");
             const _sheet = this.workbook.sheets[sheet];
+            if (row >= _sheet.rows.length) {
+                return;
+            }
             const current = _sheet.rows[row].cells[col];
             const xc = (current && current.xc) || toXC(col, row);
             const hasContent = "content" in data;
