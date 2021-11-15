@@ -187,7 +187,7 @@ def generate_formula_from_code_to_cell(name, col, lines):
         domains = [line["domain"] for line in lines]
         for _ in range(len(domains)):
             d = domains[_]
-            if type(d[0]) is str:
+            if d and type(d[0]) is str:
                 new_domain = "="
                 ops_list = re.split('(\W+)', d[0])
                 for i in range(len(ops_list)):
@@ -202,6 +202,8 @@ def generate_formula_from_code_to_cell(name, col, lines):
                         cell_number = ops_list[i]
                         new_domain += cell_number
                 domains[_] = new_domain
+            else:
+                domains[_] = "0"
     return domains
 
 

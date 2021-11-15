@@ -1,4 +1,5 @@
 from odoo import fields, models, api
+from odoo.tools.float_utils import float_compare
 
 
 class AccountReconciliation(models.AbstractModel):
@@ -95,6 +96,27 @@ class AccountReconciliation(models.AbstractModel):
     # -------------------------------------------------------------------------
     # MATCHING CONDITION
     # -------------------------------------------------------------------------
+    def _get_transaction_amount_domain(self, statement_line):
+        """
+        Helper: get domain for transaction amount filter
+        When bank journal currency is different from company currency. We won't compare transaction amount
+        with statement line amount
+        """
+        if statement_line.currency_id == statement_line.company_currency_id:
+            domain = [
+                '|',
+                    '&', ('debit', '=', 0), ('credit', '<=', -statement_line.amount),
+                    '&', ('credit', '=', 0), ('debit', '<=', statement_line.amount),
+            ]
+        else:
+            rounding = statement_line.currency_id.rounding
+            if float_compare(statement_line.amount, 0, precision_rounding=rounding) < 0:
+                domain = [('debit', '=', 0)]
+            else:
+                domain = [('credit', '=', 0)]
+
+        return domain
+
     @api.model
     def _get_query_reconciliation_widget_customer_vendor_matching_lines(self, statement_line, domain=[]):
         """
@@ -105,12 +127,9 @@ class AccountReconciliation(models.AbstractModel):
         - Transactions' amount <= BSLs' amount
         - Same Payee (OOTB)
         """
-        domain = domain + [
-            ('date', '<=', statement_line.date),
-            '|',
-                '&', ('debit', '=', 0), ('credit', '<=', -statement_line.amount),
-                '&', ('credit', '=', 0), ('debit', '<=', statement_line.amount),
-        ]
+        domain = domain + [('date', '<=', statement_line.date)] + self._get_transaction_amount_domain(statement_line)
+
+
         return super(AccountReconciliation, self)._get_query_reconciliation_widget_customer_vendor_matching_lines(statement_line, domain)
 
     @api.model
@@ -127,13 +146,9 @@ class AccountReconciliation(models.AbstractModel):
                                                                  ('type', 'in', ['bank', 'cash'])])
         liquidity_account_ids = liquidity_journals.mapped('payment_credit_account_id.id') +\
                                 liquidity_journals.mapped('payment_debit_account_id.id')
-        domain = domain + [
-            ('account_id.id', 'not in', liquidity_account_ids),
-            ('date', '<=', statement_line.date),
-            '|',
-                '&', ('debit', '=', 0), ('credit', '<=', -statement_line.amount),
-                '&', ('credit', '=', 0), ('debit', '<=', statement_line.amount),
-        ]
+        domain = domain + [('account_id.id', 'not in', liquidity_account_ids), ('date', '<=', statement_line.date)]\
+                 + self._get_transaction_amount_domain(statement_line)
+
         return super(AccountReconciliation, self)._get_query_reconciliation_widget_miscellaneous_matching_lines(statement_line, domain)
 
     # -------------------------------------------------------------------------
