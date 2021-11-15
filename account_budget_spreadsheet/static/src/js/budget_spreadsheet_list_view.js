@@ -3,10 +3,10 @@ odoo.define("documents_spreadsheet.BudgetListView", function (require) {
 
     const ListController = require("web.ListController");
     const ListView = require("web.ListView");
-    const DocumentsListView = require('documents.DocumentsListView');
+    const DocumentsListView = require('documents_spreadsheet.ListView');
     const viewRegistry = require("web.view_registry");
-
-    const BudgetController = ListController.extend({
+    const DocumentsListController = require("documents.DocumentsListController");
+    const BudgetController = DocumentsListController.extend({
         _onButtonClicked(ev) {
             this._super(...arguments);
             const {attrs, record} = ev.data;
@@ -31,7 +31,7 @@ odoo.define("documents_spreadsheet.BudgetListView", function (require) {
         },
     });
 
-    const BudgetListView = ListView.extend({
+    const BudgetListView = DocumentsListView.extend({
         config: Object.assign({}, DocumentsListView.prototype.config, {
             Controller: BudgetController,
         }),

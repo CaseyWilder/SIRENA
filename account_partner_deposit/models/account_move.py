@@ -156,9 +156,17 @@ class AccountMoveDeposit(models.Model):
         """
         total_invoice_amount = abs(sum(invoice_line.mapped('amount_residual')))
         amount = min(total_invoice_amount, abs(payment_line.amount_residual))
+        converted_amount = False
+        new_move_currency_id = invoice_line.company_currency_id
 
         if self.env.context.get('partial_amount', False):
             amount = self.env.context.get('partial_amount')
+            if payment_line.currency_id == invoice_line.currency_id \
+                    and payment_line.currency_id != payment_line.company_id.currency_id:
+                # Handle cases: invoice and deposit have the same currency but different with company currency
+                converted_amount = payment_line.currency_id._convert(amount, payment_line.company_id.currency_id,
+                                                                     payment_line.company_id, payment_line.date)
+                new_move_currency_id = payment_line.payment_id.currency_id
 
         if float_is_zero(amount, precision_rounding=self.currency_id.rounding):
             return False
@@ -183,22 +191,27 @@ class AccountMoveDeposit(models.Model):
             'partner_id': self.partner_id.id if self.partner_id else False,
             'is_deposit': True,
             'move_type': 'entry',
+            'currency_id': new_move_currency_id.id,
             'line_ids': [
                 (0, 0, {
                     'partner_id': payment_line.partner_id.id,
                     'account_id': debit_account.id,
-                    'debit': amount,
+                    'debit': converted_amount or amount,
                     'credit': 0,
                     'date': date,
                     'name': reference,
+                    'currency_id': new_move_currency_id.id,
+                    'amount_currency': amount
                 }),
                 (0, 0, {
                     'partner_id': self.partner_id.id if self.partner_id else False,
                     'account_id': credit_account.id,
                     'debit': 0,
-                    'credit': amount,
+                    'credit': converted_amount or amount,
                     'date': date,
                     'name': reference,
+                    'currency_id': new_move_currency_id.id,
+                    'amount_currency': -amount
                 })
             ],
         })
