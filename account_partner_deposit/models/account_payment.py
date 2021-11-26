@@ -52,21 +52,13 @@ class PaymentDeposit(models.Model):
                 order = record.purchase_deposit_id
                 msg = 'Total deposit amount cannot exceed purchase order amount'
             if order:
-                deposit_total = record.amount_total_signed
-                currency_date = record.partner_type == 'customer' and order.date_order or order.date_approve
                 deposit_total = order.company_id.currency_id._convert(
-                    deposit_total,
+                    record.amount_total_signed,
                     order.currency_id,
                     order.company_id,
-                    currency_date or fields.Date.today()
+                    record.date or fields.Date.today()
                 )
-                remaining_total = order.company_id.currency_id._convert(
-                    order.remaining_total,
-                    order.currency_id,
-                    order.company_id,
-                    currency_date or fields.Date.today()
-                )
-                if float_compare(deposit_total,remaining_total,precision_rounding=order.company_id.currency_id.rounding)>0:
+                if float_compare(deposit_total,order.remaining_total,precision_rounding=order.company_id.currency_id.rounding)>0:
                     raise ValidationError(_(msg))
 
         return super(PaymentDeposit, self).action_post()

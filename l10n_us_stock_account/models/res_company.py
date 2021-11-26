@@ -14,10 +14,10 @@ class ResCompany(models.Model):
         def _create_account(self, account_key, company):
             info = account_info[account_key]
 
-            account_id = self.env['account.account'].search([('code', 'like', info['code']),
-                                                             ('name', 'like', info['name']),
-                                                             ('user_type_id', '=', info['user_type_id']),
-                                                             ('company_id', '=', company.id)], limit=1)
+            account_id = self.env['account.account'].sudo().search([('code', 'like', info['code']),
+                                                                    ('name', 'like', info['name']),
+                                                                    ('user_type_id', '=', info['user_type_id']),
+                                                                    ('company_id', '=', company.id)], limit=1)
             if not account_id:
                 account_id = self.env['account.account'].sudo().create({
                     'code': info['code'] + '_default',
