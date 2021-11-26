@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <record id="view_account_supplier_payment_tree_usa" model="ir.ui.view">
+        <field name="name">account.payment.tree.usa</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_supplier_payment_tree"/>
+        <field name="arch" type="xml">
+            <field name="payment_method_id" position="after">
+                <field name="check_number"/>
+            </field>
+        </field>
+    </record>
+
     <record id="view_account_payment_form_usa" model="ir.ui.view">
         <field name="name">account.payment.form.usa</field>
         <field name="model">account.payment</field>

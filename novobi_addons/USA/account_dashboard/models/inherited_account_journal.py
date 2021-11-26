@@ -131,6 +131,9 @@ class AccountJournal(models.Model):
         currency_name = current_journal.currency_id.name or current_journal.company_id.currency_id.name
         company_id = [current_journal.company_id.id]
         type_invoice_select = 'in_invoice' if type_invoice == VENDOR_BILLS else 'out_invoice'
+        journal_currency = current_journal.currency_id or current_journal.company_id.currency_id
+        currency_rates = journal_currency._get_rates(current_journal.company_id, fields.Date.today())
+        journal_currency_rate = currency_rates and currency_rates[journal_currency.id] or 1.0
 
         currency = """
             SELECT c.id, COALESCE((
@@ -145,12 +148,12 @@ class AccountJournal(models.Model):
         transferred_currency = """
             SELECT ai.journal_id,
                 ai.invoice_date,
-                (CASE WHEN move_type IN ('out_refund', 'in_refund') THEN -1 ELSE 1 END) * ai.amount_residual / c.rate AS amount_residual_tran,
-                (CASE WHEN move_type IN ('out_refund', 'in_refund') THEN -1 ELSE 1 END) * ai.amount_total / c.rate AS amount_total_tran,
+                (CASE WHEN move_type IN ('out_refund', 'in_refund') THEN -1 ELSE 1 END) * ai.amount_residual * {} / c.rate AS amount_residual_tran,
+                (CASE WHEN move_type IN ('out_refund', 'in_refund') THEN -1 ELSE 1 END) * ai.amount_total * {} / c.rate AS amount_total_tran,
                 state, move_type, company_id
             FROM account_move AS ai
                 LEFT JOIN ({currency_table}) AS c ON ai.currency_id = c.id
-        """.format(currency_table=currency)
+        """.format(journal_currency_rate, journal_currency_rate, currency_table=currency)
 
         journal = 'aic.journal_id = {} AND'.format(journal_id) if journal_id else ''
 
