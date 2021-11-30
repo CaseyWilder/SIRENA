@@ -861,7 +861,8 @@ class PayPeriod(models.Model):
 {}Please make sure all of them are set in 'Payroll > Configuration > Deduction' and try again.
             """.format(names)))
 
-        bank_account_id = bank_journal_id.default_account_id
+        # Change in v14 -> Credit to Outstanding Payment instead of Bank
+        bank_account_id = bank_journal_id.payment_credit_account_id
         return payroll_journal_id, payroll_expense_id, bank_account_id
 
     def _check_positive_net_pay(self):
