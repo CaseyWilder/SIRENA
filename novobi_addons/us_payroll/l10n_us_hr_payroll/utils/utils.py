@@ -33,7 +33,7 @@ PAYROLL_CONFIDENTIAL_FIELDS = {
     'work_state_pri_allow', 'work_state_sec_allow', 'work_state_add_wh', 'work_filing_status_id',
     'work_county_allow', 'work_county_add_wh', 'work_city_allow', 'work_city_add_wh',
 
-    'salary_amount', 'salary_period', 'calculate_salary_by'
+    'salary_amount', 'salary_period', 'calculate_salary_by', 'pay_rate',
 }
 
 
