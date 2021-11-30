@@ -17,14 +17,13 @@ class DepositSalesOrder(models.Model):
     @api.depends('amount_total', 'deposit_ids', 'deposit_ids.state')
     def _get_deposit_total(self):
         for order in self:
-            deposit_total_signed = sum(order.deposit_ids.mapped('amount_total_signed'))
-            # Convert total deposit to currency of SO using currency date is sales order date
-            deposit_total = order.company_id.currency_id._convert(
-                deposit_total_signed,
+            deposit_total = sum(order.company_id.currency_id._convert(
+                deposit.amount_total_signed,
                 order.currency_id,
                 order.company_id,
-                order.date_order or fields.Date.today()
-            )
+                deposit.date or fields.Date.today()
+            ) for deposit in order.deposit_ids)
+
             order.update({
                 'deposit_total': deposit_total,
                 'deposit_count': len(order.deposit_ids),

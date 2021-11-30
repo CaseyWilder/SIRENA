@@ -109,6 +109,14 @@
             <field name="sequence" eval="10"/>
             <field name="parent_id" ref='account_reports.account_financial_report_equity0'/>
             <field name="level" eval="2"/>
+            <field name="domain" eval="[('account_id.user_type_id', 'in', [
+                ref('account.data_account_type_revenue'),
+                ref('account.data_account_type_other_income'),
+                ref('account.data_account_type_direct_costs'),
+                ref('account.data_account_type_expenses'),
+                ref('account.data_account_type_depreciation'),
+                ref('l10n_us_accounting.data_account_type_other_expense'),
+            ])]" />
         </record>
 
         <!-- Capital and Distribution -->
