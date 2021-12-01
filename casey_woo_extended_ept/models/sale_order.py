@@ -43,7 +43,7 @@ class SaleOrder(models.Model):
                 tracking_data = []
                 for picking_id in pickings.filtered(
                         lambda x: x.state == "done"):
-                    if picking_id.carrier_id.delivery_type and picking_id.carrier_tracking_ref:
+                    if picking_id.delivery_carrier_id.delivery_type and picking_id.carrier_tracking_ref:
                         tracking_data.append({'tracking_provider': picking_id.delivery_carrier_id.delivery_type,
                                               'tracking_number': picking_id.carrier_tracking_ref,
                                               'date_shipped': str(picking_id.date_done)})
