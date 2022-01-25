@@ -131,11 +131,11 @@ class BankReconciliationData(models.Model):
                     (
                         aml.journal_id = %s 
                         AND (
-                            (aml.account_id IN %s AND aml.payment_id IS NOT NULL AND aml.reconciled = TRUE) 
-                            OR (aml.account_id IN %s AND aml.batch_fund_line_id IS NOT NULL AND aml.reconciled = TRUE)
+                            (aml.account_id IN %s AND aml.batch_fund_line_id IS NOT NULL AND aml.reconciled = TRUE)
                             OR (aml.account_id NOT IN %s AND aml.statement_line_id IS NOT NULL)
                         )
-                    ) 
+                    )
+                    OR (aml.account_id IN %s AND aml.statement_line_id IS NULL AND aml.reconciled = TRUE) 
                     OR (aml.account_id = %s AND aml.statement_line_id IS NULL)
                 )
         """
@@ -150,7 +150,7 @@ class BankReconciliationData(models.Model):
         sql = sql.format(date_condition=date_condition)
 
         self.env.cr.execute(sql, [statement_ending_date, journal_id.id, tuple(outstanding_account_ids),
-                                  tuple(outstanding_account_ids), tuple(exclude_account_ids), bank_account_id])
+                                  tuple(exclude_account_ids), tuple(outstanding_account_ids), bank_account_id])
 
         aml_ids = [res[0] for res in self.env.cr.fetchall()]
         return self.env['account.move.line'].browse(aml_ids)

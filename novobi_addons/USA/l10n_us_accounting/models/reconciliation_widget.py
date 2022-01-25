@@ -96,24 +96,25 @@ class AccountReconciliation(models.AbstractModel):
     # -------------------------------------------------------------------------
     # MATCHING CONDITION
     # -------------------------------------------------------------------------
-    def _get_transaction_amount_domain(self, statement_line):
+    def _get_domain_for_transaction_filters(self, statement_line):
         """
-        Helper: get domain for transaction amount filter
-        When bank journal currency is different from company currency. We won't compare transaction amount
-        with statement line amount
+        Helper: Get domain for amount, date and transaction type filters in bank review screen
         """
-        if statement_line.currency_id == statement_line.company_currency_id:
-            domain = [
-                '|',
-                    '&', ('debit', '=', 0), ('credit', '<=', -statement_line.amount),
-                    '&', ('credit', '=', 0), ('debit', '<=', statement_line.amount),
-            ]
-        else:
-            rounding = statement_line.currency_id.rounding
-            if float_compare(statement_line.amount, 0, precision_rounding=rounding) < 0:
-                domain = [('debit', '=', 0)]
+        domain = []
+        company = statement_line.company_id or statement_line.journal_id.company_id
+        is_negative_statement_line = statement_line.currency_id.compare_amounts(statement_line.amount, 0) < 0
+        if company.bank_review_date_filter:
+            domain += [('date', '<=', statement_line.date)]
+        if company.bank_review_transaction_type_filter:
+            if is_negative_statement_line:
+                domain += [('debit', '=', 0)]
             else:
-                domain = [('credit', '=', 0)]
+                domain += [('credit', '=', 0)]
+        if company.bank_review_amount_filter:
+            if is_negative_statement_line:
+                domain += [('credit', '<=', -statement_line.amount), ('debit', '<=', -statement_line.amount)]
+            else:
+                domain += [('debit', '<=', statement_line.amount), ('credit', '<=', statement_line.amount)]
 
         return domain
 
@@ -127,8 +128,7 @@ class AccountReconciliation(models.AbstractModel):
         - Transactions' amount <= BSLs' amount
         - Same Payee (OOTB)
         """
-        domain = domain + [('date', '<=', statement_line.date)] + self._get_transaction_amount_domain(statement_line)
-
+        domain = domain + self._get_domain_for_transaction_filters(statement_line)
 
         return super(AccountReconciliation, self)._get_query_reconciliation_widget_customer_vendor_matching_lines(statement_line, domain)
 
@@ -146,8 +146,9 @@ class AccountReconciliation(models.AbstractModel):
                                                                  ('type', 'in', ['bank', 'cash'])])
         liquidity_account_ids = liquidity_journals.mapped('payment_credit_account_id.id') +\
                                 liquidity_journals.mapped('payment_debit_account_id.id')
-        domain = domain + [('account_id.id', 'not in', liquidity_account_ids), ('date', '<=', statement_line.date)]\
-                 + self._get_transaction_amount_domain(statement_line)
+  
+        domain = domain + [('account_id.id', 'not in', liquidity_account_ids)] \
+                 + self._get_domain_for_transaction_filters(statement_line)
 
         return super(AccountReconciliation, self)._get_query_reconciliation_widget_miscellaneous_matching_lines(statement_line, domain)
 
