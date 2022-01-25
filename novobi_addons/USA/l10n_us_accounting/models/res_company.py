@@ -22,3 +22,8 @@ class ResCompany(models.Model):
         default=0.25,
         help="Adjust the margins of generated 1099 report to make it fit your printer's settings.",
     )
+
+    # Bank Review screen settings
+    bank_review_amount_filter = fields.Boolean(string='Amount Filter', default=True)
+    bank_review_date_filter = fields.Boolean(string='Date Filter', default=True)
+    bank_review_transaction_type_filter = fields.Boolean(string='Transaction Type Filter', default=True)

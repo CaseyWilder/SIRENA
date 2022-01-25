@@ -51,6 +51,8 @@
             <!--Allow user to select open transactions when creating new payment-->
             <xpath expr="//field[@name='payment_ids']/form/group" position="after">
                 <field name="available_move_line_ids" invisible="1"/>
+                <field name="available_partner_bank_ids" invisible="1"/>
+                <field name="available_payment_method_ids" invisible="1"/>
 
                 <notebook name="open_trans" attrs="{'invisible': [('available_move_line_ids', '=', []), ('payment_line_ids', '=', [])]}">
                     <page string="Open Transactions">

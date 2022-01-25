@@ -21,7 +21,8 @@
                  <field name="is_billable" attrs="{'column_invisible': [('parent.is_billable', '=', False)]}" />
                  <field name="billable_expense_customer_id" invisible="1"/>
                  <field name="invoiced_to_id" invisible="1"/>
-                 <widget name="billable_expense_widget" width="0.1"/>
+                 <field name="parent_state" invisible="1"/>
+                 <widget attrs="{'invisible': [('parent_state', '!=', 'posted')]}" name="billable_expense_widget" width="0.1"/>
             </xpath>
 
             <xpath expr="//notebook/page/field/form/sheet/group/field[@name='company_id']" position="after">

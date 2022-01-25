@@ -150,7 +150,7 @@ odoo.define("account_budget_spreadsheet.inherit_spreadsheet", function (require)
         updateCell(sheet, col, row, data) {
             const nbspRegexp = new RegExp(String.fromCharCode(160), "g");
             const _sheet = this.workbook.sheets[sheet];
-            if (row >= _sheet.rows.length) {
+            if (row >= _sheet.rows.length){
                 return;
             }
             const current = _sheet.rows[row].cells[col];
