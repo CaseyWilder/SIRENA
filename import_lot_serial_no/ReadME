@@ -1,0 +1,17 @@
+14.0.0.1 (12-11-2020) => if given lot number all integer then it's taken as a float values fixed issue.
+14.0.0.2 (1-4-2021) => solve the Issue When trying to import picking with lot number and serial number and in its content. (i.e  NK3ST003 (22.5) and it shows to NK3ST003 (22
+
+Version 14.0.0.3 : (09-08-21)
+		- Solved import lot issue.
+
+Version 14.0.0.4 : (11-08-21)
+		- Solved issue of string type lot import.
+	
+Version 14.0.0.5 : (16-08-21)
+		- Update code for import serial number products.
+	
+14.0.0.6 ==>made option of import lot/serial invisibled in delivery order
+
+14.0.0.7 ==>fixed issue of reservation for imported lot/serial in internal transfer.
+
+14.0.0.8 : (13-4-2022) : Added import sample file download functionality.
