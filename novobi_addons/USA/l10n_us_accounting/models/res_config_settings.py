@@ -27,3 +27,11 @@ class ResConfigSettingsUSA(models.TransientModel):
         readonly=False,
         help="Adjust the margins of generated 1099 report to make it fit your printer's settings."
     )
+
+    # Bank Review screen settings
+    bank_review_amount_filter = fields.Boolean(string='Amount Filter', related='company_id.bank_review_amount_filter',
+                                               readonly=False)
+    bank_review_date_filter = fields.Boolean(string='Date Filter', related='company_id.bank_review_date_filter',
+                                             readonly=False)
+    bank_review_transaction_type_filter = fields.Boolean(string='Transaction Type Filter', readonly=False,
+                                                         related='company_id.bank_review_transaction_type_filter',)

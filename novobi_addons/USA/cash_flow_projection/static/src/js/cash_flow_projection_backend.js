@@ -93,14 +93,16 @@ odoo.define('cash_flow_projection.cash_flow_projection_report', function (requir
         },
         on_cash_in_change: function (e) {
             var self = this;
+            var reloadFromServer = true;
             if (e) {
                 try {
                     var change_value = field_utils.parse.float(e.currentTarget.value);
-                    e.currentTarget.value = String(change_value.toFixed(2));
+                    e.currentTarget.value = String(self.numberWithCommas(change_value.toFixed(2), true));
                     this.save_user_values(e);
                 } catch (error) {
                     return this.do_warn(_t("Wrong value entered!"), error);
                 }
+                reloadFromServer = false;
             }
 
             var myTable = self.$('#projection_table')[0];
@@ -125,12 +127,12 @@ odoo.define('cash_flow_projection.cash_flow_projection_report', function (requir
                         var value;
                         if (firstChild instanceof HTMLInputElement && firstChild.type == 'text') {
                             value = firstChild.value;
-                            firstChild.value = self.numberWithCommas(value);
+                            firstChild.value = self.numberWithCommas(value, reloadFromServer);
                         } else {
                             value = firstChild.nodeValue;
-                            firstChild.nodeValue = self.numberWithCommas(value);
+                            firstChild.nodeValue = self.numberWithCommas(value, reloadFromServer);
                         }
-                        total_cash_in_amount += field_utils.parse.float(self.numberWithCommas(value));
+                        total_cash_in_amount += field_utils.parse.float(self.numberWithCommas(value, reloadFromServer));
                     } catch (error) {
                         return this.do_warn(_t("Wrong value entered!"), error);
                     }
@@ -141,12 +143,12 @@ odoo.define('cash_flow_projection.cash_flow_projection_report', function (requir
                         var value;
                         if (firstChild instanceof HTMLInputElement && firstChild.type == 'text') {
                             value = firstChild.value;
-                            firstChild.value = self.numberWithCommas(value);
+                            firstChild.value = self.numberWithCommas(value, reloadFromServer);
                         } else {
                             value = firstChild.nodeValue;
-                            firstChild.nodeValue = self.numberWithCommas(value);
+                            firstChild.nodeValue = self.numberWithCommas(value, reloadFromServer);
                         }
-                        total_cash_out_amount += field_utils.parse.float(self.numberWithCommas(value));
+                        total_cash_out_amount += field_utils.parse.float(self.numberWithCommas(value, reloadFromServer));
                     } catch (error) {
                         return this.do_warn(_t("Wrong value entered!"), error);
                     }
@@ -156,14 +158,14 @@ odoo.define('cash_flow_projection.cash_flow_projection_report', function (requir
                     opening_balances.cells[col].innerHTML = "<strong>0.00</strong>";
                 } else {
                     forward_balances.cells[col].innerHTML = "<strong>0.00</strong>";
-                    opening_balances.cells[col].innerHTML = `<strong>${self.numberWithCommas(opening_balances.cells[col].innerText)}</strong>`;
+                    opening_balances.cells[col].innerHTML = `<strong>${self.numberWithCommas(opening_balances.cells[col].innerText, reloadFromServer)}</strong>`;
                 }
                 var opening_balance_amount = field_utils.parse.float(opening_balances.cells[col].innerText);
                 var opening_forward_amount = field_utils.parse.float(forward_balances.cells[col].innerText);
-                total_cash_in.cells[col].innerHTML = `<strong>${String(self.numberWithCommas(total_cash_in_amount.toFixed(2)))}</strong>`;
-                total_cash_out.cells[col].innerHTML = `<strong>${String(self.numberWithCommas(total_cash_out_amount.toFixed(2)))}</strong>`;
+                total_cash_in.cells[col].innerHTML = `<strong>${String(self.numberWithCommas(total_cash_in_amount.toFixed(2), true))}</strong>`;
+                total_cash_out.cells[col].innerHTML = `<strong>${String(self.numberWithCommas(total_cash_out_amount.toFixed(2), true))}</strong>`;
                 var cash_flow_amount = opening_balance_amount + opening_forward_amount + total_cash_in_amount - total_cash_out_amount;
-                cash_flow.cells[col].innerHTML = `<strong>${self.numberWithCommas(cash_flow_amount.toFixed(2))}</strong>`;
+                cash_flow.cells[col].innerHTML = `<strong>${self.numberWithCommas(cash_flow_amount.toFixed(2), true)}</strong>`;
                 // cash_flow.cells[col].style.backgroundColor = cash_flow_amount >= 0 ? "#4169E1" : "#FA8072";
                 cash_flow.cells[col].style.color = cash_flow_amount >= 0 ? "#0000FF" : "#FF0000";
                 // closing_balances.cells[col].innerHTML = `<strong>${String(self.numberWithCommas((field_utils.parse.float(opening_balances.cells[col].innerText) + total_cash_in_amount - total_cash_out_amount).toFixed(2)))}</strong>`;
@@ -180,7 +182,9 @@ odoo.define('cash_flow_projection.cash_flow_projection_report', function (requir
             })
                 .then(function (editable) {
                     if (editable && !(e.currentTarget.firstChild instanceof HTMLInputElement)) {
-                        e.currentTarget.innerHTML = `<input type='text' class='o_cash_in_input_cell text-right input-number-cell' value='${field_utils.parse.float(e.currentTarget.firstChild.nodeValue).toFixed(2)}'/>`;
+                        var nodeValue = field_utils.parse.float(e.currentTarget.firstChild.nodeValue).toFixed(2);
+                        nodeValue = self.numberWithCommas(nodeValue,true);
+                        e.currentTarget.innerHTML = `<input type='text' class='o_cash_in_input_cell text-right input-number-cell' value='${nodeValue}'/>`;
                     } else if (!editable) {
                         var period = self.period;
                         var period_name = $(e.currentTarget).data('period');
@@ -226,14 +230,28 @@ odoo.define('cash_flow_projection.cash_flow_projection_report', function (requir
             };
             return this.do_action(act);
         },
-        numberWithCommas: function (x) {
+        numberWithCommas: function (x, fromServerFormat=false) {
+            /*
+            * field_utils.parse.float can parse numbers whose format is defined in user's language setting
+            * After parsing and rounding, float number has format: 1000.00
+            * Convert this number to string with the format in user's language setting
+            * */
             var thousandSeparator = this.thousand_separator;
             var decimalSeparator = this.decimal_separator;
-            var stringValue = x.trim().toString().replace(/,/g, "");
-            stringValue = stringValue.replace('.', decimalSeparator);
+
+            if (fromServerFormat) {
+                var stringValue = x.trim().toString().replace(/,/g, '');
+                stringValue = stringValue.replace('.', decimalSeparator);
+                var number = field_utils.parse.float(stringValue).toFixed(2);
+                number = number.replace('.', decimalSeparator);
+                return thousandSeparator && number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, thousandSeparator) || number;
+            }
+
+            var thousandSeparatorPattern = new RegExp(`/${thousandSeparator}/`, 'g');
+            var stringValue = x.trim().toString().replace(thousandSeparatorPattern, '');
             var number = field_utils.parse.float(stringValue).toFixed(2);
-            number = number.replace('.', decimalSeparator)
-            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, thousandSeparator);
+            number = number.replace('.', decimalSeparator);
+            return thousandSeparator && number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, thousandSeparator) || number;
         },
         export_xlsx: function () {
             var self = this;

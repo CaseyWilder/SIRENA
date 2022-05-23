@@ -8,10 +8,7 @@ odoo.define('account_budget_spreadsheet.BudgetSpreadsheetWidget', function (requ
 
     var Widget = require('web.Widget');
     var widget_registry = require('web.widget_registry');
-    const {relativeToAbsolute, fetchCache, getCells} = require("documents_spreadsheet.pivot_utils");
-    const spreadsheet_utils = require("account_budget_spreadsheet.o_spreadsheet_utils");
-    const {_parse} = spreadsheet_utils
-    const {astToFormula} = require("documents_spreadsheet.spreadsheet")
+    const {relativeToAbsolute, getCells, convertFormulas, convertPivotFormulas, pivotFormulaRegex} = require("documents_spreadsheet.pivot_utils");
     const {Model} = require("documents_spreadsheet.spreadsheet");
     const core = require('web.core');
     var _t = core._t;
@@ -21,26 +18,7 @@ odoo.define('account_budget_spreadsheet.BudgetSpreadsheetWidget', function (requ
             events: _.extend({}, Widget.prototype.events, {
                 '.create_new_spreadsheet': '_createSpreadsheet'
             }),
-            convertFormulas: function convertFormulas(cells, convertFunction, ...args) {
-
-                cells.forEach((cell) => {
-                    const ast = convertFunction(_parse(cell.content), ...args);
-                    cell.content = ast ? `=${astToFormula(ast)}` : "";
-                });
-            },
-            convertPivotFormulas: async function convertPivotFormulas(rpc, cells, convertFunction, pivots, ...args) {
-                const self = this;
-                if (!pivots || pivots.length === 0) return;
-                await Promise.all(Object.values(pivots).map((pivot) => fetchCache(pivot, rpc)));
-                self.convertFormulas(cells, convertFunction, pivots, ...args);
-                Object.values(pivots).forEach((pivot) => {
-                    pivot.cache = undefined;
-                    pivot.lastUpdate = undefined;
-                    pivot.isLoaded = false;
-                })
-            },
             _removeInvalidPivotRows: function _removeInvalidPivotRows(rpc, data) {
-                const self = this;
                 const model = new Model(data, {
                     mode: "headless",
                     evalContext: {
@@ -54,7 +32,7 @@ odoo.define('account_budget_spreadsheet.BudgetSpreadsheetWidget', function (requ
                     for (let rowIndex = 0; rowIndex < model.getters.getNumberRows(sheet.id); rowIndex++) {
                         const {cells} = model.getters.getRow(sheet.id, rowIndex);
                         const [valid, invalid] = Object.values(cells)
-                            .filter((cell) => /^\s*=.*PIVOT/.test(cell.content))
+                            .filter((cell) => pivotFormulaRegex.test(cell.content))
                             .reduce(
                                 ([valid, invalid], cell) => {
                                     const isInvalid = /^\s*=.*PIVOT(\.HEADER)?.*#IDNOTFOUND/.test(cell.content);
@@ -69,7 +47,7 @@ odoo.define('account_budget_spreadsheet.BudgetSpreadsheetWidget', function (requ
                     model.dispatch("REMOVE_ROWS", {rows: invalidRows, sheet: sheet.id});
                 }
                 data = model.exportData();
-                self.convertFormulas(
+                convertFormulas(
                     getCells(data, /^\s*=.*PIVOT.*#IDNOTFOUND/),
                     () => null,
                 );
@@ -84,7 +62,7 @@ odoo.define('account_budget_spreadsheet.BudgetSpreadsheetWidget', function (requ
                 });
                 data = JSON.parse(atob(data));
                 const {pivots} = data;
-                await self.convertPivotFormulas(rpc, getCells(data, /^\s*=.*PIVOT/), relativeToAbsolute, pivots);
+                await convertPivotFormulas(rpc, getCells(data, /^\s*=.*PIVOT/), relativeToAbsolute, pivots);
                 return self._removeInvalidPivotRows(rpc, data);
             }
             ,
@@ -110,7 +88,7 @@ odoo.define('account_budget_spreadsheet.BudgetSpreadsheetWidget', function (requ
             ,
             _createSpreadsheet(data) {
                 const {name, report_type, period_type, year, analytic_account_id, create_budget_from_last_year} = data;
-                if (name === false){
+                if (name === false) {
                     return this.do_warn(_t("Warning"), 'Name must be required');
                 }
                 let analytic_account = false;

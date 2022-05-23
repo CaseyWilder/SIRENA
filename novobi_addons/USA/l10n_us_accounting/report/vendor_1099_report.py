@@ -243,18 +243,22 @@ class report_vendor_1099(models.AbstractModel):
             company = self.env.company.partner_id
             partners[0].update({
                 'payer_name': company.name,
-                'payer_street_address': '{} {}'.format(company.street, company.street2),
+                'payer_street_address': '{} {}'.format(company.street, company.street2 or ''),
                 'payer_city_address': '{}, {} {}'.format(company.city, company.state_id.code, company.zip),
-                'recipient_tin': 'SSN or EIN',
+                'payer_tin': company.vat,
                 'total_balance': self.format_value(partners[0]['total_balance'])
             })
         return partners
 
     def print_report_1099(self, options, params=None):
+        """
+        1099 form has three copies A, B and C
+        Use data argument of report_action to pass the copy type when rendering report template
+        If using this argument, "docs" in report template becomes empty recordset => need to pass "docids" and browse it when rendering
+        """
         self = self.browse(params.get('id'))[0]
         action_report_1099 = self.env.ref('l10n_us_accounting.action_print_report_1099')
-
-        return action_report_1099.report_action(self.id)
+        return action_report_1099.report_action(self.id, data={'copy': params.get('copy'), 'docids': self.ids})
 
     def _get_report_filename(self):
         self.ensure_one()

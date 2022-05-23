@@ -52,6 +52,49 @@
                     </div>
                 </div>
             </div>
+
+            <div id="bank_cash" position="after">
+                <h2>Bank Reconciliation</h2>
+                <div class="row mt16 o_settings_container" id="bank_reconciliation">
+                    <!--Options to filter transactions in bank review screen-->
+
+                    <div class="col-12 col-lg-6 o_setting_box" id="amount_filter">
+                        <div class="o_setting_left_pane">
+                            <field name="bank_review_amount_filter" widget="upgrade_boolean"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="bank_review_amount_filter"/>
+                            <div class="text-muted">
+                                Only show transactions whose amount is less than or equal to bank statement line amount in bank review screen
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-6 o_setting_box" id="date_filter">
+                        <div class="o_setting_left_pane">
+                            <field name="bank_review_date_filter" widget="upgrade_boolean"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="bank_review_date_filter"/>
+                            <div class="text-muted">
+                                Only show transactions whose date is less than or equal to bank statement line date in bank review screen
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-6 o_setting_box" id="transaction_type_filter">
+                        <div class="o_setting_left_pane">
+                            <field name="bank_review_transaction_type_filter" widget="upgrade_boolean"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="bank_review_transaction_type_filter"/>
+                            <div class="text-muted">
+                                Only show transactions whose type is the same with bank statement line type in bank review screen
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </field>
     </record>
 </odoo>
