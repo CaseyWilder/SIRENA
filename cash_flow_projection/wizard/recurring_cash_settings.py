@@ -17,7 +17,7 @@ class PeriodSettings(models.TransientModel):
                                    selection=[('day', 'day'), ('week', 'week'), ('month', 'month')],
                                    default='month', required=True)
     cash_type = fields.Selection(string='Cash Type', selection=[('cash_in', 'Cash In'), ('cash_out', 'Cash Out')])
-    company_id = fields.Many2one('res.company', string='Company')
+    company_id = fields.Many2one('res.company', string='Company', domain="[('id', 'in', allowed_company_ids)]")
 
     @api.onchange('company_id')
     def _onchange_company_id(self):

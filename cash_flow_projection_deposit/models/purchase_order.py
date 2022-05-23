@@ -23,8 +23,19 @@ class PurchaseOrder(models.Model):
             order_sudo = order.sudo()
             deposit_ids = order_sudo.deposit_ids.filtered(lambda d: d.state not in ('draft', 'cancelled'))
             deposit_move_line_ids = [deposit_id.line_ids.filtered(lambda l: l.debit) for deposit_id in deposit_ids]
-            order.residual_deposit_amount = sum(line.amount_residual for line in deposit_move_line_ids)
-    
+            residual_deposit_amount = 0.0
+            company = order.company_id
+            for line in deposit_move_line_ids:
+                amount_residual = line.amount_residual
+                amount_residual_currency = company.currency_id._convert(
+                    amount_residual,
+                    order.currency_id,
+                    order.company_id,
+                    line.move_id.date,
+                )
+                residual_deposit_amount += amount_residual_currency
+            order.residual_deposit_amount = residual_deposit_amount
+
     @api.depends('amount_total', 'invoice_ids', 'order_line.invoice_lines.move_id.state', 'residual_deposit_amount')
     def _get_remaining_so_amount(self):
         """

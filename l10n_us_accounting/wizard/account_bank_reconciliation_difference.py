@@ -41,6 +41,18 @@ class BankReconciliationDifference(models.TransientModel):
         # create journal entry
         difference = self.bank_reconciliation_data_id.difference
         journal_id = self.bank_reconciliation_data_id.journal_id
+        company_currency = journal_id.company_id.currency_id
+        currency = journal_id.currency_id or company_currency
+        if currency != company_currency:
+            # Convert difference into journal currency
+            difference_in_currency = company_currency._convert(
+                difference,
+                currency,
+                journal_id.company_id,
+                self.adjustment_date or fields.Date.today()
+            )
+        else:
+            difference_in_currency = difference
 
         debit_account, credit_account = self._get_account_side(journal_id, difference)
 
@@ -50,16 +62,20 @@ class BankReconciliationDifference(models.TransientModel):
                     'account_id': debit_account.id,
                     'debit': abs(difference),
                     'credit': 0,
+                    'amount_currency': abs(difference_in_currency),
                     'date': self.adjustment_date,
                     'name': 'Reconciliation Discrepancy',
                     'bank_reconciled': True,
+                    'currency_id': currency.id
                 }), (0, 0, {
                     'account_id': credit_account.id,
                     'debit': 0,
                     'credit': abs(difference),
+                    'amount_currency': -abs(difference_in_currency),
                     'date': self.adjustment_date,
                     'name': 'Reconciliation Discrepancy',
                     'bank_reconciled': True,
+                    'currency_id': currency.id
                 })],
             'date': self.adjustment_date,
             'ref': 'Reconciliation Discrepancy',

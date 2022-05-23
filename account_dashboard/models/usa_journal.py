@@ -46,13 +46,17 @@ VENDOR_BILLS = 'purchase'
 
 GRAPH_CONFIG = {
     PROFIT_LOSS: {'type': 'bar', 'function': 'retrieve_profit_and_loss', 'periods': 'period_by_month',
-                  'action': {'action_name': "account_reports.account_financial_html_report_action_1"}},
+                  'action': {'name': 'Profit and Loss', 'type': 'ir.actions.client', 'tag': 'account_report',
+                             'report_xml_id': 'account_reports.account_financial_report_profitandloss0',
+                             'context': {'model': 'account.financial.html.report'}},
+                  },
     INVOICE: {'type': 'line', 'function': 'retrieve_untaxed_total_amount_invoice', 'periods': 'period_by_complex',
               'action': {'action_name': 'account.action_move_out_invoice_type',
                          'domain': [('move_type', '=', 'out_invoice')],
-                         'context': {'search_default_posted': 1}}},
+                         'context': {'search_default_posted': 1, 'default_move_type': 'out_invoice'}}},
     CASH: {'type': 'bar', 'function': 'retrieve_cash', 'periods': 'period_by_complex',
-           'action': {'action_name': 'account_reports.action_account_report_cs'}},
+           'action': {'name': 'Cash Flow Statement', 'type': 'ir.actions.client', 'tag': 'account_report',
+                      'context': {'model': 'account.cash.flow.report'}}},
     CASH_FORECAST: {'type': 'bar', 'function': 'retrieve_cash_forecast', 'periods': 'period_by_month',
                     'action': None}
 }
@@ -135,6 +139,13 @@ class USAJournal(models.Model):
         self.ensure_one()
         action_name = self._context.get('action_name', False)
         if not action_name:
+            if self.type in (PROFIT_LOSS, CASH):
+                client_action = GRAPH_CONFIG[self.type]['action']
+                report_xml_id = client_action.get('report_xml_id', False)
+                if report_xml_id:
+                    report = self.env.ref(report_xml_id)
+                    client_action['context'].update({'id': report.id})
+                return GRAPH_CONFIG[self.type]['action']
             action_name = GRAPH_CONFIG[self.type]['action']['action_name']
             domain = GRAPH_CONFIG[self.type]['action'].get('domain', "")
             context = GRAPH_CONFIG[self.type]['action'].get('context', {})
@@ -147,7 +158,8 @@ class USAJournal(models.Model):
 
     def action_recurring_amount(self):
         self.ensure_one()
-        action = self.env["ir.actions.actions"]._for_xml_id('account_dashboard.usa_journal_recurring_payment_view_action')
+        action = self.env["ir.actions.actions"]._for_xml_id(
+            'account_dashboard.usa_journal_recurring_payment_view_action')
         action['res_id'] = self.id
         return action
 
@@ -255,8 +267,8 @@ class USAJournal(models.Model):
 
         # Data for chart js
         graph_data = [
-            get_barchart_format(self,income_values[0], _('Income'), COLOR_INCOME),
-            get_barchart_format(self,expense_values[0], _('Expenses'), COLOR_EXPENSE),
+            get_barchart_format(self, income_values[0], _('Income'), COLOR_INCOME),
+            get_barchart_format(self, expense_values[0], _('Expenses'), COLOR_EXPENSE),
         ]
 
         info_data = [
@@ -373,8 +385,8 @@ class USAJournal(models.Model):
                                                                           period_type=period_type,
                                                                           chart_name=INVOICE)
         graph_data = [
-            get_linechart_format(self,data=data_list[0], label=_('Sales'), color=COLOR_SALE_PAST),
-            get_linechart_format(self,data=data_list[1], label=_('Future'), color=COLOR_SALE_FUTURE),
+            get_linechart_format(self, data=data_list[0], label=_('Sales'), color=COLOR_SALE_PAST),
+            get_linechart_format(self, data=data_list[1], label=_('Future'), color=COLOR_SALE_FUTURE),
         ]
 
         info_data = [get_info_data(self, _('Total Untaxed Amount'), total_sales)]
@@ -442,9 +454,9 @@ class USAJournal(models.Model):
         # Create chart data
         # Line chart must be on top of bar chart, so put it first and reverse the order of chart's legend
         graph_data = [
-            get_linechart_format(self,data_list[2], _('Net cash'), COLOR_NET_CASH),
-            get_barchart_format(self,data_list[1], _('Cash out'), COLOR_CASH_OUT, order=1),
-            get_barchart_format(self,data_list[0], _('Cash in'), COLOR_CASH_IN, order=2),
+            get_linechart_format(self, data_list[2], _('Net cash'), COLOR_NET_CASH),
+            get_barchart_format(self, data_list[1], _('Cash out'), COLOR_CASH_OUT, order=1),
+            get_barchart_format(self, data_list[0], _('Cash in'), COLOR_CASH_IN, order=2),
         ]
 
         # Create info to show in head of chart
@@ -473,9 +485,9 @@ class USAJournal(models.Model):
         graph_label = [0]
 
         graph_data = [
-            get_linechart_format(self,data_list[2], _('Balance'), COLOR_PROJECTED_BALANCE, order=2),
-            get_barchart_format(self,data_list[1], _('Projected Cash out'), COLOR_PROJECTED_CASH_OUT),
-            get_barchart_format(self,data_list[0], _('Projected Cash in'), COLOR_PROJECTED_CASH_IN, order=1),
+            get_linechart_format(self, data_list[2], _('Balance'), COLOR_PROJECTED_BALANCE, order=2),
+            get_barchart_format(self, data_list[1], _('Projected Cash out'), COLOR_PROJECTED_CASH_OUT),
+            get_barchart_format(self, data_list[0], _('Projected Cash in'), COLOR_PROJECTED_CASH_IN, order=1),
         ]
 
         info_data = [
