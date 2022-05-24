@@ -1,0 +1,139 @@
+.report_1099_page {
+    position: relative;
+    font-size: 10pt;
+    width: 9.6in!important;
+    zoom: 1.25;
+    margin-left: -15px;
+    margin-right: -15px;
+
+    &:after {
+        display: block;
+        content: ".";
+        width: 9.6in;
+        visibility: hidden;
+    }
+
+    .report_1099_form_content > * {
+        position: absolute;
+        white-space: nowrap;
+    }
+
+    .report_1099_form_content {
+        .payer_address {
+            left: 0.38in;
+            overflow: hidden;
+            white-space: normal;
+            width: 3.8in;
+            height: 1.25in;
+        }
+
+        .total_balance {
+            left: 4.5in;
+        }
+
+        .payer_tin {
+            left: 0.38in;
+            width: 2in;
+        }
+
+        .partner_ssn {
+            left: 2.435in;
+            width: 2in;
+        }
+
+        .recipient_address.copy_a .partner_name,
+        .recipient_address.copy_a .partner_street_address_print,
+        .recipient_address.copy_a .partner_city_address_print {
+            position: absolute;
+            left: 0.38in;
+            overflow: hidden;
+            white-space: normal;
+            width: 3.8in;
+            height: 1.25in;
+        }
+    }
+
+    .first_form .report_1099_form_content {
+        .payer_address {
+            top: 0.8in;
+        }
+
+        .total_balance {
+            top: 1.65in;
+        }
+
+        .payer_tin {
+            top: 2.1in;
+        }
+
+        .partner_ssn {
+            top: 2.1in;
+        }
+
+        // Copy A
+        .recipient_address.copy_a .partner_name {
+            top: 2.8in;
+        }
+
+        .recipient_address.copy_a .partner_street_address_print {
+            top: 3.4in;
+        }
+
+        .recipient_address.copy_a .partner_city_address_print {
+            top: 4in;
+        }
+
+        // Copy B, C
+        .recipient_address.copy_b,
+        .recipient_address.copy_c {
+            top: 3in;
+            left: 0.38in;
+            overflow: hidden;
+            white-space: normal;
+            width: 3.8in;
+            height: 1.25in;
+        }
+    }
+
+    .second_form .report_1099_form_content {
+        .payer_address {
+            top: 7.1in;
+        }
+
+        .total_balance {
+            top: 8in;
+        }
+
+        .payer_tin {
+            top: 8.5in;
+        }
+
+        .partner_ssn {
+            top: 8.5in;
+        }
+
+        // Copy A
+        .recipient_address.copy_a .partner_name {
+            top: 9.2in;
+        }
+
+        .recipient_address.copy_a .partner_street_address_print {
+            top: 9.8in;
+        }
+
+        .recipient_address.copy_a .partner_city_address_print {
+            top: 10.3in;
+        }
+
+        // Copy B, C
+        .recipient_address.copy_b,
+        .recipient_address.copy_c {
+            top: 9.3in;
+            left: 0.38in;
+            overflow: hidden;
+            white-space: normal;
+            width: 3.8in;
+            height: 1.25in;
+        }
+    }
+}
