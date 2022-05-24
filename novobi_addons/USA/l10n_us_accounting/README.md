@@ -1,2 +1,0 @@
-# USA
-US Accounting
