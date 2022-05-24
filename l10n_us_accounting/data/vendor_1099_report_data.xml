@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="paperformat_report_1099" model="report.paperformat">
+            <field name="name">US 1099 Report</field>
+            <field name="default" eval="False"/>
+            <field name="format">Letter</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">0</field>
+            <field name="margin_bottom">0</field>
+            <field name="margin_left">0</field>
+            <field name="margin_right">0</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">0</field>
+            <field name="dpi">90</field>
+        </record>
+
+        <record id="action_print_report_1099" model="ir.actions.report">
+            <field name="name">Print Report 1099</field>
+            <field name="model">vendor.1099.report</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">l10n_us_accounting.report_1099_form_template</field>
+            <field name="report_file">l10n_us_accounting.report_1099_form_template</field>
+            <field name="print_report_name">(object._get_report_filename())</field>
+            <field name="paperformat_id" ref="l10n_us_accounting.paperformat_report_1099"/>
+        </record>
+
+        <record id="action_report_vendor_1099" model="ir.actions.client">
+            <field name="name">Vendor 1099 Report</field>
+            <field name="tag">usa_1099_report</field>
+            <field name="context" eval="{'model': 'vendor.1099.report'}"/>
+        </record>
+
+        <menuitem id="menu_action_report_vendor_1099" sequence="20"
+                  name="Vendor 1099 Report" action="action_report_vendor_1099"
+                  parent="account_reports.account_reports_partners_reports_menu"/>
+    </data>
+</odoo>
